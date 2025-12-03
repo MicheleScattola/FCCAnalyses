@@ -801,8 +801,16 @@ RVec<float> confusion_theta(const RVec<RPTruthInfo> &truth, int mc_event,
   RVec<float> out;
 
   for (const auto p : truth) {
-    if (foomc && p.mc_event != mc_event)
-      continue;
+    if (foomc) {
+      if (mc_event >= 0) {
+        if (p.mc_event != mc_event)
+          continue;
+      } else {
+        // looking for background events
+        if (p.mc_event == -mc_event)
+          continue;
+      }
+    }
     if (fooreco && p.reco_event != reco_event)
       continue;
     if (foopdg && abs(p.mc_pdg) != pdg)

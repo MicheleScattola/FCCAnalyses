@@ -1,9 +1,9 @@
 #Optional: List of analysis packages to load in runtime
-analysesList = ['Ztautau']
+#analysesList = ['Ztautau']
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{}
+    'p8_ee_Ztautau_ecm91':{'fraction':0.01},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -12,7 +12,7 @@ processList = {
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
@@ -127,13 +127,13 @@ class RDFanalysis():
 				.Define("myPh","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Photon0,MC_event,event_type_reco)")
 				
 				# photon involved
-				.Define("RhoAsPi_phe","Ztautau::confusion_e(myPh,4,true,3,true,22,true,0)")
-				.Define("OtAsRho_phe","Ztautau::confusion_e(myPh,0,true,4,true,22,true,0)")
-				.Define("RhoAsOt_phe","Ztautau::confusion_e(myPh,4,true,0,true,22,true,0)")
+				#.Define("RhoAsPi_phe","Ztautau::confusion_e(myPh,4,true,3,true,22,true,0)")
+				#.Define("OtAsRho_phe","Ztautau::confusion_e(myPh,0,true,4,true,22,true,0)")
+				#.Define("RhoAsOt_phe","Ztautau::confusion_e(myPh,4,true,0,true,22,true,0)")
 				
-				.Define("RhoAsPi_pht","Ztautau::confusion_theta(myPh,4,true,3,true,22,true)")
-				.Define("RhoAsOt_pht","Ztautau::confusion_theta(myPh,4,true,0,true,22,true)")
-				.Define("OtAsRho_pht","Ztautau::confusion_theta(myPh,0,true,4,true,22,true)")
+				#.Define("RhoAsPi_pht","Ztautau::confusion_theta(myPh,4,true,3,true,22,true)")
+				#.Define("RhoAsOt_pht","Ztautau::confusion_theta(myPh,4,true,0,true,22,true)")
+				#.Define("OtAsRho_pht","Ztautau::confusion_theta(myPh,0,true,4,true,22,true)")
 				
 				
 				# Miss ID as 1prong pions
@@ -141,24 +141,20 @@ class RDFanalysis():
 				.Define("MuAsPi_t","Ztautau::confusion_theta(myPi,1,true,3,true,13,true)")
 				.Define("RhoAsPi_t","Ztautau::confusion_theta(myPi,4,true,3,true,111,false)")
 				.Define("PiAsPi_t","Ztautau::confusion_theta(myPi,3,true,3,true,211,false)")
-				.Define("OtAsPi_t","Ztautau::confusion_theta(myPi,0,true,3,true,211,false)")
-				.Define("ntest","ElAsPi_t.size()")
+				.Define("A1AsPi_t","Ztautau::confusion_theta(myPi,5,true,3,true,211,false)")
+                .Define("OtAsPi_t","Ztautau::confusion_theta(myPi,0,true,3,true,211,false)")
 				
 				.Define("ElAsPi_e","Ztautau::confusion_e(myPi,2,true,3,true,11,true,0)")
 				.Define("MuAsPi_e","Ztautau::confusion_e(myPi,1,true,3,true,13,true,0)")
 				.Define("RhoAsPi_e","Ztautau::confusion_e(myPi,4,true,3,true,111,false,0)")
 				.Define("PiAsPi_e","Ztautau::confusion_e(myPi,3,true,3,true,211,false,0)")
 				.Define("OtAsPi_e","Ztautau::confusion_e(myPi,0,true,3,true,211,false,0)")
-				
-				.Define("myMu_e","Ztautau::truth_e(myMu)")
-				.Define("myMu_ct","Ztautau::truth_costheta(myMu)")
-				.Define("myEl_e","Ztautau::truth_e(myEl)")
-				.Define("myEl_ct","Ztautau::truth_costheta(myEl)")
+                .Define("A1AsPi_e","Ztautau::confusion_e(myPi,5,true,3,true,211,false,0)")
 				
 				  
                 )
 		
-        df2.Display(["myEl_e","myMu_e","MC_event","event_type_reco"],20).Print()
+        #df2.Display(["myEl_e","myMu_e","MC_event","event_type_reco"],20).Print()
         
         return df2
        
@@ -169,27 +165,18 @@ class RDFanalysis():
         branchList = [
         	"MC_event",
         	"event_type_reco",
-        	"RhoAsPi_phe",
-        	"OtAsRho_phe",
-        	"RhoAsOt_phe",
-        	"RhoAsPi_pht",
-        	"RhoAsOt_pht",
-        	"OtAsRho_pht",
         	"ElAsPi_e",
         	"MuAsPi_e",
         	"RhoAsPi_e",
         	"ElAsPi_t",
         	"MuAsPi_t",
         	"RhoAsPi_t",
+            "A1AsPi_e",
+            "A1AsPi_t",
         	"PiAsPi_e",
         	"PiAsPi_t",
         	"OtAsPi_e",
-        	"OtAsPi_t",
-        	"myMu_e",
-        	"myMu_ct",
-        	"myEl_e",
-        	"myEl_ct",
-        	"ntest"
+        	"OtAsPi_t"
         	
         	]
         return branchList
