@@ -38,31 +38,32 @@
     //C1->SetTitle("Miss-ID events: Reco #pi contribution");
     C1->SetGrid();
     C1->cd();
+    TGaxis::SetMaxDigits(3);
     
     mp_e->SetTitle("Reco #pi energy spectrum;Energy_{#pi} [GeV];Entries");
     mp_e->SetLineColor(kMagenta);
-    mp_e->SetLineWidth(1);
+    mp_e->SetLineWidth(2);
     mp_e->Draw("HIST");
     
     ep_e->SetLineColor(kRed);
-    ep_e->SetLineWidth(1);
+    ep_e->SetLineWidth(2);
     ep_e->Draw("HIST SAME");
     
     pp_e->SetLineColor(kGreen+2);
-    pp_e->SetLineWidth(1);
+    pp_e->SetLineWidth(2);
     pp_e->Draw("HIST SAME");
     
     rp_e->SetLineColor(kBlue);
-    rp_e->SetLineWidth(1);
+    rp_e->SetLineWidth(2);
     rp_e->Draw("HIST SAME");
 
-    ap_e->SetLineColor(kAzure);
-    ap_e->SetLineWidth(1);
+    ap_e->SetLineColor(kAzure+10);
+    ap_e->SetLineWidth(2);
     ap_e->Draw("HIST SAME");
     
     op_e->SetLineColor(kGray+3);
-    op_e->SetLineWidth(1);
-    op_2->SetFillColor(kGray+3); 
+    op_e->SetLineWidth(2);
+    op_e->SetFillColor(kGray+3); 
     op_e->Draw("HIST SAME");
     
     // Legend
@@ -83,37 +84,39 @@
     //C2->SetTitle("Miss-ID events: Reco #pi contribution");
     C2->SetGrid();
     C2->cd();
+    TGaxis::SetMaxDigits(3);
     
     rp_t->SetTitle("Reco #pi |cos#theta| ;cos#theta_{#pi};Entries");
     rp_t->SetLineColor(kRed);
-    rp_t->SetLineWidth(1);
+    rp_t->SetLineWidth(2);
     rp_t->Draw("HIST");
     
     mp_t->SetLineColor(kMagenta);
-    mp_t->SetLineWidth(1);
+    mp_t->Add(ep_t);
+    mp_t->SetLineWidth(2);
     mp_t->Draw("HIST SAME");
     
-    ep_t->SetLineColor(kBlue);
-    ep_t->SetLineWidth(1);
-    ep_t->Draw("HIST SAME");
+    //ep_t->SetLineColor(kRed);
+    //ep_t->SetLineWidth(2);
+    //ep_t->Draw("HIST SAME");
     
     pp_t->SetLineColor(kGreen+2);
-    pp_t->SetLineWidth(1);
+    pp_t->SetLineWidth(2);
     pp_t->Draw("HIST SAME");
 
-    ap_t->SetLineColor(kAzure);
-    ap_t->SetLineWidth(1);
+    ap_t->SetLineColor(kAzure+10);
+    ap_t->SetLineWidth(2);
     ap_t->Draw("HIST SAME");
     
     op_t->SetLineColor(kGray+3);
-    op_t->SetLineWidth(1);
+    op_t->SetLineWidth(2);
     op_t->SetFillColor(kGray+3);
     op_t->Draw("HIST SAME");
     
     // Legend
     TLegend* legg1 = new TLegend(0.40,0.60,0.70,0.88);
-    legg1->AddEntry(mp_t, "TrueMC #mu as #pi", "l");
-    legg1->AddEntry(ep_t, "TrueMC e^{#pm} as #pi", "l");
+    legg1->AddEntry(mp_t, "TrueMC lepton as #pi", "l");
+    //legg1->AddEntry(ep_t, "TrueMC e^{#pm} as #pi", "l");
     legg1->AddEntry(pp_t, "TrueMC #pi as #pi", "l");
     legg1->AddEntry(rp_t, "TrueMC #rho as #pi", "l");
     legg1->AddEntry(ap_t, "TrueMC #rho as #pi", "l");

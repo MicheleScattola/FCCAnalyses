@@ -50,9 +50,6 @@ class RDFanalysis():
                 
                 #initial basic cuts
                 .Filter("rps.size()>=2")
-                
-                #MC Event type
-                .Define("MC_event","Ztautau::classify_mc_event(Particle,Particle1)")
 				
 				#####
 				# THRUST
