@@ -277,6 +277,143 @@ RVec<float> study_ph_sum(const RVec<int> &MC_event, const RVec<event> &ev,
   return e;
 }
 
+// NEW RECO EVT STRUCT
+//===================================
+// return event struct
+RVec<myEvent> myget_event(const RVec<int> &mu_ids,
+                      const RVec<int> &el_ids,
+                      const RVec<int> &pi_ids,
+                      const RVec<int> &ph_ids,
+                      const RVec<edm4hep::ReconstructedParticleData> &rps,
+                      const RVec<float> &rps_costheta,
+                      const bool masscheck) {
+
+  // collect particles
+  RVec<edm4hep::ReconstructedParticleData> mu_tot = ReconstructedParticle::get(mu_ids, rps);
+  RVec<edm4hep::ReconstructedParticleData> el_tot = ReconstructedParticle::get(el_ids, rps);
+  RVec<edm4hep::ReconstructedParticleData> pi_tot = ReconstructedParticle::get(pi_ids, rps);
+  RVec<edm4hep::ReconstructedParticleData> ph_tot = ReconstructedParticle::get(ph_ids, rps);    
+
+
+  // cycle on hemisperhes, 0 is positive charge, 1 negative
+  RVec<myEvent> out;
+  bool hemisphere = true;
+
+  for (int i = 0; i < 2; i++) {
+    myEvent ev;
+    
+    // select particles in hemisphere
+    // bool hemisphere starts as true for positive hemi, changing after first loop to false for negative hemi
+    RVec<edm4hep::ReconstructedParticleData> mu = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta, mu_tot);
+    RVec<edm4hep::ReconstructedParticleData> el = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta,  el_tot);
+    RVec<edm4hep::ReconstructedParticleData> pi = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta,  pi_tot);
+    RVec<edm4hep::ReconstructedParticleData> ph = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta,  ph_tot);
+    // fill struct
+    ev.n_mu = mu.size();
+    ev.n_el = el.size();
+    ev.n_pi = pi.size();
+    ev.n_ph = ph.size();
+
+    // lambda helper to fill P4 and add energy & charge
+    auto fill_collection = [&](const auto& input_particles, RVec<PxPyPzMVector>& out_p4) {
+        
+        out_p4.reserve(input_particles.size());
+        
+        for(const auto& p : input_particles) {
+            ev.m_RecoCharge += p.charge;
+            ev.m_RecoEnergy += p.energy;
+
+            out_p4.emplace_back(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
+        }
+    };
+    // fill collections
+    fill_collection(mu, ev.m_muP4);
+    fill_collection(el, ev.m_elP4);
+    fill_collection(pi, ev.m_piP4);
+    fill_collection(ph, ev.m_phP4);
+
+    // event classification
+
+    // Leptonic
+    if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
+        ev.m_type = classify_lep(ev);
+        // TODO: ADD WEIGHT CALCULATION
+        // TODO: ADD OPTIMAL VARIABLE CALCULATION
+    }
+    // Hadronic
+    else if (ev.n_pi == 1 && ev.n_mu == 0 && ev.n_el == 0) {
+        ev.m_type = classify_pion(ev,masscheck);
+        // TODO: ADD WEIGHT CALCULATION
+        // TODO: ADD OPTIMAL VARIABLE CALCULATION
+    }
+    // 3 prong
+    else if (ev.n_pi == 3 && ev.n_mu == 0 && ev.n_el == 0 && ev.n_ph == 0) {
+        // mass limit
+        PxPyPzMVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
+        if (masscheck && p3pi.M() < M_TAU) {
+             ev.m_type = 5; // Type 5: a1 (3-prong mode)
+             // TODO: ADD WEIGHT CALCULATION
+            // TODO: ADD OPTIMAL VARIABLE CALCULATION
+        } else {
+             ev.m_type = 0;
+        }
+    }
+
+    // push back and change hemisphere
+    out.push_back(ev);
+    hemisphere = false;
+  }
+
+  return out;
+}
+
+// ==========================================
+int classify_lep(const myEvent &ev) {
+    // Check MUON: 1 mu, 0 others
+    if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0 && ev.n_ph == 0) {
+        return 1; // Type 1: Muon
+    }
+    // Check ELECTRON: 1 el, 0 others
+    if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0 && ev.n_ph == 0) {
+        return 2; // Type 2: Electron
+    }
+    
+    return 0; 
+}
+
+// ==========================================
+int classify_pion(const myEvent &ev, bool masscheck) {
+    
+    // assuming 1 pi and 0 leptons
+    // total visible P4
+    PxPyPzMVector p4_vis = ev.m_piP4[0];
+    m_pi_e = ev.m_piP4[0].E();
+    for (const auto& ph_p4 : ev.m_phP4) {
+        p4_vis += ph_p4; 
+    }
+    // note: .M() returns invariant mass P4 
+    // also += method always returns a PxPyPzE vector (see ROOT docs)
+    float mass_vis = p4_vis.M();
+
+    // basic limit on tau mass
+    if (masscheck && mass_vis > M_TAU) {
+        return 0; 
+    }
+
+    // classification
+    if (ev.n_ph == 0) {
+        return 3; // Type 3: Single Pion
+    } 
+    else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
+        return 4; // Type 4: Rho (pi + 1-2 gamma)
+    } 
+    else if (ev.n_ph >= 3) {
+        return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
+    }
+
+    return 0;
+}
+
 //===================================
 //===================================
 // KINEMATICS

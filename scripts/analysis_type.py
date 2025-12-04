@@ -109,13 +109,18 @@ class RDFanalysis():
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("event_type_all","Ztautau::get_event( muons,muons_costheta, electrons, electrons_costheta, pions_charged, pi_costheta, photons, photons_costheta,5.)")
-				.Define("event_type_reco","RVec<int> {event_type_all[0].type,event_type_all[1].type}")
+				#.Define("event_type_all","Ztautau::get_event( muons,muons_costheta, electrons, electrons_costheta, pions_charged, pi_costheta, photons, photons_costheta,5.)")
+				#.Define("event_type_reco","RVec<int> {event_type_all[0].type,event_type_all[1].type}")
+                .Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,RP_thrustangle,false)")
+				.Define("event_type_reco","RVec<int> {myEvent[0].m_type,myEvent[1].m_type}")
+                .Define("event_pi_e","RVec<int> {myEvent[0].m_pi_e,myEvent[1].m_pi_e}")
 				
 				#####
 				# MC IDENTIFICATION
 				#####
                 .Define("MC_event","Ztautau::classify_mc_event(Particle,Particle1)")
+                
+				.Define("pi_mask","event_pi_e > 2.0")
 				
 				# my particle collections
 				.Define("myEl","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Electron0,MC_event,event_type_reco)")
@@ -123,14 +128,7 @@ class RDFanalysis():
 				.Define("myPi","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,pions_charged_ids,MC_event,event_type_reco)")
 				.Define("myPh","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Photon0,MC_event,event_type_reco)")
 				
-				# photon involved
-				#.Define("RhoAsPi_phe","Ztautau::confusion_e(myPh,4,true,3,true,22,true,0)")
-				#.Define("OtAsRho_phe","Ztautau::confusion_e(myPh,0,true,4,true,22,true,0)")
-				#.Define("RhoAsOt_phe","Ztautau::confusion_e(myPh,4,true,0,true,22,true,0)")
-				
-				#.Define("RhoAsPi_pht","Ztautau::confusion_theta(myPh,4,true,3,true,22,true)")
-				#.Define("RhoAsOt_pht","Ztautau::confusion_theta(myPh,4,true,0,true,22,true)")
-				#.Define("OtAsRho_pht","Ztautau::confusion_theta(myPh,0,true,4,true,22,true)")
+				.Define("myPi_E","Zta")
 				
 				
 				# Miss ID as 1prong pions
@@ -162,6 +160,9 @@ class RDFanalysis():
         branchList = [
         	"MC_event",
         	"event_type_reco",
+			"pi_mask",
+            "RP_thrustcostheta",
+			"RP_thrustphi",
         	"ElAsPi_e",
         	"MuAsPi_e",
         	"RhoAsPi_e",

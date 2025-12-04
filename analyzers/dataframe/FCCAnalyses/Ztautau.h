@@ -29,11 +29,13 @@
 using namespace std;
 using namespace FCCAnalyses;
 using namespace ROOT::VecOps;
+using namespace ROOT::Math
 
 namespace Ztautau {
 
 namespace rv = ROOT::VecOps;
 
+const float M_TAU = 1.800; 
 //===================================
 // custom getThrustPointing using charge instead of energy
 RVec<float> getThrustPointing(const RVec<float> &charge,
@@ -72,6 +74,15 @@ struct event {
   RVec<float> m_ph_e;
   float m_sum_ph_e;
   bool m_correct_id = false;
+};
+
+struct myEvent {
+  int n_mu=0,n_el=0,n_pi=0,n_ph=0;
+  float m_RecoCharge;
+  float m_RecoEnergy;
+  RVec<PxPyPxPzMVector> m_muP4, m_elP4, m_piP4, m_phP4;
+  int m_type=0;
+  float m_pi_e=0.0;
 };
 
 // auxiliary function for classification
@@ -114,6 +125,23 @@ RVec<float> study_ph(const RVec<int> &MC_event, const RVec<event> &ev, bool foo,
 // return sum of energies
 RVec<float> study_ph_sum(const RVec<int> &MC_event, const RVec<event> &ev,
                          bool foo, int N_ph, bool wrong_events, int type);
+
+// NEW RECO EVT STRUCT
+//===================================
+// return event struct
+RVec<myEvent> myget_event(const RVec<int> &mu_ids,
+                      const RVec<int> &el_ids,
+                      const RVec<int> &pi_ids,
+                      const RVec<int> &ph_ids,
+                      const RVec<edm4hep::ReconstructedParticleData> &rps,
+                      const RVec<float> &rps_costheta,
+                      const bool masscheck);
+
+// ==========================================
+int classify_lep(const myEvent &ev);
+
+// ==========================================
+int classify_pion(const myEvent &ev, bool masscheck);
 
 //===================================
 //===================================

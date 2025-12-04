@@ -4,10 +4,10 @@
 {
     gROOT->Reset();
     
-    const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/optimal/p8_ee_Ztautau_ecm91.root";
+    const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/optimal/p8_ee_Ztautau_ecm91.root";
     const char* treename = "events";
     const int   nCat     = 6;      // categories 0,1,2,3,4,5
-    const char* outdir   = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/confusion";
+    const char* outdir   = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/confusion";
 
     TFile *f = TFile::Open(filename, "READ");
     if (!f || f->IsZombie()) {
@@ -62,7 +62,7 @@
     }
 
     // ============================
-    // Normalizzazione per colonna
+    // normalize row
     // ============================
     for (int j = 1; j <= nCat; ++j) { 
         double col_sum = 0.0;
