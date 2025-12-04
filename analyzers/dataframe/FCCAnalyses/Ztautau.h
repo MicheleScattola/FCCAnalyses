@@ -32,7 +32,12 @@ namespace Ztautau {
 
 namespace rv = ROOT::VecOps;
 
-const float M_TAU = 1.800; 
+const float SM_TAU = 1.77686;          // tau mass in GeV
+const float SM_PI_CHARGED = 0.13957039;
+const float SM_sin2thetaW = 0.23126;
+const float gv_ga = 1 - 4 * M_sin2thetaW;
+const float SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
+const float SM_P_TAU = -0.1421; // tau polarization in Z decays at sqrt(s) = 91.2 GeV
 //===================================
 // custom getThrustPointing using charge instead of energy
 RVec<float> getThrustPointing(const RVec<float> &charge,
@@ -59,6 +64,40 @@ inline RVec<T> get_elements_by_index(const RVec<T> &A, const RVec<int> &B) {
 }
 
 //===================================
+// myEVENT
+//===================================
+// return event struct
+RVec<myEvent> myget_event(const RVec<int> &mu_ids,
+                      const RVec<int> &el_ids,
+                      const RVec<int> &pi_ids,
+                      const RVec<int> &ph_ids,
+                      const RVec<edm4hep::ReconstructedParticleData> &rps,
+                      const RVec<float> &rps_costheta,
+                      const bool masscheck);
+
+// ==========================================
+int classify_lep(const myEvent &ev);
+
+// ==========================================
+int classify_pion(const myEvent &ev, bool masscheck);
+
+RVec<int> get_type_safe(const RVec<myEvent> &evs);
+
+RVec<float> get_energy_safe(const RVec<myEvent> &evs);
+
+float calc_Ptau(const TLorentzVector &p4_tau);
+
+void pion_weight(
+    myEvent &ev,
+    const RVec<edm4hep::MCParticleData> &mc,
+    const RVec<int> &daughters);
+
+void rho_weight(
+    myEvent &ev,
+    const RVec<edm4hep::MCParticleData> &mc,
+    const RVec<int> &daughters);
+
+//===================================
 //===================================
 // EVENT CLASSIFICATION
 //===================================
@@ -74,12 +113,20 @@ struct event {
 };
 
 struct myEvent {
-  int n_mu=0,n_el=0,n_pi=0,n_ph=0;
-  float m_RecoCharge =0.;
-  float m_RecoEnergy=0.;
-  RVec<TLorentzVector> m_muP4, m_elP4, m_piP4, m_phP4;
-  int m_type=0;
-  float m_pi_e=0.0;
+
+  // RECO
+  int n_mu=0,n_el=0,n_pi=0,n_ph=0;                      // particle counts
+  float m_RecoCharge =0.;                               // total charge in hemisphere 
+  float m_RecoEnergy=0.;                                // total energy in hemisphere  
+  RVec<TLorentzVector> m_muP4, m_elP4, m_piP4, m_phP4;  // particle TLorentzVectors 
+  int m_type=0;                                         // event reco type                      
+  float m_pi_e=0.0;                                     // single pion energy
+
+  // MC
+  int m_MCtype=0;                                       // event mc type
+  float m_MCweight_plus=1.0;                            // reweighting for h = +1
+  float m_MCweight_minus=1.0;                           // reweighting for h = -1
+  
 };
 
 // auxiliary function for classification
@@ -123,26 +170,7 @@ RVec<float> study_ph(const RVec<int> &MC_event, const RVec<event> &ev, bool foo,
 RVec<float> study_ph_sum(const RVec<int> &MC_event, const RVec<event> &ev,
                          bool foo, int N_ph, bool wrong_events, int type);
 
-// NEW RECO EVT STRUCT
-//===================================
-// return event struct
-RVec<myEvent> myget_event(const RVec<int> &mu_ids,
-                      const RVec<int> &el_ids,
-                      const RVec<int> &pi_ids,
-                      const RVec<int> &ph_ids,
-                      const RVec<edm4hep::ReconstructedParticleData> &rps,
-                      const RVec<float> &rps_costheta,
-                      const bool masscheck);
 
-// ==========================================
-int classify_lep(const myEvent &ev);
-
-// ==========================================
-int classify_pion(const myEvent &ev, bool masscheck);
-
-RVec<int> get_type_safe(const RVec<myEvent> &evs);
-
-RVec<float> get_energy_safe(const RVec<myEvent> &evs);
 
 //===================================
 //===================================
