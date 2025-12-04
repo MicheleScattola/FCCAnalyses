@@ -12,7 +12,7 @@ processList = {
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/pi_sel/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/sel1/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/"
@@ -35,13 +35,14 @@ class RDFanalysis():
             df
                 
         
-				#MC truth and Reconstructed particles
-				.Filter()
+				.Define("sel_MC_event","MC_event[pi_mask]")
+				.Define("sel_reco_event","event_type_reco[pi_mask]")
+				
 				
 				  
                 )
 		
-        #df2.Display(["myEl_e","myMu_e","MC_event","event_type_reco"],20).Print()
+        #df2.Display(["MC_event","event_type_reco","sel_MC_event","sel_reco_event"],20).Print()
         
         return df2
        
@@ -50,10 +51,8 @@ class RDFanalysis():
     #Mandatory: output function, please make sure you return the branchlist as a python list
     def output():
         branchList = [
-        	"MC_event",
-        	"event_type_reco",
-            "RP_thrustcostheta",
-			"RP_thrustphi"
+        	"sel_MC_event",
+        	"sel_reco_event"
         	
         	]
         return branchList

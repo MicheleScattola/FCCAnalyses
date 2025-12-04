@@ -111,9 +111,11 @@ class RDFanalysis():
 				#####
 				#.Define("event_type_all","Ztautau::get_event( muons,muons_costheta, electrons, electrons_costheta, pions_charged, pi_costheta, photons, photons_costheta,5.)")
 				#.Define("event_type_reco","RVec<int> {event_type_all[0].type,event_type_all[1].type}")
-                .Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,RP_thrustangle,false)")
-				.Define("event_type_reco","RVec<int> {myEvent[0].m_type,myEvent[1].m_type}")
-                .Define("event_pi_e","RVec<int> {myEvent[0].m_pi_e,myEvent[1].m_pi_e}")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,false)")
+                .Define("debug_myEvent","{ std::cout << myEvent.size() << std::endl; return 0; }")
+                	            
+				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
+                .Define("event_pi_e","Ztautau::get_energy_safe(myEvent)")
 				
 				#####
 				# MC IDENTIFICATION
@@ -128,7 +130,6 @@ class RDFanalysis():
 				.Define("myPi","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,pions_charged_ids,MC_event,event_type_reco)")
 				.Define("myPh","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Photon0,MC_event,event_type_reco)")
 				
-				.Define("myPi_E","Zta")
 				
 				
 				# Miss ID as 1prong pions
@@ -149,7 +150,7 @@ class RDFanalysis():
 				  
                 )
 		
-        #df2.Display(["myEl_e","myMu_e","MC_event","event_type_reco"],20).Print()
+        #df2.Display(["MC_event","event_type_reco","event_pi_e","pi_mask"],20).Print()
         
         return df2
        
@@ -160,7 +161,7 @@ class RDFanalysis():
         branchList = [
         	"MC_event",
         	"event_type_reco",
-			"pi_mask",
+        	"pi_mask",
             "RP_thrustcostheta",
 			"RP_thrustphi",
         	"ElAsPi_e",

@@ -292,8 +292,12 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
   RVec<edm4hep::ReconstructedParticleData> mu_tot = ReconstructedParticle::get(mu_ids, rps);
   RVec<edm4hep::ReconstructedParticleData> el_tot = ReconstructedParticle::get(el_ids, rps);
   RVec<edm4hep::ReconstructedParticleData> pi_tot = ReconstructedParticle::get(pi_ids, rps);
-  RVec<edm4hep::ReconstructedParticleData> ph_tot = ReconstructedParticle::get(ph_ids, rps);    
-
+  RVec<edm4hep::ReconstructedParticleData> ph_tot = ReconstructedParticle::get(ph_ids, rps);
+  // collect their costheta vectors
+  RVec<float> mu_costheta = get_elements_by_index(rps_costheta,mu_ids);
+  RVec<float> el_costheta = get_elements_by_index(rps_costheta,el_ids);
+  RVec<float> pi_costheta = get_elements_by_index(rps_costheta,pi_ids);
+  RVec<float> ph_costheta = get_elements_by_index(rps_costheta,ph_ids);
 
   // cycle on hemisperhes, 0 is positive charge, 1 negative
   RVec<myEvent> out;
@@ -304,10 +308,10 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
     
     // select particles in hemisphere
     // bool hemisphere starts as true for positive hemi, changing after first loop to false for negative hemi
-    RVec<edm4hep::ReconstructedParticleData> mu = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta, mu_tot);
-    RVec<edm4hep::ReconstructedParticleData> el = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta,  el_tot);
-    RVec<edm4hep::ReconstructedParticleData> pi = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta,  pi_tot);
-    RVec<edm4hep::ReconstructedParticleData> ph = ReconstructedParticle::sel_ids_axis(hemisphere)(rps_costheta,  ph_tot);
+    RVec<edm4hep::ReconstructedParticleData> mu = ReconstructedParticle::sel_axis(hemisphere)(mu_costheta, mu_tot);
+    RVec<edm4hep::ReconstructedParticleData> el = ReconstructedParticle::sel_axis(hemisphere)(el_costheta,  el_tot);
+    RVec<edm4hep::ReconstructedParticleData> pi = ReconstructedParticle::sel_axis(hemisphere)(pi_costheta,  pi_tot);
+    RVec<edm4hep::ReconstructedParticleData> ph = ReconstructedParticle::sel_axis(hemisphere)(ph_costheta,  ph_tot);
     // fill struct
     ev.n_mu = mu.size();
     ev.n_el = el.size();
@@ -315,15 +319,17 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
     ev.n_ph = ph.size();
 
     // lambda helper to fill P4 and add energy & charge
-    auto fill_collection = [&](const auto& input_particles, RVec<PxPyPzMVector>& out_p4) {
+    auto fill_collection = [&](const auto& input_particles, RVec<TLorentzVector>& out_p4) {
         
         out_p4.reserve(input_particles.size());
         
         for(const auto& p : input_particles) {
             ev.m_RecoCharge += p.charge;
             ev.m_RecoEnergy += p.energy;
-
-            out_p4.emplace_back(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
+            
+            TLorentzVector tlv;
+			tlv.SetPxPyPzE(p.momentum.x, p.momentum.y, p.momentum.z, p.energy);
+            out_p4.push_back(tlv);
         }
     };
     // fill collections
@@ -342,18 +348,26 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
     }
     // Hadronic
     else if (ev.n_pi == 1 && ev.n_mu == 0 && ev.n_el == 0) {
-        ev.m_type = classify_pion(ev,masscheck);
-        // TODO: ADD WEIGHT CALCULATION
-        // TODO: ADD OPTIMAL VARIABLE CALCULATION
+        
+        if (ev.m_piP4.size() > 0) {
+            ev.m_pi_e = ev.m_piP4[0].E();
+            ev.m_type = classify_pion(ev, masscheck);
+            // TODO: ADD WEIGHT CALCULATION
+        	// TODO: ADD OPTIMAL VARIABLE CALCULATION
+        } else {
+            // debug
+            cerr << "CRITICAL ERROR: n_pi is 1 but vector is empty inside loop!" << endl;
+            ev.m_type = 0;
+        }
     }
     // 3 prong
     else if (ev.n_pi == 3 && ev.n_mu == 0 && ev.n_el == 0 && ev.n_ph == 0) {
         // mass limit
-        PxPyPzMVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
+        TLorentzVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
         if (masscheck && p3pi.M() < M_TAU) {
              ev.m_type = 5; // Type 5: a1 (3-prong mode)
              // TODO: ADD WEIGHT CALCULATION
-            // TODO: ADD OPTIMAL VARIABLE CALCULATION
+             // TODO: ADD OPTIMAL VARIABLE CALCULATION
         } else {
              ev.m_type = 0;
         }
@@ -385,9 +399,12 @@ int classify_lep(const myEvent &ev) {
 int classify_pion(const myEvent &ev, bool masscheck) {
     
     // assuming 1 pi and 0 leptons
+    if (ev.m_piP4.empty()) {
+        cerr << "ERROR in classify_pion: n_pi=" << ev.n_pi << " but vector is empty!" << endl;
+        return 0; 
+    }
     // total visible P4
-    PxPyPzMVector p4_vis = ev.m_piP4[0];
-    m_pi_e = ev.m_piP4[0].E();
+    TLorentzVector p4_vis = ev.m_piP4[0];
     for (const auto& ph_p4 : ev.m_phP4) {
         p4_vis += ph_p4; 
     }
@@ -412,6 +429,29 @@ int classify_pion(const myEvent &ev, bool masscheck) {
     }
 
     return 0;
+}
+
+// Helper per estrarre il TYPE in modo sicuro
+RVec<int> get_type_safe(const RVec<myEvent> &evs) {
+    RVec<int> out;
+    out.reserve(evs.size()); // Riserva memoria
+    for(const auto& e : evs) {
+        out.push_back(e.m_type);
+    }
+    return out;
+}
+
+// Helper per estrarre l'ENERGIA in modo sicuro
+// NOTA: Assicurati che "m_pi_e" esista nella tua struct! 
+// Nel codice precedente si chiamava "m_RecoEnergy". Correggi il nome se necessario.
+RVec<float> get_energy_safe(const RVec<myEvent> &evs) {
+    RVec<float> out;
+    out.reserve(evs.size());
+    for(const auto& e : evs) {
+        // Usa il nome corretto della variabile nella struct
+        out.push_back(e.m_pi_e); 
+    }
+    return out;
 }
 
 //===================================
@@ -451,10 +491,10 @@ pi0_resonance_pairs(const RVec<edm4hep::ReconstructedParticleData> &legs,
   }
 
   // sort by difference to input mass
-  std::sort(out.begin(), out.end(),
+  sort(out.begin(), out.end(),
             [target_mass](const auto &A, const auto &B) {
-              return std::fabs(target_mass - A.mass) <
-                     std::fabs(target_mass - B.mass);
+              return fabs(target_mass - A.mass) <
+                     fabs(target_mass - B.mass);
             });
 
   return out;
@@ -486,8 +526,8 @@ build_pi0(const RVec<int> &ids,
 
       const float pi2 = Pxi * Pxi + Pyi * Pyi + Pzi * Pzi;
       const float pj2 = Pxj * Pxj + Pyj * Pyj + Pzj * Pzj;
-      const float pi = std::sqrt(std::max(0.f, pi2));
-      const float pj = std::sqrt(std::max(0.f, pj2));
+      const float pi = sqrt(max(0.f, pi2));
+      const float pj = sqrt(max(0.f, pj2));
       float dot = Pxi * Pxj + Pyi * Pyj + Pzi * Pzj;
       float costheta = dot / (pi * pj);
 
@@ -504,7 +544,7 @@ build_pi0(const RVec<int> &ids,
   }
 
   // sort by difference to pi0 mass
-  std::sort(out.begin(), out.end(),
+  sort(out.begin(), out.end(),
             [](const pi0_candidate &A, const pi0_candidate &B) {
               return A.delta < B.delta;
             });

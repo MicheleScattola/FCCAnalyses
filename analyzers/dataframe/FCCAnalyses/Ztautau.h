@@ -18,18 +18,15 @@
 #include "FCCAnalyses/VertexingUtils.h"
 #include "ROOT/RVec.hxx"
 #include "TLorentzVector.h"
+#include "Math/Vector4D.h"
 #include "edm4hep/ReconstructedParticle.h"
-#include <TCanvas.h>
-#include <TF1.h>
-#include <TH1.h>
-#include <TStyle.h>
 
 #include <iostream>
 
-using namespace std;
+
 using namespace FCCAnalyses;
 using namespace ROOT::VecOps;
-using namespace ROOT::Math
+using namespace ROOT::Math;
 
 namespace Ztautau {
 
@@ -78,9 +75,9 @@ struct event {
 
 struct myEvent {
   int n_mu=0,n_el=0,n_pi=0,n_ph=0;
-  float m_RecoCharge;
-  float m_RecoEnergy;
-  RVec<PxPyPxPzMVector> m_muP4, m_elP4, m_piP4, m_phP4;
+  float m_RecoCharge =0.;
+  float m_RecoEnergy=0.;
+  RVec<TLorentzVector> m_muP4, m_elP4, m_piP4, m_phP4;
   int m_type=0;
   float m_pi_e=0.0;
 };
@@ -142,6 +139,10 @@ int classify_lep(const myEvent &ev);
 
 // ==========================================
 int classify_pion(const myEvent &ev, bool masscheck);
+
+RVec<int> get_type_safe(const RVec<myEvent> &evs);
+
+RVec<float> get_energy_safe(const RVec<myEvent> &evs);
 
 //===================================
 //===================================
