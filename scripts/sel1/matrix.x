@@ -24,10 +24,10 @@
 
     // Branches
     std::vector<int> *sel_MC_event        = nullptr;
-    std::vector<int> *event_type_reco = nullptr;
+    std::vector<int> *sel_reco_event = nullptr;
 
     t->SetBranchAddress("sel_MC_event",        &sel_MC_event);
-    t->SetBranchAddress("event_type_reco", &event_type_reco);
+    t->SetBranchAddress("sel_reco_event", &sel_reco_event);
 
     // TH2 (MC vs RECO)
     TH2D *hConf = new TH2D("hConf",
@@ -40,19 +40,19 @@
 
         t->GetEntry(i);
 
-        if (!sel_MC_event || !event_type_reco) continue;
+        if (!sel_MC_event || !sel_reco_event) continue;
 
         size_t n = sel_MC_event->size();
-        if (event_type_reco->size() != n) {
+        if (sel_reco_event->size() != n) {
             printf("Warning entry %lld: size MC=%zu RECO=%zu\n",
-                   i, sel_MC_event->size(), event_type_reco->size());
-            n = std::min(sel_MC_event->size(), event_type_reco->size());
+                   i, sel_MC_event->size(), sel_reco_event->size());
+            n = std::min(sel_MC_event->size(), sel_reco_event->size());
         }
 
         for (size_t j = 0; j < n; ++j) {
 
             int mc   = sel_MC_event->at(j);
-            int reco = event_type_reco->at(j);
+            int reco = sel_reco_event->at(j);
 
             if (mc   < 0 || mc   >= nCat) continue;
             if (reco < 0 || reco >= nCat) continue;
