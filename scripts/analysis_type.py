@@ -111,9 +111,8 @@ class RDFanalysis():
 				#####
 				#.Define("event_type_all","Ztautau::get_event( muons,muons_costheta, electrons, electrons_costheta, pions_charged, pi_costheta, photons, photons_costheta,5.)")
 				#.Define("event_type_reco","RVec<int> {event_type_all[0].type,event_type_all[1].type}")
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,false)")
-                .Define("debug_myEvent","{ std::cout << myEvent.size() << std::endl; return 0; }")
-                	            
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,false,Particle,Particle1)")
+                
 				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
                 .Define("event_pi_e","Ztautau::get_energy_safe(myEvent)")
 				
@@ -121,6 +120,10 @@ class RDFanalysis():
 				# MC IDENTIFICATION
 				#####
                 .Define("MC_event","Ztautau::classify_mc_event(Particle,Particle1)")
+                .Define("MC_event_type","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
+                
+				.Define("weights_plus","RVec<float> {myEvent[0].m_MCweight_plus,myEvent[1].m_MCweight_plus}")
+                .Define("weights_minus","RVec<float> {myEvent[0].m_MCweight_minus,myEvent[1].m_MCweight_minus}")
                 
 				.Define("pi_mask","event_pi_e > 2.0")
 				
@@ -150,7 +153,7 @@ class RDFanalysis():
 				  
                 )
 		
-        #df2.Display(["MC_event","event_type_reco","event_pi_e","pi_mask"],20).Print()
+        df2.Display(["MC_event","MC_event_type","weights_plus","weights_minus"],20).Print()
         
         return df2
        
