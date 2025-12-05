@@ -82,7 +82,7 @@ RVec<int> sel_pions_id(const RVec<edm4hep::ReconstructedParticleData> &in,
 RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<int> &pi_ids, const RVec<int> &ph_ids,
                           const RVec<edm4hep::ReconstructedParticleData> &rps,
-                          const RVec<float> &rps_costheta, const bool masscheck,
+                          const RVec<float> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
                           const RVec<int> &daughters) {
 
@@ -150,16 +150,12 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     // Leptonic
     if ((ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
       ev.m_type = classify_lep(ev);
-      // TODO: ADD WEIGHT CALCULATION
-      // TODO: ADD OPTIMAL VARIABLE CALCULATION
     }
     // Hadronic
     else if (ev.n_pi == 1 && ev.n_mu == 0 && ev.n_el == 0) {
 
       if (ev.m_piP4.size() > 0) {
-        ev.m_pi_e = ev.m_piP4[0].E();
-        ev.m_type = classify_pion(ev, masscheck);
-        // TODO: ADD OPTIMAL VARIABLE CALCULATION
+        ev.m_type = classify_pion(ev);
       } else {
         // debug
         cerr << "CRITICAL ERROR: n_pi is 1 but vector is empty inside loop!"
@@ -171,10 +167,8 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     else if (ev.n_pi == 3 && ev.n_mu == 0 && ev.n_el == 0 && ev.n_ph == 0) {
       // mass limit
       TLorentzVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
-      if (masscheck && p3pi.M() < SM_TAU) {
+      if (p3pi.M() < SM_TAU) {
         ev.m_type = 5; // Type 5: a1 (3-prong mode)
-                       // TODO: ADD WEIGHT CALCULATION
-                       // TODO: ADD OPTIMAL VARIABLE CALCULATION
       } else {
         ev.m_type = 0;
       }
@@ -275,11 +269,11 @@ int classify_MC(const RVec<int> &pdgs) {
 // ==========================================
 int classify_lep(const myEvent &ev) {
   // Check MUON: 1 mu, 0 others
-  if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0 && ev.n_ph == 0) {
+  if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0 ) {
     return 1; // Type 1: Muon
   }
   // Check ELECTRON: 1 el, 0 others
-  if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0 && ev.n_ph == 0) {
+  if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0 ) {
     return 2; // Type 2: Electron
   }
 
@@ -287,7 +281,7 @@ int classify_lep(const myEvent &ev) {
 }
 
 // ==========================================
-int classify_pion(const myEvent &ev, bool masscheck) {
+int classify_pion(const myEvent &ev) {
 
   // assuming 1 pi and 0 leptons
   if (ev.m_piP4.empty()) {
@@ -300,12 +294,10 @@ int classify_pion(const myEvent &ev, bool masscheck) {
   for (const auto &ph_p4 : ev.m_phP4) {
     p4_vis += ph_p4;
   }
-  // note: .M() returns invariant mass P4
-  // also += method always returns a PxPyPzE vector (see ROOT docs)
   float mass_vis = p4_vis.M();
 
   // basic limit on tau mass
-  if (masscheck && mass_vis > SM_TAU) {
+  if (mass_vis > SM_TAU) {
     return 0;
   }
 
@@ -323,22 +315,13 @@ int classify_pion(const myEvent &ev, bool masscheck) {
 
 RVec<int> get_type_safe(const RVec<myEvent> &evs) {
   RVec<int> out;
-  out.reserve(evs.size()); // Riserva memoria
+  out.reserve(evs.size());
   for (const auto &e : evs) {
     out.push_back(e.m_type);
   }
   return out;
 }
 
-RVec<float> get_energy_safe(const RVec<myEvent> &evs) {
-  RVec<float> out;
-  out.reserve(evs.size());
-  for (const auto &e : evs) {
-    // Usa il nome corretto della variabile nella struct
-    out.push_back(e.m_pi_e);
-  }
-  return out;
-}
 
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
@@ -554,7 +537,7 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
     // check reco event
     if(bool_reco && e.m_type != reco_type) continue;
     // pion x variable
-    if(n_pi > 0) out.push_back(e.m_piP4[0].E() / E_TAU);
+    if(e.n_pi > 0) out.push_back(e.m_piP4[0].E() / E_TAU);
 
   }
   return out;

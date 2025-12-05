@@ -111,10 +111,10 @@ class RDFanalysis():
 				#####
 				#.Define("event_type_all","Ztautau::get_event( muons,muons_costheta, electrons, electrons_costheta, pions_charged, pi_costheta, photons, photons_costheta,5.)")
 				#.Define("event_type_reco","RVec<int> {event_type_all[0].type,event_type_all[1].type}")
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,false,Particle,Particle1)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,Particle,Particle1)")
                 
 				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
-                .Define("event_pi_e","Ztautau::get_energy_safe(myEvent)")
+                #.Define("event_pi_e","Ztautau::get_energy_safe(myEvent)")
 				
 				#####
 				# MC IDENTIFICATION
@@ -159,8 +159,8 @@ class RDFanalysis():
 				  
                 )
 		
-        df2.Display(["MC_event","MC_event_type","weights_plus","weights_minus","found"],20).Print()
-        df2.Display(["ElAsPi_e","MuAsPi_e","RhoAsPi_e","A1AsPi_e","PiAsPi_e"],20).Print()
+        #df2.Display(["MC_event","MC_event_type","weights_plus","weights_minus","found"],20).Print()
+        #df2.Display(["ElAsPi_e","MuAsPi_e","RhoAsPi_e","A1AsPi_e","PiAsPi_e"],20).Print()
         return df2
        
 

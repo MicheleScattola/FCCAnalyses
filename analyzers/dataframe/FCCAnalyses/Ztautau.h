@@ -88,17 +88,16 @@ struct myEvent {
 RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<int> &pi_ids, const RVec<int> &ph_ids,
                           const RVec<edm4hep::ReconstructedParticleData> &rps,
-                          const RVec<float> &rps_costheta, const bool masscheck,
+                          const RVec<float> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
                           const RVec<int> &daughters);
 
 // ==========================================
 int classify_lep(const myEvent &ev);
-int classify_pion(const myEvent &ev, bool masscheck);
+int classify_pion(const myEvent &ev);
 int classify_MC(const RVec<int> &pdgs);
 // ==========================================
 RVec<int> get_type_safe(const RVec<myEvent> &evs);
-RVec<float> get_energy_safe(const RVec<myEvent> &evs);
 
 // ==========================================
 // RE-WEIGHTING FUNCTIONS

@@ -4,10 +4,10 @@
 {
     gROOT->Reset();
     
-    const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/optimal/p8_ee_Ztautau_ecm91.root";
+    const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     const char* treename = "events";
     const int   nCat     = 6;      // categories 0,1,2,3,4,5
-    const char* outdir   = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/confusion";
+    const char* outdir   = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots";
 
     TFile *f = TFile::Open(filename, "READ");
     if (!f || f->IsZombie()) {

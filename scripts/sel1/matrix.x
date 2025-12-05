@@ -6,7 +6,7 @@
     const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/sel1/p8_ee_Ztautau_ecm91.root";
     const char* treename = "events";
     const int   nCat     = 6;      // categories 0,1,2,3,4,5
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
 
     
     TFile *f = TFile::Open(filename, "READ");
@@ -97,7 +97,7 @@
     hConf->Draw("COLZ TEXT");
 
     //TString name_png = Form("%s/matrix_id.png", outdir);
-    TString name_pdf = Form("%s/matrix_id_sel1.pdf", outdir);
+    TString name_pdf = Form("%smatrix_id_sel1.pdf", outdir);
 
     //c->SaveAs(name_png);
     c->SaveAs(name_pdf);
