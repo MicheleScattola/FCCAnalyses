@@ -189,7 +189,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
       int pe = p.daughters_end;
 
       // sanity check
-      if(pe=pb){
+      if(pe==pb){
           cerr << "[ERROR]: tau has no daughters in MC classification!" << endl;
           break;
       }
@@ -236,7 +236,8 @@ int classify_MC(const RVec<int> &pdgs){
   for(const auto & p : pdgs){
       if (p == 13) n_mu++;
       else if (p == 11) n_el++;
-      else if (p == 211) n_pi++;
+      //else if (p == 211 || p == 321 || p == 323) n_pi++; // do not distinguish between pi or Kaon
+      else if (p == 211) n_pi++; // do not distinguish between pi or Kaon
       else if (p == 111) n_pi0++;
       else if (p == 22) n_ph++;
   }
@@ -247,6 +248,8 @@ int classify_MC(const RVec<int> &pdgs){
   else if(n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 1) return 4; // rho
   else if(n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 2) return 5; // a1 (1prong)
   else if(n_mu == 0 && n_el == 0 && n_pi ==3) return 5; // a1 (3prong)
+  
+  return 0;
 
 }
 
@@ -331,6 +334,25 @@ float calc_Ptau(const TLorentzVector &p4_tau) {
     return Ptau;
 }
 
+// Function to calculate cos(theta*) using Truth MC 4-vectors
+float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
+                      const TLorentzVector &p4_pi_lab) {
+
+  // BoostVector() returns beta of the particle (Lab -> Particle)
+  TVector3 boost_to_rest = -p4_tau_lab.BoostVector();
+  // copying and boosting
+  TLorentzVector p4_pi_rest = p4_pi_lab;
+  p4_pi_rest.Boost(boost_to_rest);
+
+  // get tau's direction
+  TVector3 tau_dir_lab = p4_tau_lab.Vect().Unit();
+
+  // calculate angle between tau's flight and pi boosted in tau rest frame
+  float angle = p4_pi_rest.Vect().Angle(tau_dir_lab);
+
+  return cos(angle);
+}
+
 void pion_weight(
     myEvent &ev,
     const RVec<edm4hep::MCParticleData> &mc,
@@ -339,7 +361,7 @@ void pion_weight(
   const float charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
   float z = 0.; // costheta star
-  float alpha 1.;
+  float alpha = 1.;
   float Ptau = 0.; // recalculated from tau p4
 
   //use tau index to find tau directly
@@ -360,8 +382,10 @@ void pion_weight(
   for (int i = pb; i < pe; i++) {
       int dau_idx = daughters[i];
       const auto &dau = mc[dau_idx];
+      //if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323) {
       if (abs(dau.PDG) == 211) {
           // found pion daughter
+          ev.m_found = true;
           TLorentzVector p4_pi_lab;
           p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
           // boosting pion into tau rest frame
@@ -385,7 +409,7 @@ void rho_weight(myEvent &ev,
   const float charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
   float z = 0.; // costheta star
-  float alpha 0.46; // recalculate
+  float alpha = 0.46; // recalculate
   float Ptau = 0.;
   
   //use tau index to find tau directly
@@ -394,6 +418,7 @@ void rho_weight(myEvent &ev,
       return;
   }
   // tau found
+  const auto &p = mc[tau_idx];
   TLorentzVector p4_tau_lab;
   p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
   // cycle daugthers
@@ -409,6 +434,7 @@ void rho_weight(myEvent &ev,
     const auto &dau = mc[dau_idx];
     // save pion
     if (abs(dau.PDG) == 211) {
+	  ev.m_found = true;
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
       p4_rho_lab += p4_pi_lab;
@@ -437,7 +463,7 @@ void a1_weight(
   const float charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
   float z = 0.; // costheta star
-  float alpha 0.12; // recalculate ?? worth it??
+  float alpha = 0.12; // recalculate ?? worth it??
   float Ptau = 0.;
   
   //use tau index to find tau directly
@@ -446,6 +472,7 @@ void a1_weight(
       return;
   }
   // tau found
+  const auto &p = mc[tau_idx];
   TLorentzVector p4_tau_lab;
   p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
   // cycle daugthers
@@ -461,6 +488,7 @@ void a1_weight(
     const auto &dau = mc[dau_idx];
     // save pion
     if (abs(dau.PDG) == 211) {
+      ev.m_found = true;
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
       p4_rho_lab += p4_pi_lab;
@@ -1272,24 +1300,7 @@ float get_mc_e(const edm4hep::MCParticleData &mc) {
   return tlv.E();
 }
 
-// Function to calculate cos(theta*) using Truth MC 4-vectors
-float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
-                      const TLorentzVector &p4_pi_lab) {
 
-  // BoostVector() returns beta of the particle (Lab -> Particle)
-  TVector3 boost_to_rest = -p4_tau_lab.BoostVector();
-  // copying and boosting
-  TLorentzVector p4_pi_rest = p4_pi_lab;
-  p4_pi_rest.Boost(boost_to_rest);
-
-  // get tau's direction
-  TVector3 tau_dir_lab = p4_tau_lab.Vect().Unit();
-
-  // calculate angle between tau's flight and pi boosted in tau rest frame
-  float angle = p4_pi_rest.Vect().Angle(tau_dir_lab);
-
-  return cos(angle);
-}
 
 //===================================
 //===================================

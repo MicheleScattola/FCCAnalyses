@@ -35,7 +35,7 @@ namespace rv = ROOT::VecOps;
 const float SM_TAU = 1.77686;          // tau mass in GeV
 const float SM_PI_CHARGED = 0.13957039;
 const float SM_sin2thetaW = 0.23126;
-const float gv_ga = 1 - 4 * M_sin2thetaW;
+const float gv_ga = 1 - 4 * SM_sin2thetaW;
 const float SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
 const float SM_P_TAU = -0.1421; // tau polarization in Z decays at sqrt(s) = 91.2 GeV
 //===================================
@@ -81,6 +81,7 @@ struct myEvent {
   int m_MCtype=0;                                       // event mc type
   float m_MCweight_plus=1.0;                            // reweighting for h = +1
   float m_MCweight_minus=1.0;                           // reweighting for h = -1
+  bool m_found = false;
   
 };
 
@@ -107,6 +108,9 @@ RVec<float> get_energy_safe(const RVec<myEvent> &evs);
 // RE-WEIGHTING FUNCTIONS
 // ==========================================
 float calc_Ptau(const TLorentzVector &p4_tau);
+
+float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
+                      const TLorentzVector &p4_pi_lab);
 
 void pion_weight(
     myEvent &ev,
@@ -309,9 +313,7 @@ RVec<float> confusion_p(const RVec<RPTruthInfo> &truth, int mc_event,
 // return energy of given mc particle (no .energy method is present)
 float get_mc_e(const edm4hep::MCParticleData &mc);
 
-// Function to calculate cos(theta*) using Truth MC 4-vectors
-float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
-                      const TLorentzVector &p4_pi_lab);
+
 
 // MC CLASSIFICATION
 RVec<int> classify_mc_event(const RVec<edm4hep::MCParticleData> &mc,

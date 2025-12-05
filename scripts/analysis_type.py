@@ -124,6 +124,7 @@ class RDFanalysis():
                 
 				.Define("weights_plus","RVec<float> {myEvent[0].m_MCweight_plus,myEvent[1].m_MCweight_plus}")
                 .Define("weights_minus","RVec<float> {myEvent[0].m_MCweight_minus,myEvent[1].m_MCweight_minus}")
+                .Define("found","RVec<int> {myEvent[0].m_found,myEvent[1].m_found}")
                 
 				.Define("pi_mask","event_pi_e > 2.0")
 				
@@ -153,7 +154,7 @@ class RDFanalysis():
 				  
                 )
 		
-        df2.Display(["MC_event","MC_event_type","weights_plus","weights_minus"],20).Print()
+        df2.Display(["MC_event","MC_event_type","weights_plus","weights_minus","found"],20).Print()
         
         return df2
        
