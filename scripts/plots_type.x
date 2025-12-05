@@ -2,7 +2,7 @@
     gROOT->Reset();
 
     // Input and output paths (edit if needed)
-    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau//histmaker/p8_ee_Ztautau_ecm91.root";
+    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/histmaker/p8_ee_Ztautau_ecm91.root";
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/confusion";
 
     TFile* f = TFile::Open(infile, "READ");
@@ -44,29 +44,34 @@
     
     mp_e->SetTitle("Reco #pi energy spectrum;Energy_{#pi} [GeV];Entries");
     mp_e->SetLineColor(kMagenta);
+    mp_e->SetFillColorAlpha(kMagenta,0.3);
     mp_e->SetLineWidth(2);
     mp_e->Draw("HIST");
     
     ep_e->SetLineColor(kRed);
+    ep_e->SetFillColorAlpha(kRed,0.3);
     ep_e->SetLineWidth(2);
     ep_e->Draw("HIST SAME");
     
     pp_e->SetLineColor(kGreen+2);
     pp_e->SetLineWidth(2);
+    pp_e->SetFillColorAlpha(kGreen+2,0.3);
     pp_e->Draw("HIST SAME");
     
     rp_e->SetLineColor(kBlue);
     rp_e->SetLineWidth(2);
+    rp_e->SetFillColorAlpha(kBlue,0.3);
     rp_e->Draw("HIST SAME");
-
-    ap_e->SetLineColor(kAzure+10);
-    ap_e->SetLineWidth(2);
-    ap_e->Draw("HIST SAME");
     
     op_e->SetLineColor(kGray+3);
     op_e->SetLineWidth(2);
     op_e->SetFillColor(kGray+3); 
     op_e->Draw("HIST SAME");
+    
+    ap_e->SetLineColor(kAzure+10);
+    ap_e->SetLineWidth(2);
+    ap_e->SetFillColor(kAzure+10);
+    ap_e->Draw("HIST SAME");
     
     // Legend
     TLegend* leg1 = new TLegend(0.60,0.60,0.88,0.88);

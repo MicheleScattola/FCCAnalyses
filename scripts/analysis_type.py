@@ -127,6 +127,7 @@ class RDFanalysis():
                 .Define("found","RVec<int> {myEvent[0].m_found,myEvent[1].m_found}")
                 
 				.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
+				.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
 				
 				# my particle collections
 				#.Define("myEl","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Electron0,MC_event,event_type_reco)")
@@ -143,12 +144,14 @@ class RDFanalysis():
 				#.Define("PiAsPi_t","Ztautau::confusion_theta(myPi,3,true,3,true,211,false)")
 				#.Define("A1AsPi_t","Ztautau::confusion_theta(myPi,5,true,3,true,211,false)")
                 #.Define("OtAsPi_t","Ztautau::confusion_theta(myPi,0,true,3,true,211,false)")
-				.Define("ElAsPi_e","Ztautau::get_lepton_e(myEvent,2,true,3,true)")
-				.Define("MuAsPi_e","Ztautau::get_lepton_e(myEvent,1,true,3,true)")
+				.Define("ElAsPi_e","Ztautau::get_hadron_e(myEvent,2,true,3,true)")
+				.Define("MuAsPi_e","Ztautau::get_hadron_e(myEvent,1,true,3,true)")
 				.Define("RhoAsPi_e","Ztautau::get_hadron_e(myEvent,4,true,3,true)")
 				.Define("PiAsPi_e","Ztautau::get_hadron_e(myEvent,3,true,3,true)")
 				.Define("A1AsPi_e","Ztautau::get_hadron_e(myEvent,5,true,3,true)")
 				.Define("OtAsPi_e","Ztautau::get_hadron_e(myEvent,0,true,3,true)")
+				
+				.Define("AllPi_e","Ztautau::get_hadron_e(myEvent,3,false,3,true)")
 				#.Define("ElAsPi_e","Ztautau::confusion_e(myPi,2,true,3,true,11,true,0)")
 				#.Define("MuAsPi_e","Ztautau::confusion_e(myPi,1,true,3,true,13,true,0)")
 				#.Define("RhoAsPi_e","Ztautau::confusion_e(myPi,4,true,3,true,111,false,0)")
@@ -171,6 +174,8 @@ class RDFanalysis():
         	"MC_event",
         	"event_type_reco",
         	"pi_mask",
+        	"weight_mask",
+        	"AllPi_e",
             "RP_thrustcostheta",
 			"RP_thrustphi",
         	"ElAsPi_e",

@@ -537,7 +537,7 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
     // check reco event
     if(bool_reco && e.m_type != reco_type) continue;
     // pion x variable
-    if(e.n_pi > 0) out.push_back(e.m_piP4[0].E() / E_TAU);
+    if(e.n_pi > 0) out.push_back(e.m_piP4[0].E());
 
   }
   return out;
@@ -555,6 +555,28 @@ RVec<int> get_pi_mask(const RVec<myEvent> &evs) {
                 // energy cut
                 if (e.m_piP4[0].E() > 2.0) mask.push_back(1); 
                 else mask.push_back(0); 
+            }
+        } 
+        // pass all other events
+        else {
+            mask.push_back(1);
+        }
+    }
+    return mask;
+}
+
+RVec<int> get_weight_mask(const RVec<myEvent> &evs) {
+    RVec<int> mask;
+    for (const auto &e : evs) {
+        // apply filter to pion events
+        if (e.m_type == 3) {
+            // safety check
+            if (e.m_piP4.empty()) {
+                mask.push_back(0); 
+            } else {
+                // energy cut
+                if (e.m_MCweight_plus < 0 || e.m_MCweight_minus < 0) mask.push_back(0); 
+                else mask.push_back(1); 
             }
         } 
         // pass all other events
