@@ -20,12 +20,14 @@
     TH1F* op_e = (TH1F*)f->Get("OtAsPi_e");
     TH1F* ap_e = (TH1F*)f->Get("A1AsPi_e");
     
+    /*
     TH1F* rp_t = (TH1F*)f->Get("RhoAsPi_t");
     TH1F* ep_t = (TH1F*)f->Get("ElAsPi_t");
     TH1F* mp_t = (TH1F*)f->Get("MuAsPi_t");
     TH1F* pp_t = (TH1F*)f->Get("PiAsPi_t");
     TH1F* op_t = (TH1F*)f->Get("OtAsPi_t");
     TH1F* ap_t = (TH1F*)f->Get("A1AsPi_t");
+    */
     
     
     // Check histograms existence
@@ -80,6 +82,8 @@
     C1->SaveAs(Form("%s/missid_e.png", outdir));
     C1->SaveAs(Form("%s/missid_e.pdf", outdir));
     
+
+    /*
     TCanvas* C2 = new TCanvas("C2", "confusion 1-prong pi - costheta", 800, 600);
     //C2->SetTitle("Miss-ID events: Reco #pi contribution");
     C2->SetGrid();
@@ -126,7 +130,7 @@
     C2->Update();
     C2->SaveAs(Form("%s/missid_costheta.png", outdir));
     C2->SaveAs(Form("%s/missid_costheta.pdf", outdir));
-    
+    */
     
     
     // Clean up 

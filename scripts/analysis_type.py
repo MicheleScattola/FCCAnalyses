@@ -126,36 +126,41 @@ class RDFanalysis():
                 .Define("weights_minus","RVec<float> {myEvent[0].m_MCweight_minus,myEvent[1].m_MCweight_minus}")
                 .Define("found","RVec<int> {myEvent[0].m_found,myEvent[1].m_found}")
                 
-				.Define("pi_mask","event_pi_e > 2.0")
+				.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
 				
 				# my particle collections
-				.Define("myEl","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Electron0,MC_event,event_type_reco)")
-				.Define("myMu","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Muon0,MC_event,event_type_reco)")
-				.Define("myPi","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,pions_charged_ids,MC_event,event_type_reco)")
-				.Define("myPh","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Photon0,MC_event,event_type_reco)")
+				#.Define("myEl","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Electron0,MC_event,event_type_reco)")
+				#.Define("myMu","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Muon0,MC_event,event_type_reco)")
+				#.Define("myPi","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,pions_charged_ids,MC_event,event_type_reco)")
+				#.Define("myPh","Ztautau::buildRPTruthCollection(rps,Particle,Particle0, rps_MC_index,RP_thrustangle,Photon0,MC_event,event_type_reco)")
 				
 				
 				
 				# Miss ID as 1prong pions
-				.Define("ElAsPi_t","Ztautau::confusion_theta(myPi,2,true,3,true,11,true)")
-				.Define("MuAsPi_t","Ztautau::confusion_theta(myPi,1,true,3,true,13,true)")
-				.Define("RhoAsPi_t","Ztautau::confusion_theta(myPi,4,true,3,true,111,false)")
-				.Define("PiAsPi_t","Ztautau::confusion_theta(myPi,3,true,3,true,211,false)")
-				.Define("A1AsPi_t","Ztautau::confusion_theta(myPi,5,true,3,true,211,false)")
-                .Define("OtAsPi_t","Ztautau::confusion_theta(myPi,0,true,3,true,211,false)")
-				
-				.Define("ElAsPi_e","Ztautau::confusion_e(myPi,2,true,3,true,11,true,0)")
-				.Define("MuAsPi_e","Ztautau::confusion_e(myPi,1,true,3,true,13,true,0)")
-				.Define("RhoAsPi_e","Ztautau::confusion_e(myPi,4,true,3,true,111,false,0)")
-				.Define("PiAsPi_e","Ztautau::confusion_e(myPi,3,true,3,true,211,false,0)")
-				.Define("OtAsPi_e","Ztautau::confusion_e(myPi,0,true,3,true,211,false,0)")
-                .Define("A1AsPi_e","Ztautau::confusion_e(myPi,5,true,3,true,211,false,0)")
+				#.Define("ElAsPi_t","Ztautau::confusion_theta(myPi,2,true,3,true,11,true)")
+				#.Define("MuAsPi_t","Ztautau::confusion_theta(myPi,1,true,3,true,13,true)")
+				#.Define("RhoAsPi_t","Ztautau::confusion_theta(myPi,4,true,3,true,111,false)")
+				#.Define("PiAsPi_t","Ztautau::confusion_theta(myPi,3,true,3,true,211,false)")
+				#.Define("A1AsPi_t","Ztautau::confusion_theta(myPi,5,true,3,true,211,false)")
+                #.Define("OtAsPi_t","Ztautau::confusion_theta(myPi,0,true,3,true,211,false)")
+				.Define("ElAsPi_e","Ztautau::get_lepton_e(myEvent,2,true,3,true)")
+				.Define("MuAsPi_e","Ztautau::get_lepton_e(myEvent,1,true,3,true)")
+				.Define("RhoAsPi_e","Ztautau::get_hadron_e(myEvent,4,true,3,true)")
+				.Define("PiAsPi_e","Ztautau::get_hadron_e(myEvent,3,true,3,true)")
+				.Define("A1AsPi_e","Ztautau::get_hadron_e(myEvent,5,true,3,true)")
+				.Define("OtAsPi_e","Ztautau::get_hadron_e(myEvent,0,true,3,true)")
+				#.Define("ElAsPi_e","Ztautau::confusion_e(myPi,2,true,3,true,11,true,0)")
+				#.Define("MuAsPi_e","Ztautau::confusion_e(myPi,1,true,3,true,13,true,0)")
+				#.Define("RhoAsPi_e","Ztautau::confusion_e(myPi,4,true,3,true,111,false,0)")
+				#.Define("PiAsPi_e","Ztautau::confusion_e(myPi,3,true,3,true,211,false,0)")
+				#.Define("OtAsPi_e","Ztautau::confusion_e(myPi,0,true,3,true,211,false,0)")
+                #.Define("A1AsPi_e","Ztautau::confusion_e(myPi,5,true,3,true,211,false,0)")
 				
 				  
                 )
 		
         df2.Display(["MC_event","MC_event_type","weights_plus","weights_minus","found"],20).Print()
-        
+        df2.Display(["ElAsPi_e","MuAsPi_e","RhoAsPi_e","A1AsPi_e","PiAsPi_e"],20).Print()
         return df2
        
 
@@ -171,15 +176,9 @@ class RDFanalysis():
         	"ElAsPi_e",
         	"MuAsPi_e",
         	"RhoAsPi_e",
-        	"ElAsPi_t",
-        	"MuAsPi_t",
-        	"RhoAsPi_t",
             "A1AsPi_e",
-            "A1AsPi_t",
         	"PiAsPi_e",
-        	"PiAsPi_t",
-        	"OtAsPi_e",
-        	"OtAsPi_t"
+        	"OtAsPi_e"
         	
         	]
         return branchList

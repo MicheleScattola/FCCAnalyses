@@ -16,13 +16,12 @@
 #include "FCCAnalyses/MCParticle.h"
 #include "FCCAnalyses/ReconstructedParticle.h"
 #include "FCCAnalyses/VertexingUtils.h"
+#include "Math/Vector4D.h"
 #include "ROOT/RVec.hxx"
 #include "TLorentzVector.h"
-#include "Math/Vector4D.h"
 #include "edm4hep/ReconstructedParticle.h"
 
 #include <iostream>
-
 
 using namespace FCCAnalyses;
 using namespace ROOT::VecOps;
@@ -32,12 +31,14 @@ namespace Ztautau {
 
 namespace rv = ROOT::VecOps;
 
-const float SM_TAU = 1.77686;          // tau mass in GeV
+const float SM_TAU = 1.77686; // tau mass in GeV
 const float SM_PI_CHARGED = 0.13957039;
 const float SM_sin2thetaW = 0.23126;
 const float gv_ga = 1 - 4 * SM_sin2thetaW;
 const float SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
 const float SM_P_TAU = -0.1421; // tau polarization in Z decays at sqrt(s) = 91.2 GeV
+const float SQRTS = 91.2;    // Z pole energy
+const float E_TAU = SQRTS / 2; // tau energy at Z pole
 //===================================
 // custom getThrustPointing using charge instead of energy
 RVec<float> getThrustPointing(const RVec<float> &charge,
@@ -69,32 +70,27 @@ inline RVec<T> get_elements_by_index(const RVec<T> &A, const RVec<int> &B) {
 struct myEvent {
 
   // RECO
-  int n_mu=0,n_el=0,n_pi=0,n_ph=0;                      // particle counts
-  float m_RecoCharge =0.;                               // total charge in hemisphere 
-  float m_RecoEnergy=0.;                                // total energy in hemisphere  
-  RVec<TLorentzVector> m_muP4, m_elP4, m_piP4, m_phP4;  // particle TLorentzVectors 
-  int m_type=0;                                         // event reco type                      
-  float m_pi_e=0.0;                                     // single pion energy
+  int n_mu = 0, n_el = 0, n_pi = 0, n_ph = 0; // particle counts
+  float m_RecoCharge = 0.;                    // total charge in hemisphere
+  float m_RecoEnergy = 0.;                    // total energy in hemisphere
+  RVec<TLorentzVector> m_muP4, m_elP4, m_piP4, m_phP4;         // particle TLorentzVectors
+  int m_type = 0;     // event reco type
 
   // MC
-  int m_tauMCindex = -1;                                // tau MC index
-  int m_MCtype=0;                                       // event mc type
-  float m_MCweight_plus=1.0;                            // reweighting for h = +1
-  float m_MCweight_minus=1.0;                           // reweighting for h = -1
+  int m_tauMCindex = -1;        // tau MC index
+  int m_MCtype = 0;             // event mc type
+  float m_MCweight_plus = 1.0;  // reweighting for h = +1
+  float m_MCweight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
-  
 };
 
 // return event struct
-RVec<myEvent> myget_event(const RVec<int> &mu_ids,
-                      const RVec<int> &el_ids,
-                      const RVec<int> &pi_ids,
-                      const RVec<int> &ph_ids,
-                      const RVec<edm4hep::ReconstructedParticleData> &rps,
-                      const RVec<float> &rps_costheta,
-                      const bool masscheck,
-                      const RVec<edm4hep::MCParticleData> &mc,
-                      const RVec<int> &daughters);
+RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
+                          const RVec<int> &pi_ids, const RVec<int> &ph_ids,
+                          const RVec<edm4hep::ReconstructedParticleData> &rps,
+                          const RVec<float> &rps_costheta, const bool masscheck,
+                          const RVec<edm4hep::MCParticleData> &mc,
+                          const RVec<int> &daughters);
 
 // ==========================================
 int classify_lep(const myEvent &ev);
@@ -112,21 +108,27 @@ float calc_Ptau(const TLorentzVector &p4_tau);
 float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
                       const TLorentzVector &p4_pi_lab);
 
-void pion_weight(
-    myEvent &ev,
-    const RVec<edm4hep::MCParticleData> &mc,
-    const RVec<int> &daughters);
+void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
+                 const RVec<int> &daughters);
 
-void rho_weight(
-    myEvent &ev,
-    const RVec<edm4hep::MCParticleData> &mc,
-    const RVec<int> &daughters);
+void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
+                const RVec<int> &daughters);
 
-void a1_weight(
-    myEvent &ev,
-    const RVec<edm4hep::MCParticleData> &mc,
-    const RVec<int> &daughters);
+void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
+               const RVec<int> &daughters);
 
+// ==========================================
+// EXTRACT OPTIMAL VARIABLES
+// ==========================================
+RVec<float> get_lepton_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco);
+
+RVec<float> get_hadron_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco);
+
+RVec<int> get_pi_mask(const RVec<myEvent> &evs);                                
 //===================================
 //===================================
 // EVENT CLASSIFICATION
@@ -141,8 +143,6 @@ struct event {
   float m_sum_ph_e;
   bool m_correct_id = false;
 };
-
-
 
 // auxiliary function for classification
 event classify(int n_mu, int n_el, int n_pi, int n_ph, const RVec<float> &ph_e,
@@ -184,8 +184,6 @@ RVec<float> study_ph(const RVec<int> &MC_event, const RVec<event> &ev, bool foo,
 // return sum of energies
 RVec<float> study_ph_sum(const RVec<int> &MC_event, const RVec<event> &ev,
                          bool foo, int N_ph, bool wrong_events, int type);
-
-
 
 //===================================
 //===================================
@@ -312,8 +310,6 @@ RVec<float> confusion_p(const RVec<RPTruthInfo> &truth, int mc_event,
 
 // return energy of given mc particle (no .energy method is present)
 float get_mc_e(const edm4hep::MCParticleData &mc);
-
-
 
 // MC CLASSIFICATION
 RVec<int> classify_mc_event(const RVec<edm4hep::MCParticleData> &mc,

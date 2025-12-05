@@ -13,7 +13,7 @@ using namespace std;
 namespace Ztautau {
 
 //===================================
-// THRUST  
+// THRUST
 //===================================
 // custom getThrustPointing using charge instead of energy
 RVec<float> getThrustPointing(const RVec<float> &charge,
@@ -79,26 +79,27 @@ RVec<int> sel_pions_id(const RVec<edm4hep::ReconstructedParticleData> &in,
 // myEVENT
 //===================================
 // return event struct
-RVec<myEvent> myget_event(const RVec<int> &mu_ids,
-                      const RVec<int> &el_ids,
-                      const RVec<int> &pi_ids,
-                      const RVec<int> &ph_ids,
-                      const RVec<edm4hep::ReconstructedParticleData> &rps,
-                      const RVec<float> &rps_costheta,
-                      const bool masscheck,
-                      const RVec<edm4hep::MCParticleData> &mc,
-                      const RVec<int> &daughters) {
+RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
+                          const RVec<int> &pi_ids, const RVec<int> &ph_ids,
+                          const RVec<edm4hep::ReconstructedParticleData> &rps,
+                          const RVec<float> &rps_costheta, const bool masscheck,
+                          const RVec<edm4hep::MCParticleData> &mc,
+                          const RVec<int> &daughters) {
 
   // collect particles
-  RVec<edm4hep::ReconstructedParticleData> mu_tot = ReconstructedParticle::get(mu_ids, rps);
-  RVec<edm4hep::ReconstructedParticleData> el_tot = ReconstructedParticle::get(el_ids, rps);
-  RVec<edm4hep::ReconstructedParticleData> pi_tot = ReconstructedParticle::get(pi_ids, rps);
-  RVec<edm4hep::ReconstructedParticleData> ph_tot = ReconstructedParticle::get(ph_ids, rps);
+  RVec<edm4hep::ReconstructedParticleData> mu_tot =
+      ReconstructedParticle::get(mu_ids, rps);
+  RVec<edm4hep::ReconstructedParticleData> el_tot =
+      ReconstructedParticle::get(el_ids, rps);
+  RVec<edm4hep::ReconstructedParticleData> pi_tot =
+      ReconstructedParticle::get(pi_ids, rps);
+  RVec<edm4hep::ReconstructedParticleData> ph_tot =
+      ReconstructedParticle::get(ph_ids, rps);
   // collect their costheta vectors
-  RVec<float> mu_costheta = get_elements_by_index(rps_costheta,mu_ids);
-  RVec<float> el_costheta = get_elements_by_index(rps_costheta,el_ids);
-  RVec<float> pi_costheta = get_elements_by_index(rps_costheta,pi_ids);
-  RVec<float> ph_costheta = get_elements_by_index(rps_costheta,ph_ids);
+  RVec<float> mu_costheta = get_elements_by_index(rps_costheta, mu_ids);
+  RVec<float> el_costheta = get_elements_by_index(rps_costheta, el_ids);
+  RVec<float> pi_costheta = get_elements_by_index(rps_costheta, pi_ids);
+  RVec<float> ph_costheta = get_elements_by_index(rps_costheta, ph_ids);
 
   // cycle on hemisperhes, 0 is positive charge, 1 negative
   RVec<myEvent> out;
@@ -106,13 +107,18 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
 
   for (int i = 0; i < 2; i++) {
     myEvent ev;
-    
+
     // select particles in hemisphere
-    // bool hemisphere starts as true for positive hemi, changing after first loop to false for negative hemi
-    RVec<edm4hep::ReconstructedParticleData> mu = ReconstructedParticle::sel_axis(hemisphere)(mu_costheta, mu_tot);
-    RVec<edm4hep::ReconstructedParticleData> el = ReconstructedParticle::sel_axis(hemisphere)(el_costheta,  el_tot);
-    RVec<edm4hep::ReconstructedParticleData> pi = ReconstructedParticle::sel_axis(hemisphere)(pi_costheta,  pi_tot);
-    RVec<edm4hep::ReconstructedParticleData> ph = ReconstructedParticle::sel_axis(hemisphere)(ph_costheta,  ph_tot);
+    // bool hemisphere starts as true for positive hemi, changing after first
+    // loop to false for negative hemi
+    RVec<edm4hep::ReconstructedParticleData> mu =
+        ReconstructedParticle::sel_axis(hemisphere)(mu_costheta, mu_tot);
+    RVec<edm4hep::ReconstructedParticleData> el =
+        ReconstructedParticle::sel_axis(hemisphere)(el_costheta, el_tot);
+    RVec<edm4hep::ReconstructedParticleData> pi =
+        ReconstructedParticle::sel_axis(hemisphere)(pi_costheta, pi_tot);
+    RVec<edm4hep::ReconstructedParticleData> ph =
+        ReconstructedParticle::sel_axis(hemisphere)(ph_costheta, ph_tot);
     // fill struct
     ev.n_mu = mu.size();
     ev.n_el = el.size();
@@ -120,18 +126,18 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
     ev.n_ph = ph.size();
 
     // lambda helper to fill P4 and add energy & charge
-    auto fill_collection = [&](const auto& input_particles, RVec<TLorentzVector>& out_p4) {
-        
-        out_p4.reserve(input_particles.size());
-        
-        for(const auto& p : input_particles) {
-            ev.m_RecoCharge += p.charge;
-            ev.m_RecoEnergy += p.energy;
-            
-            TLorentzVector tlv;
-			tlv.SetPxPyPzE(p.momentum.x, p.momentum.y, p.momentum.z, p.energy);
-            out_p4.push_back(tlv);
-        }
+    auto fill_collection = [&](const auto &input_particles,
+                               RVec<TLorentzVector> &out_p4) {
+      out_p4.reserve(input_particles.size());
+
+      for (const auto &p : input_particles) {
+        ev.m_RecoCharge += p.charge;
+        ev.m_RecoEnergy += p.energy;
+
+        TLorentzVector tlv;
+        tlv.SetPxPyPzE(p.momentum.x, p.momentum.y, p.momentum.z, p.energy);
+        out_p4.push_back(tlv);
+      }
     };
     // fill collections
     fill_collection(mu, ev.m_muP4);
@@ -142,44 +148,47 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
     // RECO EVT CLASSIFICATION
 
     // Leptonic
-    if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
-        ev.m_type = classify_lep(ev);
-        // TODO: ADD WEIGHT CALCULATION
-        // TODO: ADD OPTIMAL VARIABLE CALCULATION
+    if ((ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
+      ev.m_type = classify_lep(ev);
+      // TODO: ADD WEIGHT CALCULATION
+      // TODO: ADD OPTIMAL VARIABLE CALCULATION
     }
     // Hadronic
     else if (ev.n_pi == 1 && ev.n_mu == 0 && ev.n_el == 0) {
-        
-        if (ev.m_piP4.size() > 0) {
-            ev.m_pi_e = ev.m_piP4[0].E();
-            ev.m_type = classify_pion(ev, masscheck);
-        	  // TODO: ADD OPTIMAL VARIABLE CALCULATION
-        } else {
-            // debug
-            cerr << "CRITICAL ERROR: n_pi is 1 but vector is empty inside loop!" << endl;
-            ev.m_type = 0;
-        }
+
+      if (ev.m_piP4.size() > 0) {
+        ev.m_pi_e = ev.m_piP4[0].E();
+        ev.m_type = classify_pion(ev, masscheck);
+        // TODO: ADD OPTIMAL VARIABLE CALCULATION
+      } else {
+        // debug
+        cerr << "CRITICAL ERROR: n_pi is 1 but vector is empty inside loop!"
+             << endl;
+        ev.m_type = 0;
+      }
     }
     // 3 prong
     else if (ev.n_pi == 3 && ev.n_mu == 0 && ev.n_el == 0 && ev.n_ph == 0) {
-        // mass limit
-        TLorentzVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
-        if (masscheck && p3pi.M() < SM_TAU) {
-             ev.m_type = 5; // Type 5: a1 (3-prong mode)
-             // TODO: ADD WEIGHT CALCULATION
-             // TODO: ADD OPTIMAL VARIABLE CALCULATION
-        } else {
-             ev.m_type = 0;
-        }
+      // mass limit
+      TLorentzVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
+      if (masscheck && p3pi.M() < SM_TAU) {
+        ev.m_type = 5; // Type 5: a1 (3-prong mode)
+                       // TODO: ADD WEIGHT CALCULATION
+                       // TODO: ADD OPTIMAL VARIABLE CALCULATION
+      } else {
+        ev.m_type = 0;
+      }
     }
 
     // MC EVENT CLASSIFICATION & WEIGHTING
-    
+
     // find tau, loop on daughters for event type, then weight based on evt type
-    for(int i=0; i<mc.size(); i++){
+    for (int i = 0; i < mc.size(); i++) {
       const auto &p = mc[i];
       // skip if not matching tau
-      if (abs(p.PDG) != 15 || p.charge * ev.m_RecoCharge < 0 || p.generatorStatus !=2) continue;
+      if (abs(p.PDG) != 15 || p.charge * ev.m_RecoCharge < 0 ||
+          p.generatorStatus != 2)
+        continue;
       // found tau with matching charge and decayed status
       ev.m_tauMCindex = i;
       TLorentzVector p4_tau_lab;
@@ -189,37 +198,36 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
       int pe = p.daughters_end;
 
       // sanity check
-      if(pe==pb){
-          cerr << "[ERROR]: tau has no daughters in MC classification!" << endl;
-          break;
+      if (pe == pb) {
+        cerr << "[ERROR]: tau has no daughters in MC classification!" << endl;
+        break;
       }
       // loop daughters, collect pdgs, classify
       RVec<int> dau_pdgs;
       for (int i = pb; i < pe; i++) {
-          int dau_idx = daughters[i];
-          const auto &dau = mc[dau_idx];
-          dau_pdgs.push_back(abs(dau.PDG));
-      } 
+        int dau_idx = daughters[i];
+        const auto &dau = mc[dau_idx];
+        dau_pdgs.push_back(abs(dau.PDG));
+      }
       // classify
       ev.m_MCtype = 0;
       ev.m_MCtype = classify_MC(dau_pdgs);
-      
+
       // weight calculation
       if (ev.m_MCtype == 3) {
-          pion_weight(ev, mc, daughters);
+        pion_weight(ev, mc, daughters);
       } else if (ev.m_MCtype == 4) {
-          rho_weight(ev, mc, daughters);
+        rho_weight(ev, mc, daughters);
       } else if (ev.m_MCtype == 5) {
-          a1_weight(ev, mc, daughters);
+        a1_weight(ev, mc, daughters);
       }
 
       // check on negative weights
-      if(ev.m_MCweight_plus < 0.0 || ev.m_MCweight_minus < 0.0){
-          cerr << "[WARNING]: negative MC weight!" << endl;
+      if (ev.m_MCweight_plus < 0.0 || ev.m_MCweight_minus < 0.0) {
+        cerr << "[WARNING]: negative MC weight!" << endl;
       }
       // now exit the loop
       break;
-      
     }
 
     // push back and change hemisphere
@@ -231,97 +239,105 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids,
 }
 
 // ==========================================
-int classify_MC(const RVec<int> &pdgs){
-  int n_mu = 0, n_el = 0, n_pi = 0, n_pi0 = 0, n_ph=0;
-  for(const auto & p : pdgs){
-      if (p == 13) n_mu++;
-      else if (p == 11) n_el++;
-      //else if (p == 211 || p == 321 || p == 323) n_pi++; // do not distinguish between pi or Kaon
-      else if (p == 211) n_pi++; // do not distinguish between pi or Kaon
-      else if (p == 111) n_pi0++;
-      else if (p == 22) n_ph++;
+int classify_MC(const RVec<int> &pdgs) {
+  int n_mu = 0, n_el = 0, n_pi = 0, n_pi0 = 0, n_ph = 0;
+  for (const auto &p : pdgs) {
+    if (p == 13)
+      n_mu++;
+    else if (p == 11)
+      n_el++;
+    // else if (p == 211 || p == 321 || p == 323) n_pi++; // do not distinguish
+    // between pi or Kaon
+    else if (p == 211)
+      n_pi++; // do not distinguish between pi or Kaon
+    else if (p == 111)
+      n_pi0++;
+    else if (p == 22)
+      n_ph++;
   }
   // classification
-  if     (n_mu == 1 && n_el == 0 && n_pi == 0) return 1; // mu
-  else if(n_mu == 0 && n_el == 1 && n_pi == 0) return 2; // el
-  else if(n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 0) return 3; // pi
-  else if(n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 1) return 4; // rho
-  else if(n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 2) return 5; // a1 (1prong)
-  else if(n_mu == 0 && n_el == 0 && n_pi ==3) return 5; // a1 (3prong)
-  
-  return 0;
+  if (n_mu == 1 && n_el == 0 && n_pi == 0)
+    return 1; // mu
+  else if (n_mu == 0 && n_el == 1 && n_pi == 0)
+    return 2; // el
+  else if (n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 0)
+    return 3; // pi
+  else if (n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 1)
+    return 4; // rho
+  else if (n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 2)
+    return 5; // a1 (1prong)
+  else if (n_mu == 0 && n_el == 0 && n_pi == 3)
+    return 5; // a1 (3prong)
 
+  return 0;
 }
 
 // ==========================================
 int classify_lep(const myEvent &ev) {
-    // Check MUON: 1 mu, 0 others
-    if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0 && ev.n_ph == 0) {
-        return 1; // Type 1: Muon
-    }
-    // Check ELECTRON: 1 el, 0 others
-    if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0 && ev.n_ph == 0) {
-        return 2; // Type 2: Electron
-    }
-    
-    return 0; 
+  // Check MUON: 1 mu, 0 others
+  if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0 && ev.n_ph == 0) {
+    return 1; // Type 1: Muon
+  }
+  // Check ELECTRON: 1 el, 0 others
+  if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0 && ev.n_ph == 0) {
+    return 2; // Type 2: Electron
+  }
+
+  return 0;
 }
 
 // ==========================================
 int classify_pion(const myEvent &ev, bool masscheck) {
-    
-    // assuming 1 pi and 0 leptons
-    if (ev.m_piP4.empty()) {
-        cerr << "ERROR in classify_pion: n_pi=" << ev.n_pi << " but vector is empty!" << endl;
-        return 0; 
-    }
-    // total visible P4
-    TLorentzVector p4_vis = ev.m_piP4[0];
-    for (const auto& ph_p4 : ev.m_phP4) {
-        p4_vis += ph_p4; 
-    }
-    // note: .M() returns invariant mass P4 
-    // also += method always returns a PxPyPzE vector (see ROOT docs)
-    float mass_vis = p4_vis.M();
 
-    // basic limit on tau mass
-    if (masscheck && mass_vis > SM_TAU) {
-        return 0; 
-    }
-
-    // classification
-    if (ev.n_ph == 0) {
-        return 3; // Type 3: Single Pion
-    } 
-    else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
-        return 4; // Type 4: Rho (pi + 1-2 gamma)
-    } 
-    else if (ev.n_ph >= 3) {
-        return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
-    }
-
+  // assuming 1 pi and 0 leptons
+  if (ev.m_piP4.empty()) {
+    cerr << "ERROR in classify_pion: n_pi=" << ev.n_pi
+         << " but vector is empty!" << endl;
     return 0;
-}
+  }
+  // total visible P4
+  TLorentzVector p4_vis = ev.m_piP4[0];
+  for (const auto &ph_p4 : ev.m_phP4) {
+    p4_vis += ph_p4;
+  }
+  // note: .M() returns invariant mass P4
+  // also += method always returns a PxPyPzE vector (see ROOT docs)
+  float mass_vis = p4_vis.M();
 
+  // basic limit on tau mass
+  if (masscheck && mass_vis > SM_TAU) {
+    return 0;
+  }
+
+  // classification
+  if (ev.n_ph == 0) {
+    return 3; // Type 3: Single Pion
+  } else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
+    return 4; // Type 4: Rho (pi + 1-2 gamma)
+  } else if (ev.n_ph >= 3) {
+    return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
+  }
+
+  return 0;
+}
 
 RVec<int> get_type_safe(const RVec<myEvent> &evs) {
-    RVec<int> out;
-    out.reserve(evs.size()); // Riserva memoria
-    for(const auto& e : evs) {
-        out.push_back(e.m_type);
-    }
-    return out;
+  RVec<int> out;
+  out.reserve(evs.size()); // Riserva memoria
+  for (const auto &e : evs) {
+    out.push_back(e.m_type);
+  }
+  return out;
 }
 
-
 RVec<float> get_energy_safe(const RVec<myEvent> &evs) {
-    RVec<float> out;
-    out.reserve(evs.size());
-    for(const auto& e : evs) {
-        // Usa il nome corretto della variabile nella struct
-        out.push_back(e.m_pi_e); 
-    }
-    return out;
+  RVec<float> out;
+  out.reserve(evs.size());
+  for (const auto &e : evs) {
+    // Usa il nome corretto della variabile nella struct
+    out.push_back(e.m_pi_e);
+  }
+  return out;
 }
 
 // ==========================================
@@ -329,9 +345,10 @@ RVec<float> get_energy_safe(const RVec<myEvent> &evs) {
 // ==========================================
 
 float calc_Ptau(const TLorentzVector &p4_tau) {
-    float costheta = p4_tau.CosTheta();
-    float Ptau = - ( SM_Atau * (1+costheta*costheta) + 2*SM_Atau*costheta ) / ( 1 + costheta*costheta + 2*SM_Atau*SM_Atau*costheta );
-    return Ptau;
+  float costheta = p4_tau.CosTheta();
+  float Ptau = -(SM_Atau * (1 + costheta * costheta) + 2 * SM_Atau * costheta) /
+               (1 + costheta * costheta + 2 * SM_Atau * SM_Atau * costheta);
+  return Ptau;
 }
 
 // Function to calculate cos(theta*) using Truth MC 4-vectors
@@ -353,21 +370,19 @@ float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
   return cos(angle);
 }
 
-void pion_weight(
-    myEvent &ev,
-    const RVec<edm4hep::MCParticleData> &mc,
-    const RVec<int> &daughters) {
-  
+void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
+                 const RVec<int> &daughters) {
+
   const float charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
   float z = 0.; // costheta star
   float alpha = 1.;
   float Ptau = 0.; // recalculated from tau p4
 
-  //use tau index to find tau directly
+  // use tau index to find tau directly
   if (tau_idx < 0 || tau_idx >= mc.size()) {
-      cerr << "[ERROR]: Invalid tau index" << endl;
-      return;
+    cerr << "[ERROR]: Invalid tau index" << endl;
+    return;
   }
   // tau found
   const auto &p = mc[tau_idx];
@@ -378,98 +393,44 @@ void pion_weight(
   int pe = p.daughters_end;
 
   Ptau = calc_Ptau(p4_tau_lab);
-  
+
   for (int i = pb; i < pe; i++) {
-      int dau_idx = daughters[i];
-      const auto &dau = mc[dau_idx];
-      //if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323) {
-      if (abs(dau.PDG) == 211) {
-          // found pion daughter
-          ev.m_found = true;
-          TLorentzVector p4_pi_lab;
-          p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
-          // boosting pion into tau rest frame
-          z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
-          // now exit the loops
-          break;
-      }
-  } 
+    int dau_idx = daughters[i];
+    const auto &dau = mc[dau_idx];
+    // if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323) {
+    if (abs(dau.PDG) == 211) {
+      // found pion daughter
+      ev.m_found = true;
+      TLorentzVector p4_pi_lab;
+      p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                        dau.mass);
+      // boosting pion into tau rest frame
+      z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
+      // now exit the loops
+      break;
+    }
+  }
   // weight
-  float w_plus = (1+alpha*z)/(1+alpha*Ptau*z);
-  float w_minus = (1-alpha*z)/(1-alpha*Ptau*z);
+  float w_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
+  float w_minus = (1 - alpha * z) / (1 - alpha * Ptau * z);
 
   ev.m_MCweight_plus = w_plus;
   ev.m_MCweight_minus = w_minus;
 }
 
-void rho_weight(myEvent &ev,
-    const RVec<edm4hep::MCParticleData> &mc,
-    const RVec<int> &daughters) {
-  
+void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
+                const RVec<int> &daughters) {
+
   const float charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
-  float z = 0.; // costheta star
+  float z = 0.;       // costheta star
   float alpha = 0.46; // recalculate
   float Ptau = 0.;
-  
-  //use tau index to find tau directly
+
+  // use tau index to find tau directly
   if (tau_idx < 0 || tau_idx >= mc.size()) {
-      cerr << "[ERROR]: Invalid tau index" << endl;
-      return;
-  }
-  // tau found
-  const auto &p = mc[tau_idx];
-  TLorentzVector p4_tau_lab;
-  p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
-  // cycle daugthers
-  int pb = p.daughters_begin;
-  int pe = p.daughters_end;
-
-  Ptau = calc_Ptau(p4_tau_lab);
-  TLorentzVector p4_rho_lab;
-
-  for (int i = pb; i < pe; i++) {
-    // loop on daughters, find resonance, store p4
-    int dau_idx = daughters[i];
-    const auto &dau = mc[dau_idx];
-    // save pion
-    if (abs(dau.PDG) == 211) {
-	  ev.m_found = true;
-      TLorentzVector p4_pi_lab;
-      p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
-      p4_rho_lab += p4_pi_lab;
-    } else if (abs(dau.PDG) == 111) {
-        // save pi0
-        TLorentzVector p4_pi0_lab;
-        p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
-        p4_rho_lab += p4_pi0_lab;
-
-    }
-  }
-  float mRho = p4_rho_lab.M();
-  z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
-  alpha = (SM_TAU*SM_TAU - 2*mRho*mRho)/(SM_TAU*SM_TAU + 2*mRho*mRho);
-  // weights
-  ev.m_MCweight_plus = (1+alpha*z)/(1+alpha*Ptau*z);
-  ev.m_MCweight_minus = (1-alpha*z)/(1-alpha*Ptau*z);
-
-}
-
-void a1_weight(
-    myEvent &ev,
-    const RVec<edm4hep::MCParticleData> &mc,
-    const RVec<int> &daughters) {
-  
-  const float charge = ev.m_RecoCharge;
-  const int tau_idx = ev.m_tauMCindex;
-  float z = 0.; // costheta star
-  float alpha = 0.12; // recalculate ?? worth it??
-  float Ptau = 0.;
-  
-  //use tau index to find tau directly
-  if (tau_idx < 0 || tau_idx >= mc.size()) {
-      cerr << "[ERROR]: Invalid tau index" << endl;
-      return;
+    cerr << "[ERROR]: Invalid tau index" << endl;
+    return;
   }
   // tau found
   const auto &p = mc[tau_idx];
@@ -490,22 +451,135 @@ void a1_weight(
     if (abs(dau.PDG) == 211) {
       ev.m_found = true;
       TLorentzVector p4_pi_lab;
-      p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
+      p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                        dau.mass);
       p4_rho_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
-        // save pi0
-        TLorentzVector p4_pi0_lab;
-        p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y,dau.momentum.z, dau.mass);
-        p4_rho_lab += p4_pi0_lab;
+      // save pi0
+      TLorentzVector p4_pi0_lab;
+      p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                         dau.mass);
+      p4_rho_lab += p4_pi0_lab;
+    }
+  }
+  float mRho = p4_rho_lab.M();
+  z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
+  alpha =
+      (SM_TAU * SM_TAU - 2 * mRho * mRho) / (SM_TAU * SM_TAU + 2 * mRho * mRho);
+  // weights
+  ev.m_MCweight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
+  ev.m_MCweight_minus = (1 - alpha * z) / (1 - alpha * Ptau * z);
+}
 
+void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
+               const RVec<int> &daughters) {
+
+  const float charge = ev.m_RecoCharge;
+  const int tau_idx = ev.m_tauMCindex;
+  float z = 0.;       // costheta star
+  float alpha = 0.12; // recalculate ?? worth it??
+  float Ptau = 0.;
+
+  // use tau index to find tau directly
+  if (tau_idx < 0 || tau_idx >= mc.size()) {
+    cerr << "[ERROR]: Invalid tau index" << endl;
+    return;
+  }
+  // tau found
+  const auto &p = mc[tau_idx];
+  TLorentzVector p4_tau_lab;
+  p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
+  // cycle daugthers
+  int pb = p.daughters_begin;
+  int pe = p.daughters_end;
+
+  Ptau = calc_Ptau(p4_tau_lab);
+  TLorentzVector p4_rho_lab;
+
+  for (int i = pb; i < pe; i++) {
+    // loop on daughters, find resonance, store p4
+    int dau_idx = daughters[i];
+    const auto &dau = mc[dau_idx];
+    // save pion
+    if (abs(dau.PDG) == 211) {
+      ev.m_found = true;
+      TLorentzVector p4_pi_lab;
+      p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                        dau.mass);
+      p4_rho_lab += p4_pi_lab;
+    } else if (abs(dau.PDG) == 111) {
+      // save pi0
+      TLorentzVector p4_pi0_lab;
+      p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                         dau.mass);
+      p4_rho_lab += p4_pi0_lab;
     }
   }
 
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
   // weights
-  ev.m_MCweight_plus = (1+alpha*z)/(1+alpha*Ptau*z);
-  ev.m_MCweight_minus = (1-alpha*z)/(1-alpha*Ptau*z);
+  ev.m_MCweight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
+  ev.m_MCweight_minus = (1 - alpha * z) / (1 - alpha * Ptau * z);
+}
 
+// ==========================================
+// EXTRACT OPTIMAL VARIABLES
+// ==========================================
+RVec<float> get_lepton_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco){
+
+  RVec<float> out;                                 
+  for(const auto &e : evs){
+    // check mc event
+    if(bool_mc && e.m_MCtype != mc_type) continue;
+    // check reco event
+    if(bool_reco && e.m_type != reco_type) continue;
+    // leptonic x variable
+    if(e.n_mu > 0) out.push_back(e.m_muP4[0].E());
+    else if(e.n_el > 0) out.push_back(e.m_elP4[0].E());
+
+  }
+  return out;
+};
+// ==========================================
+RVec<float> get_hadron_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco){
+  
+  RVec<float> out;                                 
+  for(const auto &e : evs){
+    // check mc event
+    if(bool_mc && e.m_MCtype != mc_type) continue;
+    // check reco event
+    if(bool_reco && e.m_type != reco_type) continue;
+    // pion x variable
+    if(n_pi > 0) out.push_back(e.m_piP4[0].E() / E_TAU);
+
+  }
+  return out;
+};
+
+RVec<int> get_pi_mask(const RVec<myEvent> &evs) {
+    RVec<int> mask;
+    for (const auto &e : evs) {
+        // apply filter to pion events
+        if (e.m_type == 3) {
+            // safety check
+            if (e.m_piP4.empty()) {
+                mask.push_back(0); 
+            } else {
+                // energy cut
+                if (e.m_piP4[0].E() > 2.0) mask.push_back(1); 
+                else mask.push_back(0); 
+            }
+        } 
+        // pass all other events
+        else {
+            mask.push_back(1);
+        }
+    }
+    return mask;
 }
 
 /*
@@ -709,9 +783,6 @@ RVec<float> study_ph_sum(const RVec<int> &MC_event, const RVec<event> &ev,
   return e;
 }
 */
-
-
-
 
 /*
 
@@ -1299,8 +1370,6 @@ float get_mc_e(const edm4hep::MCParticleData &mc) {
 
   return tlv.E();
 }
-
-
 
 //===================================
 //===================================
