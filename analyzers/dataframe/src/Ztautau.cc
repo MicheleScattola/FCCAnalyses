@@ -168,7 +168,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       // mass limit
       TLorentzVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
       float mass_vis = p3pi.M();
-      e.m_invariant_mass = mass_vis;
+      ev.m_invariant_mass = mass_vis;
       if (mass_vis < 1.8) {
         ev.m_type = 5; // Type 5: a1 (3-prong mode)
       } else {
@@ -284,7 +284,7 @@ int classify_lep(const myEvent &ev) {
 }
 
 // ==========================================
-int classify_pion(const myEvent &ev) {
+int classify_pion(myEvent &ev) {
 
   // assuming 1 pi and 0 leptons
   if (ev.m_piP4.empty()) {
@@ -298,7 +298,7 @@ int classify_pion(const myEvent &ev) {
     p4_vis += ph_p4;
   }
   float mass_vis = p4_vis.M();
-  e.m_invariant_mass = mass_vis;
+  ev.m_invariant_mass = mass_vis;
   // basic limit on tau mass
   if (mass_vis > 1.8) {
     return 0;
@@ -388,8 +388,10 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       // found pion daughter
       ev.m_found = true;
       TLorentzVector p4_pi_lab;
+      
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
+      ev.mc_piP4.push_back(p4_pi_lab);
       // boosting pion into tau rest frame
       z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
       // now exit the loops
@@ -439,6 +441,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
+      ev.mc_piP4.push_back(p4_pi_lab);
       p4_rho_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0
@@ -490,6 +493,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     if (abs(dau.PDG) == 211) {
       ev.m_found = true;
       TLorentzVector p4_pi_lab;
+      ev.mc_piP4.push_back(p4_pi_lab);
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
       p4_rho_lab += p4_pi_lab;
@@ -544,9 +548,9 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
       for(const auto &p4 : e.m_piP4){
         out.push_back(p4.E());
       }
-    }}
+    }
+    }
 
-  }
   return out;
 };
 // ==========================================
@@ -563,6 +567,26 @@ RVec<float> get_photon_e(const RVec<myEvent> &evs,
     // photon energies
     if(e.n_ph > 0){
       for(const auto &p4 : e.m_phP4){
+        out.push_back(p4.E());
+      }
+    }
+  }
+  return out;
+};
+// ==========================================
+RVec<float> get_MCpi_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco){
+  
+  RVec<float> out;                                 
+  for(const auto &e : evs){
+    // check mc event
+    if(bool_mc && e.m_MCtype != mc_type) continue;
+    // check reco event
+    if(bool_reco && e.m_type != reco_type) continue;
+    // photon energies
+    if(e.mc_piP4.size() > 0){
+      for(const auto &p4 : e.mc_piP4){
         out.push_back(p4.E());
       }
     }

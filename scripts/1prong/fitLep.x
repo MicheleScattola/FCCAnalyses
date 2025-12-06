@@ -1,14 +1,25 @@
 #include <iostream>
 //================================================
-double W_lep(double *x, double *par){
-	double W =  par[1]*par[2]*1./3.*( (5-9*x[0]*x[0]+4*x[0]*x[0]*x[0]) + par[0] * (1-9*x[0]*x[0]+8*x[0]*x[0]*x[0]) );
-	return W;
-}
-
 double aux_norm(double x, double P){
-	return (5*3 - 3*x*x*x + x*x*x*x) + P * (x - 3*x*x*x + 2*x*x*x*x);
+	return 1./3. * ( (5*x -3*x*x*x + x*x*x*x) + P * (x -3*x*x +2*x*x*x*x) );
 }
-	
+// =============================================================================
+// functor class to pass fitting range normalization
+struct TemplateFitFunctor {
+    const double xmin; 
+    const double xmax; 
+
+    // constructor
+    TemplateFitFunctor(const double &x_min, const double &x_max) : xmin(x_min), xmax(x_max) {}
+
+
+    double operator()(double *x, double *par) {
+
+        double W =  par[1]*par[2]*1./3.*( (5-9*x[0]*x[0]+4*x[0]*x[0]*x[0]) + par[0] * (1-9*x[0]*x[0]+8*x[0]*x[0]*x[0]) );
+		double norm = ( aux_norm(xmax,par[0]) - aux_norm(xmin,par[0]) );
+        return W/norm;
+    }
+};	
 
 void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
 		
@@ -27,17 +38,20 @@ void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
 	
 	double bin_width = h->GetBinWidth(1);
 	
-	// TF1 with 1 parameter P
 	//double xmin = h->GetXaxis()->GetXmin();
 	//double xmax = h->GetXaxis()->GetXmax();
 	double xmin = 0.05;
 	double xmax = 1.0;
-	TF1 *f = new TF1(Form("fit_%s", hist->GetName()),W_lep, xmin, xmax, 3);
+	
+	// fit using functor
+    TemplateFitFunctor fitFunctor(xmin, xmax);
+    
+    TF1 *f = new TF1("fit", fitFunctor, xmin, xmax, 3);
 	cout << "Fitting between " << xmin << " and " << xmax << endl;     
 	// initialize values
 	f->SetParName(0, "P_{#tau}");
 	f->SetParameter(0, -0.1); 
-	f->SetParameter(1, N);
+	f->FixParameter(1, N);
 	f->FixParameter(2, bin_width);
 	
 	double Perr = 0.0;
@@ -77,13 +91,13 @@ void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
 	// Additional drawings
     
     // Helicity +1 -1
-    TF1 *H_plus = new TF1("Hplus_draw", W_lep, xmin, xmax, 3);
+    TF1 *H_plus = new TF1("Hplus_draw", fitFunctor, xmin, xmax, 3);
     H_plus->SetParameters(f->GetParameters());
     H_plus->SetParameter(0, +1); 
     H_plus->SetLineColor(kBlue);
     H_plus->SetLineStyle(2);
     H_plus->Draw("SAME");
-    TF1 *H_minus = new TF1("Hminus_draw", W_lep, xmin, xmax, 3);
+    TF1 *H_minus = new TF1("Hminus_draw", fitFunctor, xmin, xmax, 3);
     H_minus->SetParameters(f->GetParameters());
     H_minus->SetParameter(0, -1); 
     H_minus->SetLineColor(kRed);

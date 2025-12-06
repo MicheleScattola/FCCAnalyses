@@ -82,6 +82,7 @@ struct myEvent {
   float m_MCweight_plus = 1.0;  // reweighting for h = +1
   float m_MCweight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
+  RVec<TLorentzVector> mc_piP4;
 
   //debug
   int m_debug = 0; // 1 == high mass 3prong
@@ -98,7 +99,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
 // ==========================================
 int classify_lep(const myEvent &ev);
-int classify_pion(const myEvent &ev);
+int classify_pion(myEvent &ev); // NOT CONST, need to add invariant mass information
 int classify_MC(const RVec<int> &pdgs);
 // ==========================================
 RVec<int> get_type_safe(const RVec<myEvent> &evs);
@@ -133,7 +134,10 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
 RVec<float> get_photon_e(const RVec<myEvent> &evs,
                                 const int mc_type, const bool bool_mc,
                                 const int reco_type, const bool bool_reco);
-
+// ==========================================
+RVec<float> get_MCpi_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco);
 // ==========================================
 RVec<float> get_weights(const int sign,
                                 const RVec<myEvent> &evs,
