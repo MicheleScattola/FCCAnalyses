@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.01},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.005},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -12,7 +12,7 @@ processList = {
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
@@ -119,29 +119,13 @@ class RDFanalysis():
                 .Define("MC_event","Ztautau::classify_mc_event(Particle,Particle1)")
                 .Define("MC_event_type","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
                 
-				#.Define("weights_plus","RVec<float> {myEvent[0].m_MCweight_plus,myEvent[1].m_MCweight_plus}")
-                #.Define("weights_minus","RVec<float> {myEvent[0].m_MCweight_minus,myEvent[1].m_MCweight_minus}")
-                #.Define("found","RVec<int> {myEvent[0].m_found,myEvent[1].m_found}")
-                
 				# masks for later cuts and selections
 				.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
 				.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
-				
-				# parameters are: event collection, MC type, bool MC type, reco type, bool reco type
-				# confusion matrix
-				.Define("ElAsPi_e","Ztautau::get_hadron_e(myEvent,2,true,3,true)")
-				.Define("MuAsPi_e","Ztautau::get_hadron_e(myEvent,1,true,3,true)")
-				.Define("RhoAsPi_e","Ztautau::get_hadron_e(myEvent,4,true,3,true)")
-				.Define("PiAsPi_e","Ztautau::get_hadron_e(myEvent,3,true,3,true)")
-				.Define("A1AsPi_e","Ztautau::get_hadron_e(myEvent,5,true,3,true)")
-				.Define("OtAsPi_e","Ztautau::get_hadron_e(myEvent,0,true,3,true)")
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
 				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
-				# lepton signals
-				.Define("el_sgn","Ztautau::get_hadron_e(myEvent,2,false,2,true)/45.5")
-				.Define("mu_sgn","Ztautau::get_hadron_e(myEvent,1,false,1,true)/45.5")
 				
 				  
                 )
@@ -155,21 +139,9 @@ class RDFanalysis():
     #Mandatory: output function, please make sure you return the branchlist as a python list
     def output():
         branchList = [
-        	"MC_event",
-        	"event_type_reco",
-        	"pi_mask",
-        	"weight_mask",
         	"pi_sng",
 			"w_plus",
-			"w_minus",
-            "RP_thrustcostheta",
-			"RP_thrustphi",
-        	"ElAsPi_e",
-        	"MuAsPi_e",
-        	"RhoAsPi_e",
-            "A1AsPi_e",
-        	"PiAsPi_e",
-        	"OtAsPi_e"
+			"w_minus"
         	
         	]
         return branchList

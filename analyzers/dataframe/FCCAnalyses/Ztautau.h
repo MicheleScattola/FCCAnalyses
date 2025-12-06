@@ -127,6 +127,13 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
                                 const int mc_type, const bool bool_mc,
                                 const int reco_type, const bool bool_reco);
 
+// ==========================================
+RVec<float> get_weights(cont int sign,
+                                const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco);
+                    
+
 RVec<int> get_pi_mask(const RVec<myEvent> &evs); 
 RVec<int> get_weight_mask(const RVec<myEvent> &evs);                               
 //===================================

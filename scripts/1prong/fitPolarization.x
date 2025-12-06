@@ -36,11 +36,11 @@ struct TemplateFitFunctor {
 
 void fitPolarization() {
 
-    const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/optimal/p8_ee_Ztautau_ecm91.root";
+    const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/p8_ee_Ztautau_ecm91.root";
     
-    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/optimal/bkg/templates.root";
+    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/bkg/templates.root";
     
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/optimal/";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/";
     std::string treeName = "events";
 
     // recover template

@@ -542,6 +542,26 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
   }
   return out;
 };
+// ==========================================
+RVec<float> get_weights(cont int sign,
+                                const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco){
+  
+  RVec<float> out;                                 
+  for(const auto &e : evs){
+    // check mc event
+    if(bool_mc && e.m_MCtype != mc_type) continue;
+    // check reco event
+    if(bool_reco && e.m_type != reco_type) continue;
+    // get weight based on sign passed
+    if(sign > 0) out.push_back(e.m_MCweight_plus);
+    else if(sign < 0 ) out.push_back(e.m_MCweight_minus);
+     
+
+  }
+  return out;
+};
 
 RVec<int> get_pi_mask(const RVec<myEvent> &evs) {
     RVec<int> mask;
@@ -574,7 +594,7 @@ RVec<int> get_weight_mask(const RVec<myEvent> &evs) {
             if (e.m_piP4.empty()) {
                 mask.push_back(0); 
             } else {
-                // energy cut
+                // weight check
                 if (e.m_MCweight_plus < 0 || e.m_MCweight_minus < 0) mask.push_back(0); 
                 else mask.push_back(1); 
             }

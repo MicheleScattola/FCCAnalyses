@@ -10,9 +10,9 @@
 void templates() {
 	    
     // input
-    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/optimal/bkg/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/optimal/";
-    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/optimal/bkg/";
+    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/bkg/p8_ee_Ztautau_ecm91.root";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/";
+    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/bkg/";
     
     
     std::string treeName = "events"; 

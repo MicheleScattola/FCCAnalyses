@@ -24,6 +24,7 @@ intLumi = 5000000 # 5 /ab
 # define some binning for various histograms
 bins = (90, 0, 45)
 binst = (20, 0.8, 1)
+binsx = (40, 0, 1)
 
 def build_graph(df, dataset):
 
@@ -39,12 +40,8 @@ def build_graph(df, dataset):
     results.append(df.Histo1D(("OtAsPi_e", "Energy_{#gamma}", *bins), "OtAsPi_e"))
     results.append(df.Histo1D(("A1AsPi_e", "Energy_{#gamma}", *bins), "A1AsPi_e"))
     
-    #results.append(df.Histo1D(("RhoAsPi_t", "costheta", *binst), "RhoAsPi_t"))
-    #results.append(df.Histo1D(("ElAsPi_t", "costheta", *binst), "ElAsPi_t"))
-    #results.append(df.Histo1D(("MuAsPi_t", "costheta", *binst), "MuAsPi_t"))
-    #results.append(df.Histo1D(("PiAsPi_t", "costheta", *binst), "PiAsPi_t"))
-    #results.append(df.Histo1D(("OtAsPi_t", "costheta", *binst), "OtAsPi_t"))
-    #results.append(df.Histo1D(("A1AsPi_t", "costheta", *binst), "A1AsPi_t"))
+    results.append(df.Histo1D(("mu_sgn", "x_{#mu}", *binsx), "mu_sgn"))
+    results.append(df.Histo1D(("el_sgn", "x_{e}", *binsx), "el_sgn"))
 
     return results, weightsum
 

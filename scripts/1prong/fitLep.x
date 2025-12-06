@@ -10,7 +10,7 @@ double aux_norm(double x, double P){
 }
 	
 
-void Fit_1prong(TH1 *hist, bool lep, const char *outname, const char *title) {
+void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
 		
 	if (!hist) {
 		std::cerr << "[ERROR] Fit_1prong: hist is null\n";
@@ -131,7 +131,7 @@ void fitLep() {
     //gROOT->Reset();
 
     const char* infile =
-        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/histmaker/optimal/p8_ee_Ztautau_ecm91.root";
+        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/histmaker/p8_ee_Ztautau_ecm91.root";
 
     TFile* f = TFile::Open(infile, "READ");
     if (!f || f->IsZombie()) {
@@ -150,14 +150,14 @@ void fitLep() {
     if (h_el) {
         TString el = "electron";
         TString title = "#tau #rightarrow e #nu_{e} #nu_{#tau} channel;x_{e};Events";
-        Fit_1prong(h_el, true, el, title);
+        Fit_1prong(h_el, el, title);
     }
 
     // Fit for muons
     if (h_mu) {
         TString mu = "muon";
         TString title = "#tau #rightarrow #mu #nu_{#mu} #nu_{#tau} channel;x_{#mu};Events";
-        Fit_1prong(h_mu, true, mu, title);
+        Fit_1prong(h_mu, mu, title);
     }
 
     f->Close();
