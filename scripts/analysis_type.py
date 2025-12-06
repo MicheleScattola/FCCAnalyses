@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.01},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.02},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -140,8 +140,8 @@ class RDFanalysis():
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
 				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
 				# lepton signals
-				.Define("el_sgn","Ztautau::get_hadron_e(myEvent,2,false,2,true)/45.5")
-				.Define("mu_sgn","Ztautau::get_hadron_e(myEvent,1,false,1,true)/45.5")
+				.Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
+				.Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")
 				
 				  
                 )
@@ -159,9 +159,11 @@ class RDFanalysis():
         	"event_type_reco",
         	"pi_mask",
         	"weight_mask",
-        	"pi_sng",
+        	"pi_sgn",
 			"w_plus",
 			"w_minus",
+			"mu_sgn",
+			"el_sgn",
             "RP_thrustcostheta",
 			"RP_thrustphi",
         	"ElAsPi_e",

@@ -36,11 +36,11 @@ struct TemplateFitFunctor {
 
 void fitPolarization() {
 
-    const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/p8_ee_Ztautau_ecm91.root";
+    const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     
-    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/treemaker/bkg/templates.root";
+    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/templates.root";
     
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
     std::string treeName = "events";
 
     // recover template
@@ -174,7 +174,7 @@ void fitPolarization() {
     h_data->SetMaximum(std::max(max_data, max_fit) * 1.2);
 
 
-    h_data->Draw("EP ");             
+    h_data->Draw("EP HIST");             
     h_result_total->Draw("HIST SAME"); 
     h_result_plus->Draw("HIST SAME"); 
     h_result_minus->Draw("HIST SAME"); 

@@ -167,7 +167,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     else if (ev.n_pi == 3 && ev.n_mu == 0 && ev.n_el == 0 && ev.n_ph == 0) {
       // mass limit
       TLorentzVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
-      if (p3pi.M() < SM_TAU) {
+      if (p3pi.M() < 1.8) {
         ev.m_type = 5; // Type 5: a1 (3-prong mode)
       } else {
         ev.m_type = 0;
@@ -297,7 +297,7 @@ int classify_pion(const myEvent &ev) {
   float mass_vis = p4_vis.M();
 
   // basic limit on tau mass
-  if (mass_vis > SM_TAU) {
+  if (mass_vis > 1.8) {
     return 0;
   }
 
@@ -543,7 +543,7 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
   return out;
 };
 // ==========================================
-RVec<float> get_weights(cont int sign,
+RVec<float> get_weights(const int sign,
                                 const RVec<myEvent> &evs,
                                 const int mc_type, const bool bool_mc,
                                 const int reco_type, const bool bool_reco){

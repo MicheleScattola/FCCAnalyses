@@ -20,15 +20,10 @@ void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
 	// cloning and normalizing histogram
 	TH1 *h = (TH1*)hist->Clone(Form("%s_clone", hist->GetName()));
 	h->Sumw2();
-	double integral = h->Integral("width");
+	
 	int N = h->Integral();
-	if (integral <= 0) {
-		std::cerr << "[ERROR] Fit_1prong: hist integral (width) <= 0\n";
-		delete h;
-		return;
-	} else {
-		cout << "\n =========================\n" << endl;
-		cout << "[INFO] Fitting " << hist->GetName() << " with " << N << " entries." << endl;}
+	cout << "\n =========================\n" << endl;
+	cout << "[INFO] Fitting " << hist->GetName() << " with " << N << " entries." << endl;
 	
 	double bin_width = h->GetBinWidth(1);
 	
@@ -108,7 +103,7 @@ void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
 
 	// file save
 	const char* outdir =
-        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/optimal/";
+        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
         
 	if (outname) {
 		TString png = TString(outdir) + TString(outname) + "_fit.png";
@@ -131,7 +126,7 @@ void fitLep() {
     //gROOT->Reset();
 
     const char* infile =
-        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/histmaker/p8_ee_Ztautau_ecm91.root";
+        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/histmaker/p8_ee_Ztautau_ecm91.root";
 
     TFile* f = TFile::Open(infile, "READ");
     if (!f || f->IsZombie()) {

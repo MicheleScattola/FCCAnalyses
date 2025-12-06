@@ -111,17 +111,6 @@ class RDFanalysis():
 				#####
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,Particle,Particle1)")
                 
-				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
-				
-				#####
-				# MC IDENTIFICATION
-				#####
-                .Define("MC_event","Ztautau::classify_mc_event(Particle,Particle1)")
-                .Define("MC_event_type","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
-                
-				# masks for later cuts and selections
-				.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
-				.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
@@ -139,7 +128,7 @@ class RDFanalysis():
     #Mandatory: output function, please make sure you return the branchlist as a python list
     def output():
         branchList = [
-        	"pi_sng",
+        	"pi_sgn",
 			"w_plus",
 			"w_minus"
         	
