@@ -142,7 +142,11 @@ class RDFanalysis():
 				# lepton signals
 				.Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
 				.Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")
-				
+				# a1 confusion
+				.Define("a1_rho_e","Ztautau::get_photon_e(myEvent,5,true,4,true)")
+				.Define("a1_ot_e","Ztautau::get_photon_e(myEvent,5,true,0,true)")
+				.Define("a1_rho_m","Ztautau::get_invariant_mass(myEvent,5,true,4,true)")
+				.Define("a1_ot_m","Ztautau::get_invariant_mass(myEvent,5,true,0,true)")
 				  
                 )
 		
@@ -171,7 +175,11 @@ class RDFanalysis():
         	"RhoAsPi_e",
             "A1AsPi_e",
         	"PiAsPi_e",
-        	"OtAsPi_e"
+        	"OtAsPi_e",
+			"a1_rho_e",
+			"a1_ot_e",
+			"a1_rho_m",
+			"a1_ot_m"
         	
         	]
         return branchList

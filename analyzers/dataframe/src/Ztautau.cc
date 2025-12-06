@@ -164,13 +164,16 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       }
     }
     // 3 prong
-    else if (ev.n_pi == 3 && ev.n_mu == 0 && ev.n_el == 0 && ev.n_ph == 0) {
+    else if (ev.n_pi == 3 && ev.n_mu == 0 && ev.n_el == 0) {
       // mass limit
       TLorentzVector p3pi = ev.m_piP4[0] + ev.m_piP4[1] + ev.m_piP4[2];
-      if (p3pi.M() < 1.8) {
+      float mass_vis = p3pi.M();
+      e.m_invariant_mass = mass_vis;
+      if (mass_vis < 1.8) {
         ev.m_type = 5; // Type 5: a1 (3-prong mode)
       } else {
         ev.m_type = 0;
+        ev.m_debug = 1; // debug code for high mass 3prong
       }
     }
 
@@ -295,7 +298,7 @@ int classify_pion(const myEvent &ev) {
     p4_vis += ph_p4;
   }
   float mass_vis = p4_vis.M();
-
+  e.m_invariant_mass = mass_vis;
   // basic limit on tau mass
   if (mass_vis > 1.8) {
     return 0;
@@ -518,7 +521,7 @@ RVec<float> get_lepton_e(const RVec<myEvent> &evs,
     if(bool_mc && e.m_MCtype != mc_type) continue;
     // check reco event
     if(bool_reco && e.m_type != reco_type) continue;
-    // leptonic x variable
+    // lepton energy
     if(e.n_mu > 0) out.push_back(e.m_muP4[0].E());
     else if(e.n_el > 0) out.push_back(e.m_elP4[0].E());
 
@@ -536,9 +539,33 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs,
     if(bool_mc && e.m_MCtype != mc_type) continue;
     // check reco event
     if(bool_reco && e.m_type != reco_type) continue;
-    // pion x variable
-    if(e.n_pi > 0) out.push_back(e.m_piP4[0].E());
+    // pion energies
+    if(e.n_pi > 0){
+      for(const auto &p4 : e.m_piP4){
+        out.push_back(p4.E());
+      }
+    }}
 
+  }
+  return out;
+};
+// ==========================================
+RVec<float> get_photon_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco){
+  
+  RVec<float> out;                                 
+  for(const auto &e : evs){
+    // check mc event
+    if(bool_mc && e.m_MCtype != mc_type) continue;
+    // check reco event
+    if(bool_reco && e.m_type != reco_type) continue;
+    // photon energies
+    if(e.n_ph > 0){
+      for(const auto &p4 : e.m_phP4){
+        out.push_back(p4.E());
+      }
+    }
   }
   return out;
 };
@@ -559,6 +586,29 @@ RVec<float> get_weights(const int sign,
     else if(sign < 0 ) out.push_back(e.m_MCweight_minus);
      
 
+  }
+  return out;
+};
+
+// ==========================================
+// MASKS AND FILTERS
+// ==========================================
+RVec<float> get_invariant_mass(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco){
+  
+  RVec<float> out;                                 
+  for(const auto &e : evs){
+    // check mc event
+    if(bool_mc && e.m_MCtype != mc_type) continue;
+    // check reco event
+    if(bool_reco && e.m_type != reco_type) continue;
+    // pion x variable
+    if(e.n_ph > 0){
+      for(const auto &p4 : e.m_phP4){
+        out.push_back(p4.E());
+      }
+    }
   }
   return out;
 };

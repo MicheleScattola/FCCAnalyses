@@ -82,6 +82,10 @@ struct myEvent {
   float m_MCweight_plus = 1.0;  // reweighting for h = +1
   float m_MCweight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
+
+  //debug
+  int m_debug = 0; // 1 == high mass 3prong
+  float m_invariant_mass = 0.0;
 };
 
 // return event struct
@@ -98,7 +102,6 @@ int classify_pion(const myEvent &ev);
 int classify_MC(const RVec<int> &pdgs);
 // ==========================================
 RVec<int> get_type_safe(const RVec<myEvent> &evs);
-
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
 // ==========================================
@@ -126,6 +129,10 @@ RVec<float> get_lepton_e(const RVec<myEvent> &evs,
 RVec<float> get_hadron_e(const RVec<myEvent> &evs,
                                 const int mc_type, const bool bool_mc,
                                 const int reco_type, const bool bool_reco);
+// ==========================================
+RVec<float> get_photon_e(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco);
 
 // ==========================================
 RVec<float> get_weights(const int sign,
@@ -133,7 +140,12 @@ RVec<float> get_weights(const int sign,
                                 const int mc_type, const bool bool_mc,
                                 const int reco_type, const bool bool_reco);
                     
-
+// ==========================================
+// MASKS AND FILTERS
+// ==========================================
+RVec<float> get_invariant_mass(const RVec<myEvent> &evs,
+                                const int mc_type, const bool bool_mc,
+                                const int reco_type, const bool bool_reco);
 RVec<int> get_pi_mask(const RVec<myEvent> &evs); 
 RVec<int> get_weight_mask(const RVec<myEvent> &evs);                               
 //===================================
