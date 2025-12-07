@@ -272,11 +272,11 @@ int classify_MC(const RVec<int> &pdgs) {
 // ==========================================
 int classify_lep(const myEvent &ev) {
   // Check MUON: 1 mu, 0 others
-  if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0 ) {
+  if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0) {
     return 1; // Type 1: Muon
   }
   // Check ELECTRON: 1 el, 0 others
-  if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0 ) {
+  if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0) {
     return 2; // Type 2: Electron
   }
 
@@ -324,7 +324,6 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
   }
   return out;
 }
-
 
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
@@ -388,7 +387,7 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       // found pion daughter
       ev.m_found = true;
       TLorentzVector p4_pi_lab;
-      
+
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
       ev.mc_piP4.push_back(p4_pi_lab);
@@ -515,58 +514,65 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 // ==========================================
 // EXTRACT OPTIMAL VARIABLES
 // ==========================================
-RVec<float> get_lepton_e(const RVec<myEvent> &evs,
-                                const int mc_type, const bool bool_mc,
-                                const int reco_type, const bool bool_reco){
+RVec<float> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco) {
 
-  RVec<float> out;                                 
-  for(const auto &e : evs){
+  RVec<float> out;
+  for (const auto &e : evs) {
     // check mc event
-    if(bool_mc && e.m_MCtype != mc_type) continue;
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
     // check reco event
-    if(bool_reco && e.m_type != reco_type) continue;
+    if (bool_reco && e.m_type != reco_type)
+      continue;
     // lepton energy
-    if(e.n_mu > 0) out.push_back(e.m_muP4[0].E());
-    else if(e.n_el > 0) out.push_back(e.m_elP4[0].E());
-
+    if (e.n_mu > 0)
+      out.push_back(e.m_muP4[0].E());
+    else if (e.n_el > 0)
+      out.push_back(e.m_elP4[0].E());
   }
   return out;
 };
 // ==========================================
-RVec<float> get_hadron_e(const RVec<myEvent> &evs,
-                                const int mc_type, const bool bool_mc,
-                                const int reco_type, const bool bool_reco){
-  
-  RVec<float> out;                                 
-  for(const auto &e : evs){
+RVec<float> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco) {
+
+  RVec<float> out;
+  for (const auto &e : evs) {
     // check mc event
-    if(bool_mc && e.m_MCtype != mc_type) continue;
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
     // check reco event
-    if(bool_reco && e.m_type != reco_type) continue;
+    if (bool_reco && e.m_type != reco_type)
+      continue;
     // pion energies
-    if(e.n_pi > 0){
-      for(const auto &p4 : e.m_piP4){
+    if (e.n_pi > 0) {
+      for (const auto &p4 : e.m_piP4) {
         out.push_back(p4.E());
       }
     }
-    }
+  }
 
   return out;
 };
 // ==========================================
-RVec<float> get_photon_e(const RVec<myEvent> &evs,
-                                const int mc_type, const bool bool_mc,
-                                const int reco_type, const bool bool_reco){
-  
-  RVec<float> out;                                 
-  for(const auto &e : evs){
+RVec<float> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco) {
+
+  RVec<float> out;
+  for (const auto &e : evs) {
     // check mc event
-    if(bool_mc && e.m_MCtype != mc_type) continue;
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
     // check reco event
-    if(bool_reco && e.m_type != reco_type) continue;
+    if (bool_reco && e.m_type != reco_type)
+      continue;
     // photon energies
-    if(e.n_ph > 0){
-      for(const auto &p4 : e.m_phP4){
+    if (e.n_ph > 0) {
+      for (const auto &p4 : e.m_phP4) {
         out.push_back(p4.E());
       }
     }
@@ -574,19 +580,21 @@ RVec<float> get_photon_e(const RVec<myEvent> &evs,
   return out;
 };
 // ==========================================
-RVec<float> get_MCpi_e(const RVec<myEvent> &evs,
-                                const int mc_type, const bool bool_mc,
-                                const int reco_type, const bool bool_reco){
-  
-  RVec<float> out;                                 
-  for(const auto &e : evs){
+RVec<float> get_MCpi_e(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco) {
+
+  RVec<float> out;
+  for (const auto &e : evs) {
     // check mc event
-    if(bool_mc && e.m_MCtype != mc_type) continue;
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
     // check reco event
-    if(bool_reco && e.m_type != reco_type) continue;
-    // photon energies
-    if(e.mc_piP4.size() > 0){
-      for(const auto &p4 : e.mc_piP4){
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // true pi MC energies
+    if (e.mc_piP4.size() > 0) {
+      for (const auto &p4 : e.mc_piP4) {
         out.push_back(p4.E());
       }
     }
@@ -594,22 +602,23 @@ RVec<float> get_MCpi_e(const RVec<myEvent> &evs,
   return out;
 };
 // ==========================================
-RVec<float> get_weights(const int sign,
-                                const RVec<myEvent> &evs,
-                                const int mc_type, const bool bool_mc,
-                                const int reco_type, const bool bool_reco){
-  
-  RVec<float> out;                                 
-  for(const auto &e : evs){
+RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
+                        const int mc_type, const bool bool_mc,
+                        const int reco_type, const bool bool_reco) {
+
+  RVec<float> out;
+  for (const auto &e : evs) {
     // check mc event
-    if(bool_mc && e.m_MCtype != mc_type) continue;
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
     // check reco event
-    if(bool_reco && e.m_type != reco_type) continue;
+    if (bool_reco && e.m_type != reco_type)
+      continue;
     // get weight based on sign passed
-    if(sign > 0) out.push_back(e.m_MCweight_plus);
-    else if(sign < 0 ) out.push_back(e.m_MCweight_minus);
-     
-
+    if (sign > 0)
+      out.push_back(e.m_MCweight_plus);
+    else if (sign < 0)
+      out.push_back(e.m_MCweight_minus);
   }
   return out;
 };
@@ -617,19 +626,21 @@ RVec<float> get_weights(const int sign,
 // ==========================================
 // MASKS AND FILTERS
 // ==========================================
-RVec<float> get_invariant_mass(const RVec<myEvent> &evs,
-                                const int mc_type, const bool bool_mc,
-                                const int reco_type, const bool bool_reco){
-  
-  RVec<float> out;                                 
-  for(const auto &e : evs){
+RVec<float> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
+                               const bool bool_mc, const int reco_type,
+                               const bool bool_reco) {
+
+  RVec<float> out;
+  for (const auto &e : evs) {
     // check mc event
-    if(bool_mc && e.m_MCtype != mc_type) continue;
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
     // check reco event
-    if(bool_reco && e.m_type != reco_type) continue;
+    if (bool_reco && e.m_type != reco_type)
+      continue;
     // pion x variable
-    if(e.n_ph > 0){
-      for(const auto &p4 : e.m_phP4){
+    if (e.n_ph > 0) {
+      for (const auto &p4 : e.m_phP4) {
         out.push_back(p4.E());
       }
     }
@@ -638,47 +649,51 @@ RVec<float> get_invariant_mass(const RVec<myEvent> &evs,
 };
 
 RVec<int> get_pi_mask(const RVec<myEvent> &evs) {
-    RVec<int> mask;
-    for (const auto &e : evs) {
-        // apply filter to pion events
-        if (e.m_type == 3) {
-            // safety check
-            if (e.m_piP4.empty()) {
-                mask.push_back(0); 
-            } else {
-                // energy cut
-                if (e.m_piP4[0].E() > 2.0) mask.push_back(1); 
-                else mask.push_back(0); 
-            }
-        } 
-        // pass all other events
-        else {
-            mask.push_back(1);
-        }
+  RVec<int> mask;
+  for (const auto &e : evs) {
+    // apply filter to pion events
+    if (e.m_type == 3) {
+      // safety check
+      if (e.m_piP4.empty()) {
+        mask.push_back(0);
+      } else {
+        // energy cut
+        if (e.m_piP4[0].E() > 2.0)
+          mask.push_back(1);
+        else
+          mask.push_back(0);
+      }
     }
-    return mask;
+    // pass all other events
+    else {
+      mask.push_back(1);
+    }
+  }
+  return mask;
 }
 
 RVec<int> get_weight_mask(const RVec<myEvent> &evs) {
-    RVec<int> mask;
-    for (const auto &e : evs) {
-        // apply filter to pion events
-        if (e.m_type == 3) {
-            // safety check
-            if (e.m_piP4.empty()) {
-                mask.push_back(0); 
-            } else {
-                // weight check
-                if (e.m_MCweight_plus < 0 || e.m_MCweight_minus < 0) mask.push_back(0); 
-                else mask.push_back(1); 
-            }
-        } 
-        // pass all other events
-        else {
-            mask.push_back(1);
-        }
+  RVec<int> mask;
+  for (const auto &e : evs) {
+    // apply filter to pion events
+    if (e.m_type == 3) {
+      // safety check
+      if (e.m_piP4.empty()) {
+        mask.push_back(0);
+      } else {
+        // weight check
+        if (e.m_MCweight_plus < 0 || e.m_MCweight_minus < 0)
+          mask.push_back(0);
+        else
+          mask.push_back(1);
+      }
     }
-    return mask;
+    // pass all other events
+    else {
+      mask.push_back(1);
+    }
+  }
+  return mask;
 }
 
 /*
