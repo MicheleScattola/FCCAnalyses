@@ -37,7 +37,6 @@ class RDFanalysis():
         
 				.Define("sel_MC_event","MC_event[pi_mask]")
 				.Define("sel_reco_event","event_type_reco[pi_mask]")
-				.Define("neg_weight","AllPi_e[weight_mask]")
 				
 				
 				  
@@ -53,8 +52,7 @@ class RDFanalysis():
     def output():
         branchList = [
         	"sel_MC_event",
-        	"sel_reco_event",
-        	"neg_weight"
+        	"sel_reco_event"
         	
         	]
         return branchList

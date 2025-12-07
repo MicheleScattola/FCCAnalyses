@@ -33,7 +33,7 @@ namespace rv = ROOT::VecOps;
 
 const float SM_TAU = 1.77686; // tau mass in GeV
 const float SM_PI_CHARGED = 0.13957039;
-const float SM_sin2thetaW = 0.23126;
+const float SM_sin2thetaW = 0.2312;
 const float gv_ga = 1 - 4 * SM_sin2thetaW;
 const float SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
 const float SM_P_TAU =

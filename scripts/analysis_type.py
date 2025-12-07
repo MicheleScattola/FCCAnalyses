@@ -147,6 +147,9 @@ class RDFanalysis():
 				.Define("a1_ot_e","Ztautau::get_photon_e(myEvent,5,true,0,true)")
 				.Define("a1_rho_m","Ztautau::get_invariant_mass(myEvent,5,true,4,true)")
 				.Define("a1_ot_m","Ztautau::get_invariant_mass(myEvent,5,true,0,true)")
+				.Define("pi_m","Ztautau::get_invariant_mass(myEvent,3,false,3,true)")
+				.Define("rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
+				.Define("a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
 				  
                 )
 		
@@ -179,7 +182,10 @@ class RDFanalysis():
 			"a1_rho_e",
 			"a1_ot_e",
 			"a1_rho_m",
-			"a1_ot_m"
+			"a1_ot_m",
+			"pi_m",
+			"rho_m",
+			"a1_m"
         	
         	]
         return branchList

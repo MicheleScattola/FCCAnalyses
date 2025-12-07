@@ -347,7 +347,7 @@ float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
   p4_pi_rest.Boost(boost_to_rest);
 
   // get tau's direction
-  TVector3 tau_dir_lab = p4_tau_lab.Vect().Unit();
+  TVector3 tau_dir_lab = p4_tau_lab.Vect();
 
   // calculate angle between tau's flight and pi boosted in tau rest frame
   float angle = p4_pi_rest.Vect().Angle(tau_dir_lab);
@@ -377,29 +377,38 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   int pb = p.daughters_begin;
   int pe = p.daughters_end;
 
-  Ptau = calc_Ptau(p4_tau_lab);
-
+  //Ptau = calc_Ptau(p4_tau_lab);
+  Ptau = -0.150;
+  TLorentzVector p4_pi_lab;
+  
   for (int i = pb; i < pe; i++) {
     int dau_idx = daughters[i];
     const auto &dau = mc[dau_idx];
     // if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323) {
+    
     if (abs(dau.PDG) == 211) {
       // found pion daughter
       ev.m_found = true;
-      TLorentzVector p4_pi_lab;
-
-      p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+      
+      TLorentzVector p_temp;
+      p_temp.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
-      ev.mc_piP4.push_back(p4_pi_lab);
-      // boosting pion into tau rest frame
-      z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
-      // now exit the loops
-      break;
+      p4_pi_lab += p_temp;
     }
+    // INCLUDE FSR PHOTONS!!!!!
+    else if (abs(dau.PDG) == 22){
+		TLorentzVector p_temp;
+		p_temp.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+				        dau.mass);
+		p4_pi_lab += p_temp;
+    }
+    
   }
+  ev.mc_piP4.push_back(p4_pi_lab);
+  z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
   // weight
   float w_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
-  float w_minus = (1 - alpha * z) / (1 - alpha * Ptau * z);
+  float w_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 
   ev.m_MCweight_plus = w_plus;
   ev.m_MCweight_minus = w_minus;
@@ -448,7 +457,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                          dau.mass);
       p4_rho_lab += p4_pi0_lab;
-    }
+    } 
   }
   float mRho = p4_rho_lab.M();
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
@@ -456,7 +465,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       (SM_TAU * SM_TAU - 2 * mRho * mRho) / (SM_TAU * SM_TAU + 2 * mRho * mRho);
   // weights
   ev.m_MCweight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
-  ev.m_MCweight_minus = (1 - alpha * z) / (1 - alpha * Ptau * z);
+  ev.m_MCweight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 }
 
 void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
@@ -508,7 +517,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
   // weights
   ev.m_MCweight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
-  ev.m_MCweight_minus = (1 - alpha * z) / (1 - alpha * Ptau * z);
+  ev.m_MCweight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 }
 
 // ==========================================
@@ -639,11 +648,7 @@ RVec<float> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // pion x variable
-    if (e.n_ph > 0) {
-      for (const auto &p4 : e.m_phP4) {
-        out.push_back(p4.E());
-      }
-    }
+    out.push_back(e.m_invariant_mass);
   }
   return out;
 };
