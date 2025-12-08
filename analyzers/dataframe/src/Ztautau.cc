@@ -377,8 +377,8 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   int pb = p.daughters_begin;
   int pe = p.daughters_end;
 
-  //Ptau = calc_Ptau(p4_tau_lab);
-  Ptau = -0.150;
+  Ptau = calc_Ptau(p4_tau_lab);
+  
   TLorentzVector p4_pi_lab;
   
   for (int i = pb; i < pe; i++) {
@@ -602,6 +602,7 @@ RVec<float> get_MCpi_e(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // true pi MC energies
+    if (e.mc_piP4.size() != 1 ) cout << "CRITICAL ERROR: piP4 size != 1 , size = " << e.mc_piP4.size() <<  endl;
     if (e.mc_piP4.size() > 0) {
       for (const auto &p4 : e.mc_piP4) {
         out.push_back(p4.E());
