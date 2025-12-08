@@ -1,4 +1,4 @@
-{
+void plots_pi{
     gROOT->Reset();
 
     // Input and output paths (edit if needed)
@@ -20,19 +20,6 @@
     TH1F* op_e = (TH1F*)f->Get("OtAsPi_e");
     TH1F* ap_e = (TH1F*)f->Get("A1AsPi_e");
     
-    /*
-    TH1F* rp_t = (TH1F*)f->Get("RhoAsPi_t");
-    TH1F* ep_t = (TH1F*)f->Get("ElAsPi_t");
-    TH1F* mp_t = (TH1F*)f->Get("MuAsPi_t");
-    TH1F* pp_t = (TH1F*)f->Get("PiAsPi_t");
-    TH1F* op_t = (TH1F*)f->Get("OtAsPi_t");
-    TH1F* ap_t = (TH1F*)f->Get("A1AsPi_t");
-    */
-    
-    
-    // Check histograms existence
-
-    // Create output directory if missing (system call)
     gSystem->Exec(Form("mkdir -p %s", outdir));
     
     // -------------------------
@@ -88,55 +75,6 @@
     C1->SaveAs(Form("%s/missid_e.pdf", outdir));
     
 
-    /*
-    TCanvas* C2 = new TCanvas("C2", "confusion 1-prong pi - costheta", 800, 600);
-    //C2->SetTitle("Miss-ID events: Reco #pi contribution");
-    C2->SetGrid();
-    C2->cd();
-    TGaxis::SetMaxDigits(3);
-    
-    rp_t->SetTitle("Reco #pi |cos#theta| ;cos#theta_{#pi};Entries");
-    rp_t->SetLineColor(kRed);
-    rp_t->SetLineWidth(2);
-    rp_t->Draw("HIST");
-    
-    mp_t->SetLineColor(kMagenta);
-    mp_t->Add(ep_t);
-    mp_t->SetLineWidth(2);
-    mp_t->Draw("HIST SAME");
-    
-    //ep_t->SetLineColor(kRed);
-    //ep_t->SetLineWidth(2);
-    //ep_t->Draw("HIST SAME");
-    
-    pp_t->SetLineColor(kGreen+2);
-    pp_t->SetLineWidth(2);
-    pp_t->Draw("HIST SAME");
-
-    ap_t->SetLineColor(kAzure+10);
-    ap_t->SetLineWidth(2);
-    ap_t->Draw("HIST SAME");
-    
-    op_t->SetLineColor(kGray+3);
-    op_t->SetLineWidth(2);
-    op_t->SetFillColor(kGray+3);
-    op_t->Draw("HIST SAME");
-    
-    // Legend
-    TLegend* legg1 = new TLegend(0.40,0.60,0.70,0.88);
-    legg1->AddEntry(mp_t, "TrueMC lepton as #pi", "l");
-    //legg1->AddEntry(ep_t, "TrueMC e^{#pm} as #pi", "l");
-    legg1->AddEntry(pp_t, "TrueMC #pi as #pi", "l");
-    legg1->AddEntry(rp_t, "TrueMC #rho as #pi", "l");
-    legg1->AddEntry(ap_t, "TrueMC #rho as #pi", "l");
-    legg1->AddEntry(op_t, "TrueMC other as #pi", "l");
-    legg1->Draw();
-    
-    C2->Update();
-    C2->SaveAs(Form("%s/missid_costheta.png", outdir));
-    C2->SaveAs(Form("%s/missid_costheta.pdf", outdir));
-    */
-    
     
     // Clean up 
     // f->Close();

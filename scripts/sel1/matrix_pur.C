@@ -1,7 +1,7 @@
 #include "TString.h"
 #include "TText.h"
 
-{
+void matrix_pur(){
     gROOT->Reset();
     
     const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/sel1/p8_ee_Ztautau_ecm91.root";
@@ -10,20 +10,11 @@
     const char* outdir   = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
 
     TFile *f = TFile::Open(filename, "READ");
-    if (!f || f->IsZombie()) {
-        printf("Errore: impossibile aprire %s\n", filename);
-        return;
-    }
 
     TTree *t = (TTree*)f->Get(treename);
-    if (!t) {
-        printf("Error: TTree %s not found\n", treename);
-        f->Close();
-        return;
-    }
 
     // Branches
-    std::vector<int> *sel_MC_event        = nullptr;
+    std::vector<int> *sel_MC_event = nullptr;
     std::vector<int> *sel_reco_event = nullptr;
 
     t->SetBranchAddress("sel_MC_event",        &sel_MC_event);
@@ -44,9 +35,8 @@
 
         size_t n = sel_MC_event->size();
         if (sel_reco_event->size() != n) {
-            printf("Warning entry %lld: size MC=%zu RECO=%zu\n",
-                   i, sel_MC_event->size(), sel_reco_event->size());
-            n = std::min(sel_MC_event->size(), sel_reco_event->size());
+            std::cerr << "[ERROR] Mismatched sizes in sel_MC_event and sel_reco_event" << std::endl;
+            continue;
         }
 
         for (size_t j = 0; j < n; ++j) {
@@ -77,7 +67,7 @@
         }
     }
 
-    // Plot base (solo heatmap)
+    // Plot 
     gStyle->SetOptStat(0);
     gStyle->SetPalette(kStarryNight);
 
@@ -108,23 +98,23 @@
     hConf->LabelsOption("h");
 
     hConf->GetZaxis()->SetRangeUser(0.0, 1.0);
-    // Disegna solo la mappa colori
+   
     hConf->Draw("COL");
 
-    // Sovrapponi il testo formattato come percentuale (3 decimali)
+    // text
     for (int ix = 1; ix <= nCat; ++ix) {
         double x = hConf->GetXaxis()->GetBinCenter(ix);
         for (int iy = 1; iy <= nCat; ++iy) {
             double y   = hConf->GetYaxis()->GetBinCenter(iy);
             double val = hConf->GetBinContent(ix, iy);   // 0–1
 
-            // testo "xx.xxx %"
+            
             TString label = Form("%.1f %%", val * 100.0);
 
             TText *t = new TText(x, y, label);
-            t->SetTextAlign(22);       // centro (x,y)
-            t->SetTextColor(kWhite);   // testo bianco
-            t->SetTextSize(0.035);     // regola se troppo grande/piccolo
+            t->SetTextAlign(22);       // centered
+            t->SetTextColor(kWhite);   
+            t->SetTextSize(0.035);     
             t->Draw("same");
         }
     }

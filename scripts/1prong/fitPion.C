@@ -34,7 +34,7 @@ struct TemplateFitFunctor {
 
 // =============================================================================
 
-void fitPolarization() {
+void fitPion() {
 
     const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     
@@ -45,18 +45,9 @@ void fitPolarization() {
 
     // recover template
     TFile *fTemp = TFile::Open(infile_templates, "READ");
-    if (!fTemp || fTemp->IsZombie()) {
-        std::cerr << "[ERROR] Impossibile aprire il file dei template: " << infile_templates << std::endl;
-        return;
-    }
     
     TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_plus");
     TH1D *h_minus = (TH1D*)fTemp->Get("h_template_minus");
-
-    if (!h_plus || !h_minus) {
-        std::cerr << "[ERROR] Template h_template_plus o h_template_minus non trovati!" << std::endl;
-        return;
-    }
     
     h_plus->SetDirectory(0);
     h_minus->SetDirectory(0);
@@ -89,9 +80,10 @@ void fitPolarization() {
 
     // plot
     gStyle->SetOptStat(0);
-    gStyle->SetOptFit(1111); // Mostra parametri fit
+    gStyle->SetOptFit(1111); 
 
     TCanvas *c = new TCanvas("c_fit", "Polarization Fit", 800, 600);
+    
 	// S saves data for cov matrix 
     TFitResultPtr r = h_data->Fit(f_fit, "L S R"); 
 

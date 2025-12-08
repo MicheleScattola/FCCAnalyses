@@ -138,8 +138,8 @@ class RDFanalysis():
 				# pi signal and weights
 				#.Define("pi_sgn","Ztautau::get_MCpi_e(myEvent,3,true,3,false)/45.5")
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
-				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,true,3,false)")
-				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,true,3,false)")
+				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
+				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
 				# lepton signals
 				.Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
 				.Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")

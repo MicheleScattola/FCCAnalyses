@@ -1,33 +1,24 @@
 #include "TString.h"
 
-{
+voidm matrix(){
 	gROOT->Reset();
 	
     const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     const char* treename = "events";
     const int   nCat     = 6;      // categories 0,1,2,3,4,5
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
 
     
     TFile *f = TFile::Open(filename, "READ");
-    if (!f || f->IsZombie()) {
-        printf("Errore: impossibile aprire %s\n", filename);
-        return;
-    }
 
     TTree *t = (TTree*)f->Get(treename);
-    if (!t) {
-        printf("Error: TTree %s not found\n", treename);
-        f->Close();
-        return;
-    }
 
     // Branches
-    std::vector<int> *MC_event        = nullptr;
-    std::vector<int> *event_type_reco = nullptr;
+    std::vector<int> *sel_MC_event = nullptr;
+    std::vector<int> *sel_reco_event = nullptr;
 
-    t->SetBranchAddress("MC_event",        &MC_event);
-    t->SetBranchAddress("event_type_reco", &event_type_reco);
+    t->SetBranchAddress("sel_MC_event",        &sel_MC_event);
+    t->SetBranchAddress("sel_reco_event", &sel_reco_event);
 
     // TH2 (MC vs RECO)
     TH2D *hConf = new TH2D("hConf",
@@ -40,19 +31,18 @@
 
         t->GetEntry(i);
 
-        if (!MC_event || !event_type_reco) continue;
+        if (!sel_MC_event || !sel_reco_event) continue;
 
-        size_t n = MC_event->size();
-        if (event_type_reco->size() != n) {
-            printf("Warning entry %lld: size MC=%zu RECO=%zu\n",
-                   i, MC_event->size(), event_type_reco->size());
-            n = std::min(MC_event->size(), event_type_reco->size());
+        size_t n = sel_MC_event->size();
+        if (sel_reco_event->size() != n) {
+            std::cerr << "[ERROR] Mismatched sizes in sel_MC_event and sel_reco_event" << std::endl;
+            continue;
         }
 
         for (size_t j = 0; j < n; ++j) {
 
-            int mc   = MC_event->at(j);
-            int reco = event_type_reco->at(j);
+            int mc   = sel_MC_event->at(j);
+            int reco = sel_reco_event->at(j);
 
             if (mc   < 0 || mc   >= nCat) continue;
             if (reco < 0 || reco >= nCat) continue;
@@ -72,7 +62,7 @@
     hConf->GetXaxis()->SetLabelSize(0.06);  
 	hConf->GetYaxis()->SetLabelSize(0.06);  
 
-	// opzionale: togliere anche i tick
+	
 	hConf->GetXaxis()->SetTickLength(0);
 	hConf->GetYaxis()->SetTickLength(0);
 	
@@ -91,15 +81,14 @@
 	hConf->GetYaxis()->SetBinLabel(6, "a_{1}");
 	
 	hConf->LabelsOption("h");  
-	hConf->SetMarkerColor(kWhite);   // colore del testo nelle celle
-	hConf->SetMarkerSize(1.5);       // opzionale: testo più grande
+	hConf->SetMarkerColor(kWhite);  
+	hConf->SetMarkerSize(1.5);       
 
     hConf->Draw("COLZ TEXT");
 
-    TString name_png = Form("%s/matrix_id.png", outdir);
-    TString name_pdf = Form("%s/matrix_id.pdf", outdir);
+    TString name_pdf = Form("%smatrix_id.pdf", outdir);
 
-    c->SaveAs(name_png);
+    //c->SaveAs(name_png);
     c->SaveAs(name_pdf);
 
     //f->Close();

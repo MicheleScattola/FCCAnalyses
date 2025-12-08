@@ -1,37 +1,28 @@
 #include "TString.h"
 #include "TText.h"
 
-{
+void matrix_eff(){
     gROOT->Reset();
     
     const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     const char* treename = "events";
     const int   nCat     = 6;      // categories 0,1,2,3,4,5
-    const char* outdir   = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots";
+    const char* outdir   = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
 
     TFile *f = TFile::Open(filename, "READ");
-    if (!f || f->IsZombie()) {
-        printf("Errore: impossibile aprire %s\n", filename);
-        return;
-    }
 
     TTree *t = (TTree*)f->Get(treename);
-    if (!t) {
-        printf("Error: TTree %s not found\n", treename);
-        f->Close();
-        return;
-    }
 
     // Branches
-    std::vector<int> *MC_event        = nullptr;
-    std::vector<int> *event_type_reco = nullptr;
+    std::vector<int> *sel_MC_event = nullptr;
+    std::vector<int> *sel_reco_event = nullptr;
 
-    t->SetBranchAddress("MC_event",        &MC_event);
-    t->SetBranchAddress("event_type_reco", &event_type_reco);
+    t->SetBranchAddress("sel_MC_event", &sel_MC_event);
+    t->SetBranchAddress("sel_reco_event", &sel_reco_event);
 
     // TH2 (MC vs RECO)
     TH2D *hConf = new TH2D("hConf",
-                           "Confusion Purity;MC;RECO",
+                           "Confusion Efficiency;MC;RECO",
                            nCat, -0.5, nCat - 0.5,
                            nCat, -0.5, nCat - 0.5);
 
@@ -40,19 +31,18 @@
 
         t->GetEntry(i);
 
-        if (!MC_event || !event_type_reco) continue;
+        if (!sel_MC_event || !sel_reco_event) continue;
 
-        size_t n = MC_event->size();
-        if (event_type_reco->size() != n) {
-            printf("Warning entry %lld: size MC=%zu RECO=%zu\n",
-                   i, MC_event->size(), event_type_reco->size());
-            n = std::min(MC_event->size(), event_type_reco->size());
+        size_t n = sel_MC_event->size();
+        if (sel_reco_event->size() != n) {
+            std::cerr << "[ERROR] Mismatched sizes in sel_MC_event and sel_reco_event" << std::endl;
+            continue;
         }
 
         for (size_t j = 0; j < n; ++j) {
 
-            int mc   = MC_event->at(j);
-            int reco = event_type_reco->at(j);
+            int mc   = sel_MC_event->at(j);
+            int reco = sel_reco_event->at(j);
 
             if (mc   < 0 || mc   >= nCat) continue;
             if (reco < 0 || reco >= nCat) continue;
@@ -62,26 +52,26 @@
     }
 
     // ============================
-    // normalize row
+    // normalize column
     // ============================
-    for (int j = 1; j <= nCat; ++j) { 
+    for (int i = 1; i <= nCat; ++i) { 
         double col_sum = 0.0;
-        for (int i = 1; i <= nCat; ++i)
+        for (int j = 1; j <= nCat; ++j)
             col_sum += hConf->GetBinContent(i, j);
 
         if (col_sum == 0.0) continue;
 
-        for (int i = 1; i <= nCat; ++i) {
+        for (int j = 1; j <= nCat; ++j) {
             double v = hConf->GetBinContent(i, j);
             hConf->SetBinContent(i, j, v / col_sum);   // ora 0–1
         }
     }
 
-    // Plot base (solo heatmap)
+    // Plot 
     gStyle->SetOptStat(0);
     gStyle->SetPalette(kStarryNight);
 
-    TCanvas *c = new TCanvas("cConf", "Confusion matrix (Pur)", 900, 700);
+    TCanvas *c = new TCanvas("cConf", "Confusion matrix (Eff)", 900, 700);
     c->SetLeftMargin(0.15);
     c->SetGrid();
 
@@ -108,29 +98,27 @@
     hConf->LabelsOption("h");
 
     hConf->GetZaxis()->SetRangeUser(0.0, 1.0);
-    // Disegna solo la mappa colori
+    
     hConf->Draw("COL");
 
-    // Sovrapponi il testo formattato come percentuale (3 decimali)
+    // text 
     for (int ix = 1; ix <= nCat; ++ix) {
         double x = hConf->GetXaxis()->GetBinCenter(ix);
         for (int iy = 1; iy <= nCat; ++iy) {
             double y   = hConf->GetYaxis()->GetBinCenter(iy);
             double val = hConf->GetBinContent(ix, iy);   // 0–1
 
-            // testo "xx.xxx %"
             TString label = Form("%.1f %%", val * 100.0);
 
             TText *t = new TText(x, y, label);
-            t->SetTextAlign(22);       // centro (x,y)
-            t->SetTextColor(kWhite);   // testo bianco
-            t->SetTextSize(0.035);     // regola se troppo grande/piccolo
+            t->SetTextAlign(22);       // centered
+            t->SetTextColor(kWhite);   
+            t->SetTextSize(0.035);    
             t->Draw("same");
         }
     }
 
-    
-    TString name_pdf = Form("%s/confusion_purity.pdf", outdir);
+    TString name_pdf = Form("%sconf_eff.pdf", outdir);
 
     c->SaveAs(name_pdf);
 

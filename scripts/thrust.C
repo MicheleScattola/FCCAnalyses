@@ -61,7 +61,6 @@ void thrust() {
 
     // canvas
     TCanvas *c = new TCanvas("c", "Thrust Variables", 900, 800);
-    // Divisione standard 1x2 (con margini di default tra i pad)
     c->Divide(1, 2); 
 
     // COSTHETA
@@ -83,7 +82,7 @@ void thrust() {
     
     h_phi->Draw("HIST");
 
-    // Legenda centrata in alto
+    // center legend
     TLegend *leg2 = new TLegend(0.35, 0.80, 0.65, 0.92);
     leg2->SetBorderSize(0);
     leg2->SetFillStyle(0);

@@ -1,6 +1,6 @@
 #include "TString.h"
 
-{
+voidm matrix(){
 	gROOT->Reset();
 	
     const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/sel1/p8_ee_Ztautau_ecm91.root";
@@ -10,20 +10,11 @@
 
     
     TFile *f = TFile::Open(filename, "READ");
-    if (!f || f->IsZombie()) {
-        printf("Errore: impossibile aprire %s\n", filename);
-        return;
-    }
 
     TTree *t = (TTree*)f->Get(treename);
-    if (!t) {
-        printf("Error: TTree %s not found\n", treename);
-        f->Close();
-        return;
-    }
 
     // Branches
-    std::vector<int> *sel_MC_event        = nullptr;
+    std::vector<int> *sel_MC_event = nullptr;
     std::vector<int> *sel_reco_event = nullptr;
 
     t->SetBranchAddress("sel_MC_event",        &sel_MC_event);
@@ -44,9 +35,8 @@
 
         size_t n = sel_MC_event->size();
         if (sel_reco_event->size() != n) {
-            printf("Warning entry %lld: size MC=%zu RECO=%zu\n",
-                   i, sel_MC_event->size(), sel_reco_event->size());
-            n = std::min(sel_MC_event->size(), sel_reco_event->size());
+            std::cerr << "[ERROR] Mismatched sizes in sel_MC_event and sel_reco_event" << std::endl;
+            continue;
         }
 
         for (size_t j = 0; j < n; ++j) {
@@ -72,7 +62,7 @@
     hConf->GetXaxis()->SetLabelSize(0.06);  
 	hConf->GetYaxis()->SetLabelSize(0.06);  
 
-	// opzionale: togliere anche i tick
+	
 	hConf->GetXaxis()->SetTickLength(0);
 	hConf->GetYaxis()->SetTickLength(0);
 	
@@ -91,8 +81,8 @@
 	hConf->GetYaxis()->SetBinLabel(6, "a_{1}");
 	
 	hConf->LabelsOption("h");  
-	hConf->SetMarkerColor(kWhite);   // colore del testo nelle celle
-	hConf->SetMarkerSize(1.5);       // opzionale: testo più grande
+	hConf->SetMarkerColor(kWhite);  
+	hConf->SetMarkerSize(1.5);       
 
     hConf->Draw("COLZ TEXT");
 

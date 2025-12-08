@@ -1,4 +1,5 @@
 #include <iostream>
+#include "ROOT/RDataFrame.hxx"
 //================================================
 double aux_norm(double x, double P){
 	return 1./3. * ( (5*x -3*x*x*x + x*x*x*x) + P * (x -3*x*x +2*x*x*x*x) );
@@ -21,7 +22,7 @@ struct TemplateFitFunctor {
     }
 };	
 
-void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
+void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 		
 	if (!hist) {
 		std::cerr << "[ERROR] Fit_1prong: hist is null\n";
@@ -29,7 +30,7 @@ void Fit_1prong(TH1 *hist, const char *outname, const char *title) {
 	}
 
 	// cloning and normalizing histogram
-	TH1 *h = (TH1*)hist->Clone(Form("%s_clone", hist->GetName()));
+	TH1D *h = (TH1D*)hist->Clone(Form("%s_clone", hist->GetName()));
 	h->Sumw2();
 	
 	int N = h->Integral();
@@ -140,17 +141,22 @@ void fitLep() {
     //gROOT->Reset();
 
     const char* infile =
-        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/histmaker/p8_ee_Ztautau_ecm91.root";
+        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
 
     TFile* f = TFile::Open(infile, "READ");
-    if (!f || f->IsZombie()) {
-        std::cerr << "ERROR: cannot open file: " << infile << std::endl;
-        return;
-    }
+	std::string treeName = "events";
+	ROOT::EnableImplicitMT();
+    ROOT::RDataFrame df(treeName, infile);
+	
 
-    // histos
-    TH1F* h_el = (TH1F*)f->Get("el_sgn");
-    TH1F* h_mu = (TH1F*)f->Get("mu_sgn");
+	int nBins = 38;
+	double xMin = 0.05;
+	double xMax = 1.0;
+    
+    auto h_data1 = df.Histo1D({"h_data1", "Fit Polarization;x_{#mu};Events", nBins, xMin, xMax}, "mu_sgn");
+	auto h_data2 = df.Histo1D({"h_data2", "Fit Polarization;x_{#el};Events", nBins, xMin, xMax}, "el_sgn");
+    TH1D *h_mu = (TH1D*)h_data1->Clone("copy1");
+	TH1D *h_el = (TH1D*)h_data2->Clone("copy2");
 
     if (!h_el) std::cerr << "[WARN] Histogram el_sgn not found" << std::endl;
     if (!h_mu) std::cerr << "[WARN] Histogram mu_sgn not found" << std::endl;
