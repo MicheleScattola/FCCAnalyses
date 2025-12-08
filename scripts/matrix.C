@@ -1,6 +1,6 @@
 #include "TString.h"
 
-voidm matrix(){
+void matrix(){
 	gROOT->Reset();
 	
     const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
@@ -14,42 +14,53 @@ voidm matrix(){
     TTree *t = (TTree*)f->Get(treename);
 
     // Branches
-    std::vector<int> *sel_MC_event = nullptr;
-    std::vector<int> *sel_reco_event = nullptr;
+    std::vector<int> *MC_event = nullptr;
+    std::vector<int> *event_type_reco = nullptr;
 
-    t->SetBranchAddress("sel_MC_event",        &sel_MC_event);
-    t->SetBranchAddress("sel_reco_event", &sel_reco_event);
+    t->SetBranchAddress("MC_event",        &MC_event);
+    t->SetBranchAddress("event_type_reco", &event_type_reco);
 
     // TH2 (MC vs RECO)
     TH2D *hConf = new TH2D("hConf",
                            "Confusion matrix;MC category;RECO category",
                            nCat, -0.5, nCat - 0.5,
                            nCat, -0.5, nCat - 0.5);
-
+	
+	std::vector<long> mc_counts(nCat, 0);
     Long64_t nEntries = t->GetEntries();
     for (Long64_t i = 0; i < nEntries; ++i) {
 
         t->GetEntry(i);
 
-        if (!sel_MC_event || !sel_reco_event) continue;
+        if (!MC_event || !event_type_reco) continue;
 
-        size_t n = sel_MC_event->size();
-        if (sel_reco_event->size() != n) {
-            std::cerr << "[ERROR] Mismatched sizes in sel_MC_event and sel_reco_event" << std::endl;
+        size_t n = MC_event->size();
+        if (event_type_reco->size() != n) {
+            std::cerr << "[ERROR] Mismatched sizes in MC_event and event_type_reco" << std::endl;
             continue;
         }
 
         for (size_t j = 0; j < n; ++j) {
 
-            int mc   = sel_MC_event->at(j);
-            int reco = sel_reco_event->at(j);
+            int mc   = MC_event->at(j);
+            int reco = event_type_reco->at(j);
 
             if (mc   < 0 || mc   >= nCat) continue;
             if (reco < 0 || reco >= nCat) continue;
 
             hConf->Fill(mc, reco);
+            mc_counts[mc]++;
         }
     }
+    const char* labels[] = {"Other", "Mu", "El", "Pi", "Rho", "A1"};
+    int total = 0;
+    std::cout << "MC type counts: " << endl;
+    for(int i=0; i<nCat; ++i) {
+        std::cout << labels[i] << " = " << mc_counts[i] << std::endl;
+        total += mc_counts[i];
+    }
+    std::cout << "total events = " << total/2 << endl;
+    
 
     // Plot
     gStyle->SetOptStat(0);

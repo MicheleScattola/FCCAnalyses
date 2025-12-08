@@ -64,14 +64,14 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 	// plot
 	TCanvas *c = new TCanvas(Form("canvas_%s", hist->GetName()), "P fit", 900,600);
 	c->cd();
-	
+	TGaxis::SetMaxDigits(3);
 	// Fit:
 	
 	h->SetTitle(title);
 	h->SetMarkerStyle(20);
 	h->SetMarkerSize(0.7);
 	h->SetLineColor(kBlack);
-	h->SetLineWidth(1);
+	h->SetLineWidth(2);
 	      
 	f->SetLineColor(kMagenta);
 	f->SetLineWidth(2);
@@ -97,16 +97,18 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
     H_plus->SetParameter(0, +1); 
     H_plus->SetLineColor(kBlue);
     H_plus->SetLineStyle(2);
+    H_plus->SetLineWidth(2);
     H_plus->Draw("SAME");
     TF1 *H_minus = new TF1("Hminus_draw", fitFunctor, xmin, xmax, 3);
     H_minus->SetParameters(f->GetParameters());
     H_minus->SetParameter(0, -1); 
     H_minus->SetLineColor(kRed);
     H_minus->SetLineStyle(2);
+    H_minus->SetLineWidth(2);
     H_minus->Draw("SAME");
     
     // legend
-    TLegend* leg = new TLegend(0.15,0.15,0.3,0.3);
+    TLegend* leg = new TLegend(0.15,0.15,0.35,0.35);
     leg->AddEntry(h, "signal", "l");
     leg->AddEntry(f, "global fit", "l");
     leg->AddEntry(H_plus, "H = +1", "l");

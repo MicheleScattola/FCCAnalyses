@@ -116,8 +116,9 @@ class RDFanalysis():
 				#####
 				# MC IDENTIFICATION
 				#####
-                .Define("MC_event","Ztautau::classify_mc_event(Particle,Particle1)")
-                .Define("MC_event_type","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
+                .Define("MC_event","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
+                .Define("debug","RVec<int> {myEvent[0].m_debug,myEvent[1].m_debug}")
+                .Define("debug_mass","RVec<int> {myEvent[0].m_debug_mass,myEvent[1].m_debug_mass}")
                 
 				#.Define("weights_plus","RVec<float> {myEvent[0].m_MCweight_plus,myEvent[1].m_MCweight_plus}")
                 #.Define("weights_minus","RVec<float> {myEvent[0].m_MCweight_minus,myEvent[1].m_MCweight_minus}")
@@ -163,6 +164,8 @@ class RDFanalysis():
         branchList = [
         	"MC_event",
         	"event_type_reco",
+        	"debug",
+        	"debug_mass",
         	"pi_mask",
         	"weight_mask",
         	"pi_sgn",

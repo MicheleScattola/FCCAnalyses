@@ -126,24 +126,38 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     ev.n_ph = ph.size();
 
     // fill collections
-    fill_collection(mu, ev.m_muP4);
-    fill_collection(el, ev.m_elP4);
-    fill_collection(pi, ev.m_piP4);
-    fill_collection(ph, ev.m_phP4);
+    ev.m_RecoEnergy = 0.;
+    ev.m_RecoMass = 0.;
+    ev.m_RecoCharge = 0.;
+    fill_collection(ev, mu, ev.m_muP4);
+    fill_collection(ev, el, ev.m_elP4);
+    fill_collection(ev, pi, ev.m_piP4);
+    fill_collection(ev, ph, ev.m_phP4);
 
     // RECO EVT CLASSIFICATION
     // Leptonic
-    if ((ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
+    if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0 ) {
       ev.m_type = classify_lep(ev);
     }
     // Hadronic
     else if (ev.n_pi > 0 && ev.n_mu == 0 && ev.n_el == 0) {
       ev.m_type = classify_pion(ev);
     }
+    
+    else if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi != 0 ) {
+      ev.m_debug = 1;
+    }
 
     // invariant mass check
+    TLorentzVector p4_tot;
+    for(auto &p : ev.m_muP4) p4_tot += p;
+    for(auto &p : ev.m_elP4) p4_tot += p;
+    for(auto &p : ev.m_piP4) p4_tot += p;
+    for(auto &p : ev.m_phP4) p4_tot += p;
+    
+    ev.m_RecoMass = p4_tot.M(); 
     if (ev.m_RecoMass > 1.8){
-      ev.m_debug = 1; // high mass
+      ev.m_debug_mass = 1; // high mass
       ev.m_type = 0; // reset type
     }
 
@@ -206,18 +220,17 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 }
 // ==========================================
 // helper to fill P4 and add energy & charge
-auto fill_collection = (const auto &input_particles,
+void fill_collection (myEvent &ev, const auto &input_particles,
                             RVec<TLorentzVector> &out_p4) {
 
   out_p4.reserve(input_particles.size());
-
+  
   for (const auto &p : input_particles) {
     ev.m_RecoCharge += p.charge;
     ev.m_RecoEnergy += p.energy;
 
     TLorentzVector tlv;
     tlv.SetPxPyPzE(p.momentum.x, p.momentum.y, p.momentum.z, p.energy);
-    ev.m_RecoMass += tlv.M();
     out_p4.push_back(tlv);
   }
 }
@@ -230,9 +243,7 @@ int classify_MC(const RVec<int> &pdgs) {
       n_mu++;
     else if (p == 11)
       n_el++;
-    // else if (p == 211 || p == 321 || p == 323) n_pi++; // do not distinguish
-    // between pi or Kaon
-    else if (p == 211)
+    else if (p == 211|| p == 321 || p == 323)
       n_pi++; // do not distinguish between pi or Kaon
     else if (p == 111)
       n_pi0++;
@@ -240,17 +251,17 @@ int classify_MC(const RVec<int> &pdgs) {
       n_ph++;
   }
   // classification
-  if (n_mu == 1 && n_el == 0 && n_pi == 0)
+  if (n_mu == 1)
     return 1; // mu
-  else if (n_mu == 0 && n_el == 1 && n_pi == 0)
+  else if (n_el == 1)
     return 2; // el
-  else if (n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 0)
+  else if (n_pi == 1 && n_pi0 == 0)
     return 3; // pi
-  else if (n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 1)
+  else if (n_pi == 1 && n_pi0 == 1)
     return 4; // rho
-  else if (n_mu == 0 && n_el == 0 && n_pi == 1 && n_pi0 == 2)
+  else if (n_pi == 1 && n_pi0 == 2)
     return 5; // a1 (1prong)
-  else if (n_mu == 0 && n_el == 0 && n_pi == 3)
+  else if (n_pi == 3)
     return 5; // a1 (3prong)
 
   return 0;
@@ -259,11 +270,11 @@ int classify_MC(const RVec<int> &pdgs) {
 // ==========================================
 int classify_lep(const myEvent &ev) {
   // Check MUON: 1 mu, 0 others
-  if (ev.n_mu == 1 && ev.n_el == 0 && ev.n_pi == 0) {
+  if (ev.n_mu == 1 && ev.n_el == 0) {
     return 1; // Type 1: Muon
   }
   // Check ELECTRON: 1 el, 0 others
-  if (ev.n_mu == 0 && ev.n_el == 1 && ev.n_pi == 0) {
+  if (ev.n_mu == 0 && ev.n_el == 1 ) {
     return 2; // Type 2: Electron
   }
 
@@ -283,13 +294,14 @@ int classify_pion(myEvent &ev) {
   } else if (ev.n_ph >= 3) {
       return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
   }
+  }
   if (ev.n_pi == 3) {
     return 5; // Type 5: a1 (3-prong mode)
   }
-
+  ev.m_debug = 2;
   return 0;
 }
-  }
+  
   
 
 RVec<int> get_type_safe(const RVec<myEvent> &evs) {
@@ -625,8 +637,8 @@ RVec<float> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
-    // pion x variable
-    out.push_back(e.m_invariant_mass);
+    // invariant mass
+    out.push_back(e.m_RecoMass);
   }
   return out;
 };

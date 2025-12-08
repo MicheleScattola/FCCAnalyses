@@ -1,4 +1,4 @@
-void plots_pi{
+void plots_pi(){
     gROOT->Reset();
 
     // Input and output paths (edit if needed)

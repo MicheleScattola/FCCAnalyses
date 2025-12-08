@@ -83,7 +83,8 @@ void fitPion() {
     gStyle->SetOptFit(1111); 
 
     TCanvas *c = new TCanvas("c_fit", "Polarization Fit", 800, 600);
-    
+    c->cd();
+    TGaxis::SetMaxDigits(3);
 	// S saves data for cov matrix 
     TFitResultPtr r = h_data->Fit(f_fit, "L S R"); 
 

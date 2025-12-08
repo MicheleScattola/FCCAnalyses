@@ -90,7 +90,7 @@ struct myEvent {
 
   // debug
   int m_debug = 0; 
-  float m_invariant_mass = 0.0;
+  int m_debug_mass = 0;
 };
 
 // return event struct
@@ -102,7 +102,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<int> &daughters);
 // ==========================================
 // helper to fill P4 and add energy & charge
-auto fill_collection = (const auto &input_particles,
+void fill_collection (myEvent &ev, const auto &input_particles,
                             RVec<TLorentzVector> &out_p4);
 // ==========================================
 int classify_lep(const myEvent &ev);
