@@ -349,7 +349,7 @@ float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
   // get tau's direction
   TVector3 tau_dir_lab = p4_tau_lab.Vect();
 
-  // calculate angle between tau's flight and pi boosted in tau rest frame
+  // calculate angle between tau and pi boosted in tau rest frame
   float angle = p4_pi_rest.Vect().Angle(tau_dir_lab);
 
   return cos(angle);
