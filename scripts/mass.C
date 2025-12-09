@@ -2,7 +2,7 @@
 
 // invariant mass BreitWigner distribution
 float BreitWigner(double *x, double *par){
-	return TMath::BreitWigner (x[0],par[1],par[2]);
+	return TMath::BreitWigner (x[0],par[0],par[1]);
 }
 
 void mass() {
@@ -53,16 +53,18 @@ void mass() {
     aMC->SetLineColor(kBlue + 1);
     aMC->SetFillColorAlpha(kBlue + 1, 0.3); 
     aMC->SetLineWidth(2);
-    aMC->Draw("HIST");
+    aMC->Draw("HIST E");
     
     aReco->SetLineColor(kRed);
     aReco->SetLineWidth(2);
     // aReco->SetFillColorAlpha(kRed, 0.0);
-    aReco->Fit("gaus","Q"); 
     // convolution fit
-    TF1* fit1 = new TF1()
-    
-    aReco->Draw("HIST SAMES");
+    TF1* f = new TF1("f", BreitWigner, 0, 2, 2);
+    f->SetParameters(1.26, 0.4); // initial values
+    f->SetParNames("mass", "#Gamma");
+    aReco->Draw("HIST SAMES E");
+    aReco->Fit(f,"RQ SAME");
+    f->Draw("SAME");
     C1->Update();
     
     TLegend* leg1 = new TLegend(0.2, 0.70, 0.4, 0.88);
@@ -82,12 +84,12 @@ void mass() {
     rMC->SetLineColor(kBlue + 1);
     rMC->SetFillColorAlpha(kBlue + 1, 0.3); 
     rMC->SetLineWidth(2);
-    rMC->Draw("HIST");
+    rMC->Draw("HIST E");
     
     rReco->SetLineColor(kRed);
     rReco->SetLineWidth(2);
     rReco->Fit("gaus","Q"); 
-    rReco->Draw("HIST SAMES");   
+    rReco->Draw("HIST SAME S E");   
     C2->Update();
     
     TLegend* leg2 = new TLegend(0.65, 0.30, 0.88, 0.48);
