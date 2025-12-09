@@ -1,7 +1,6 @@
-#include "ROOT/TMath.cxx"
 
 // invariant mass BreitWigner distribution
-float BreitWigner(double *x, double *par){
+double BreitWigner(double *x, double *par){
 	return TMath::BreitWigner (x[0],par[0],par[1]);
 }
 
@@ -12,7 +11,7 @@ void mass() {
     gROOT->Reset();
 
     const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots";
 
     gSystem->Exec(Form("mkdir -p %s", outdir));
 
@@ -51,19 +50,19 @@ void mass() {
 
     aMC->SetTitle("a_{1} Mass: MC vs Reco;Mass [GeV];Entries");
     aMC->SetLineColor(kBlue + 1);
-    aMC->SetFillColorAlpha(kBlue + 1, 0.3); 
+    aMC->SetFillColorAlpha(kBlue + 1, 0.2); 
     aMC->SetLineWidth(2);
     aMC->Draw("HIST E");
     
     aReco->SetLineColor(kRed);
     aReco->SetLineWidth(2);
     // aReco->SetFillColorAlpha(kRed, 0.0);
-    // convolution fit
     TF1* f = new TF1("f", BreitWigner, 0, 2, 2);
     f->SetParameters(1.26, 0.4); // initial values
     f->SetParNames("mass", "#Gamma");
     aReco->Draw("HIST SAMES E");
-    aReco->Fit(f,"RQ SAME");
+    aReco->Fit(f,"R SAME");
+    f->SetLineColor(kMagenta);
     f->Draw("SAME");
     C1->Update();
     
@@ -82,7 +81,7 @@ void mass() {
 
     rMC->SetTitle("#rho Mass: MC vs Reco;Mass [GeV];Entries");
     rMC->SetLineColor(kBlue + 1);
-    rMC->SetFillColorAlpha(kBlue + 1, 0.3); 
+    rMC->SetFillColorAlpha(kBlue + 1, 0.2); 
     rMC->SetLineWidth(2);
     rMC->Draw("HIST E");
     
