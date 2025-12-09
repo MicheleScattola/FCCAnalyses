@@ -60,9 +60,9 @@ void thrust() {
     h_phi->GetXaxis()->SetTitleSize(titleSize);
 
     // canvas
-    TCanvas *c = new TCanvas("c", "Thrust Variables", 900, 800);
+    TCanvas *c = new TCanvas("c", "Thrust Variables", 800, 800);
     c->Divide(1, 2); 
-
+	TGaxis::SetMaxDigits(3);
     // COSTHETA
     c->cd(1);
     
@@ -72,7 +72,7 @@ void thrust() {
     TLegend *leg1 = new TLegend(0.35, 0.75, 0.65, 0.92);
     leg1->SetBorderSize(0);
     leg1->SetFillStyle(0);
-    leg1->SetTextSize(0.06);
+    leg1->SetTextSize(0.065);
     leg1->SetTextAlign(22); 
     leg1->AddEntry(h_costheta, "Thrust cos(#theta)", "f");
     leg1->Draw();

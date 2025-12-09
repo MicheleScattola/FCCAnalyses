@@ -3,7 +3,7 @@ void plots_pi(){
 
     // Input and output paths (edit if needed)
     const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/histmaker/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/analysis/plots/confusion";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
 
     TFile* f = TFile::Open(infile, "READ");
     if (!f || f->IsZombie()) {

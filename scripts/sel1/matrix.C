@@ -1,6 +1,6 @@
 #include "TString.h"
 
-voidm matrix(){
+void matrix(){
 	gROOT->Reset();
 	
     const char* filename = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/sel1/p8_ee_Ztautau_ecm91.root";
