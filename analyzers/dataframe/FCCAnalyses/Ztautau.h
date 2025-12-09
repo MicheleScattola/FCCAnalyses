@@ -150,6 +150,10 @@ RVec<float> get_MCpi_e(const RVec<myEvent> &evs, const int mc_type,
 RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
                         const int reco_type, const bool bool_reco);
+// ==========================================
+RVec<float> get_MCmeson_mass(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco);           
 
 // ==========================================
 // MASKS AND FILTERS

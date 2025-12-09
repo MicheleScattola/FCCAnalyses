@@ -1,111 +1,143 @@
-void mass(){
+#include "ROOT/TMath.cxx"
+
+// invariant mass BreitWigner distribution
+float BreitWigner(double *x, double *par){
+	return TMath::BreitWigner (x[0],par[1],par[2]);
+}
+
+void mass() {
+    
+    ROOT::EnableImplicitMT(); 
 
     gROOT->Reset();
 
-    // Input and output paths (edit if needed)
-    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/histmaker/p8_ee_Ztautau_ecm91.root";
+    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
 
-    TFile* f = TFile::Open(infile, "READ");
-    if (!f || f->IsZombie()) {
-        std::cerr << "ERROR: could not open file: " << infile << std::endl;
-        return;
-    }
-
-    // Retrieve histograms 
-    
-    TH1F* aMC = (TH1F*)f->Get("MC_a1_m");
-    TH1F* rMC = (TH1F*)f->Get("MC_rho_m");
-    TH1F* aReco = (TH1F*)f->Get("reco_a1_m");
-    TH1F* rReco = (TH1F*)f->Get("reco_rho_m");
-    
     gSystem->Exec(Form("mkdir -p %s", outdir));
+
+    ROOT::RDataFrame df("events", infile);
+
+    int nbins_m = 60; double min_m = 0; double max_m = 2;
+    int nbins_p = 50; double min_p = -0.6; double max_p = 0.6;
+
+    // MC Masses
+    auto h_aMC = df.Histo1D({"MC_a1_m", "MC a_{1} mass", nbins_m, min_m, max_m}, "MC_a1_m");
+    auto h_rMC = df.Histo1D({"MC_rho_m", "MC #rho mass", nbins_m, min_m, max_m}, "MC_rho_m");
     
-    // -------------------------
-    TCanvas* C1 = new TCanvas("C1", "MC masses", 800, 600);
+    // Reco Masses
+    auto h_aReco = df.Histo1D({"reco_a1_m", "Reconstructed a_{1} mass", nbins_m, min_m, max_m}, "reco_a1_m");
+    auto h_rReco = df.Histo1D({"reco_rho_m", "Reconstructed #rho mass", nbins_m, min_m, max_m}, "reco_rho_m");
+    
+    // Pulls
+    auto h_aPull = df.Histo1D({"a1_pull", "a_{1} mass pull", nbins_p, min_p, max_p}, "a1_pull");
+    auto h_rPull = df.Histo1D({"rho_pull", "#rho mass pull", nbins_p, min_p, max_p}, "rho_pull");
+
+    // Clone histograms to detach from RDataFrame
+    TH1D* aMC = (TH1D*)h_aMC->Clone();
+    TH1D* rMC = (TH1D*)h_rMC->Clone();
+    TH1D* aReco = (TH1D*)h_aReco->Clone();
+    TH1D* rReco = (TH1D*)h_rReco->Clone();
+    TH1D* aPull = (TH1D*)h_aPull->Clone();
+    TH1D* rPull = (TH1D*)h_rPull->Clone();
+
+	gStyle->SetOptStat(0);
+	gStyle->SetOptFit(1111);
+    // A1
+    TCanvas* C1 = new TCanvas("C1", "a1 Comparison", 800, 600);
     C1->SetGrid();
     C1->cd();
     TGaxis::SetMaxDigits(3);
-    
-    aMC->SetTitle("MC invariant masses;Mass [GeV];Entries");
-    aMC->SetLineColor(kBlue);
-    aMC->SetFillColorAlpha(kBlue,0.3);
+
+    aMC->SetTitle("a_{1} Mass: MC vs Reco;Mass [GeV];Entries");
+    aMC->SetLineColor(kBlue + 1);
+    aMC->SetFillColorAlpha(kBlue + 1, 0.3); 
     aMC->SetLineWidth(2);
     aMC->Draw("HIST");
     
-    rMC->SetLineColor(kRed);
-    rMC->SetFillColorAlpha(kRed,0.3);
-    rMC->SetLineWidth(2);
-    rMC->Draw("HIST SAME");
+    aReco->SetLineColor(kRed);
+    aReco->SetLineWidth(2);
+    // aReco->SetFillColorAlpha(kRed, 0.0);
+    aReco->Fit("gaus","Q"); 
+    // convolution fit
+    TF1* fit1 = new TF1()
     
-    // Legend
-    TLegend* leg1 = new TLegend(0.65,0.70,0.88,0.88);
-    leg1->AddEntry(aMC, "TrueMC a_{1}", "l");
-    leg1->AddEntry(rMC, "TrueMC #rho", "l");
+    aReco->Draw("HIST SAMES");
+    C1->Update();
+    
+    TLegend* leg1 = new TLegend(0.2, 0.70, 0.4, 0.88);
+    leg1->AddEntry(aMC, "MC a_{1}", "f");   
+    leg1->AddEntry(aReco, "Reco a_{1}", "l");
     leg1->Draw();
 
-    C1->Update();
-    C1->SaveAs(Form("%s/MC_masses.pdf", outdir));
+    C1->SaveAs(Form("%s/a1_mass.pdf", outdir));
 
-    // ============================
-    // now same but with reco masses
-    TCanvas* C2 = new TCanvas("C2", "Reco masses", 800, 600);
+    // RHO
+    TCanvas* C2 = new TCanvas("C2", "rho Comparison", 800, 600);
     C2->SetGrid();
     C2->cd();
     TGaxis::SetMaxDigits(3);
 
-    aReco->SetTitle("Reconstructed invariant masses;Mass [GeV];Entries");
-    aReco->SetLineColor(kBlue);
-    aReco->SetFillColorAlpha(kBlue,0.3);
-    aReco->SetLineWidth(2);
-    aReco->Draw("HIST");    
-
-    rReco->SetLineColor(kRed);
-    rReco->SetFillColorAlpha(kRed,0.3);
-    rReco->SetLineWidth(2);
-    rReco->Draw("HIST SAME");
+    rMC->SetTitle("#rho Mass: MC vs Reco;Mass [GeV];Entries");
+    rMC->SetLineColor(kBlue + 1);
+    rMC->SetFillColorAlpha(kBlue + 1, 0.3); 
+    rMC->SetLineWidth(2);
+    rMC->Draw("HIST");
     
-    // Legend
-    TLegend* leg2 = new TLegend(0.65,0.70,0.88,0.88);
-    leg2->AddEntry(aMC, "Reco a_{1}", "l");
-    leg2->AddEntry(rMC, "Reco #rho", "l");
+    rReco->SetLineColor(kRed);
+    rReco->SetLineWidth(2);
+    rReco->Fit("gaus","Q"); 
+    rReco->Draw("HIST SAMES");   
+    C2->Update();
+    
+    TLegend* leg2 = new TLegend(0.65, 0.30, 0.88, 0.48);
+    leg2->AddEntry(rMC, "MC #rho", "f");
+    leg2->AddEntry(rReco, "Reco #rho", "l");
     leg2->Draw();
 
-    C1->Update();
-    C1->SaveAs(Form("%s/Reco_masses.pdf", outdir));
+    C2->SaveAs(Form("%s/rho_mass.pdf", outdir));
 
-    // ============================
-    // now pulls
-    TCanvas* C3 = new TCanvas("C3", "Mass pulls", 800, 600);
-    C3->Divide(2,1);
+    // PULLS
+    TCanvas* C3 = new TCanvas("C3", "Mass pulls", 900, 600);
+    C3->Divide(2, 1);
+    
     C3->cd(1);
     C3->cd(1)->SetGrid();
     TGaxis::SetMaxDigits(3);
-    TH1F* aPull = (TH1F*)aMC->Clone("aPull");
-    aPull->Add(aReco, -1);
     aPull->SetTitle("a_{1} mass pull;Mass_{MC} - Mass_{Reco} [GeV];Entries");
-    aPull->SetLineColor(kBlue);
-    aPull->SetFillColorAlpha(kBlue,0.3);
+    aPull->SetLineColor(kBlue+1);
+    aPull->SetFillColorAlpha(kBlue, 0.3);
     aPull->SetLineWidth(2);
     aPull->Draw("HIST");
 
     C3->cd(2);
     C3->cd(2)->SetGrid();
     TGaxis::SetMaxDigits(3);
-    TH1F* rPull = (TH1F*)rMC->Clone("rPull");
-    rPull->Add(rReco, -1);
     rPull->SetTitle("#rho mass pull;Mass_{MC} - Mass_{Reco} [GeV];Entries");
     rPull->SetLineColor(kRed);
-    rPull->SetFillColorAlpha(kRed,0.3);
+    rPull->SetFillColorAlpha(kRed, 0.3);
     rPull->SetLineWidth(2);
     rPull->Draw("HIST");
 
-    C3->Update();
     C3->SaveAs(Form("%s/mass_pulls.pdf", outdir));
+    
+    // ==========================================
+    // OVERFLOW COUNTS
+    // ==========================================
+    
+    // Find bin for 2 GeV
+    int bin_a_start = aReco->FindBin(2);
+    int bin_r_start = rReco->FindBin(2);
+    
+    // GetNbinsX() + 1 is the OVERFLOW bin
+    double counts_a = aReco->Integral(bin_a_start, aReco->GetNbinsX() + 1);
+    double counts_r = rReco->Integral(bin_r_start, rReco->GetNbinsX() + 1);
 
-    // Clean up 
-    // f->Close();
-    // delete f;
+    std::cout << "\n=======================================" << std::endl;
+    std::cout << "COUNTS FOR RECO MASS > 2 GeV" << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "Reco a1 counts : " << counts_a << std::endl;
+    std::cout << "Reco rho counts: " << counts_r << std::endl;
+    std::cout << "TOTAL          : " << counts_a + counts_r << std::endl;
+    std::cout << "=======================================\n" << std::endl;
 }
-
-

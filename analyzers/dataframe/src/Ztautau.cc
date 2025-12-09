@@ -158,7 +158,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     ev.m_RecoMass = p4_tot.M(); 
     if (ev.m_RecoMass > 1.8){
       ev.m_debug_mass = 1; // high mass
-      ev.m_type = 0; // reset type
+      //ev.m_type = 0; // reset type
     }
 
     // MC EVENT CLASSIFICATION & WEIGHTING
@@ -440,7 +440,6 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
-      ev.mc_mesonP4.push_back(p4_pi_lab);
       p4_rho_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0
@@ -497,7 +496,6 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
-      ev.mc_mesonP4.push_back(p4_pi_lab);
       p4_rho_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0

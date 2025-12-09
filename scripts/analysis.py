@@ -155,6 +155,8 @@ class RDFanalysis():
 				.Define("MC_a1_m","Ztautau::get_MCmeson_mass(myEvent,5,true,5,true)")
 				.Define("reco_rho_m","Ztautau::get_invariant_mass(myEvent,4,true,4,true)")
 				.Define("reco_a1_m","Ztautau::get_invariant_mass(myEvent,5,true,5,true)")
+				.Define("rho_pull","MC_rho_m - reco_rho_m")
+				.Define("a1_pull","MC_a1_m - reco_a1_m")
 				  
                 )
 		
@@ -189,7 +191,10 @@ class RDFanalysis():
 			"reco_rho_m",
 			"reco_a1_m",
 			"MC_rho_m",
-			"MC_a1_m"
+			"MC_a1_m",
+			"rho_pull",
+			"a1_pull"
+		
         	
         	]
         return branchList
