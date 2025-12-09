@@ -62,10 +62,9 @@ void thrust() {
     // canvas
     TCanvas *c = new TCanvas("c", "Thrust Variables", 800, 800);
     c->Divide(1, 2); 
-	TGaxis::SetMaxDigits(3);
     // COSTHETA
     c->cd(1);
-    
+    TGaxis::SetMaxDigits(3);
     h_costheta->Draw("HIST");
 
     // center legend
@@ -79,7 +78,7 @@ void thrust() {
 
     // PHI
     c->cd(2);
-    
+    TGaxis::SetMaxDigits(3);
     h_phi->Draw("HIST");
 
     // center legend

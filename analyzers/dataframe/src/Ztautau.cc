@@ -243,8 +243,8 @@ int classify_MC(const RVec<int> &pdgs) {
       n_mu++;
     else if (p == 11)
       n_el++;
-    else if (p == 211|| p == 321 || p == 323)
-      n_pi++; // do not distinguish between pi or Kaon
+    else if (p == 211)
+      n_pi++; 
     else if (p == 111)
       n_pi0++;
     else if (p == 22)
@@ -383,14 +383,14 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                         dau.mass);
       p4_pi_lab += p_temp;
     }
-    // INCLUDE FSR PHOTONS!!!!!
+    /* INCLUDE FSR PHOTONS??
     else if (abs(dau.PDG) == 22){
     cout << "Found FSR photon in pion decay!" << endl;
 		TLorentzVector p_temp;
 		p_temp.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
 				        dau.mass);
 		p4_pi_lab += p_temp;
-    }
+    } */
     
   }
   ev.mc_piP4.push_back(p4_pi_lab);
@@ -490,9 +490,9 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     if (abs(dau.PDG) == 211) {
       ev.m_found = true;
       TLorentzVector p4_pi_lab;
-      ev.mc_piP4.push_back(p4_pi_lab);
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
+      ev.mc_piP4.push_back(p4_pi_lab);
       p4_rho_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0

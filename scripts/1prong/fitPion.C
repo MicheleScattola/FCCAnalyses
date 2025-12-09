@@ -189,7 +189,7 @@ void fitPion() {
 
     // save
     //c->SaveAs(TString(outdir) + "polarization_fit_result_histo.png");
-    c->SaveAs(TString(outdir) + "fit_interpolation.pdf");
+    c->SaveAs(TString(outdir) + "fitPion.pdf");
 
     delete h_result_plus;
     delete h_result_minus;
