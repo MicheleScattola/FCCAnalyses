@@ -366,7 +366,7 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   int pe = p.daughters_end;
 
   Ptau = calc_Ptau(p4_tau_lab);
-  
+  ev.m_MCPtau = Ptau;
   TLorentzVector p4_pi_lab;
   
   for (int i = pb; i < pe; i++) {
@@ -426,6 +426,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   int pe = p.daughters_end;
 
   Ptau = calc_Ptau(p4_tau_lab);
+  ev.m_MCPtau = Ptau;
   TLorentzVector p4_rho_lab;
 
   for (int i = pb; i < pe; i++) {
@@ -480,6 +481,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   int pe = p.daughters_end;
 
   Ptau = calc_Ptau(p4_tau_lab);
+  ev.m_MCPtau = Ptau;
   TLorentzVector p4_rho_lab;
 
   for (int i = pb; i < pe; i++) {

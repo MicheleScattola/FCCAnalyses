@@ -34,7 +34,7 @@ namespace rv = ROOT::VecOps;
 const float SM_TAU = 1.77686; // tau mass in GeV
 const float SM_PI_CHARGED = 0.13957039;
 const float SM_sin2thetaW = 0.2312;
-const float gv_ga = -1 + 4 * SM_sin2thetaW;
+const float gv_ga = 1 - 4 * SM_sin2thetaW;
 const float SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
 const float SQRTS = 91.2; // Z pole energy
 const float E_TAU = SQRTS / 2; // tau energy at Z pole
@@ -80,6 +80,7 @@ struct myEvent {
   // MC
   int m_tauMCindex = -1;        // tau MC index
   int m_MCtype = 0;             // event mc type
+  float m_MCPtau = 0.;        // tau polarisation from MC
   float m_MCweight_plus = 1.0;  // reweighting for h = +1
   float m_MCweight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
