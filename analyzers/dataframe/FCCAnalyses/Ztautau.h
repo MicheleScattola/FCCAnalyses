@@ -36,8 +36,6 @@ const float SM_PI_CHARGED = 0.13957039;
 const float SM_sin2thetaW = 0.2312;
 const float gv_ga = -1 + 4 * SM_sin2thetaW;
 const float SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
-const float SM_P_TAU =
-    -0.1421;              // tau polarization in Z decays at sqrt(s) = 91.2 GeV
 const float SQRTS = 91.2; // Z pole energy
 const float E_TAU = SQRTS / 2; // tau energy at Z pole
 //===================================
