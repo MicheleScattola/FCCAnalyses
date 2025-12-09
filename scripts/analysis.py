@@ -147,11 +147,14 @@ class RDFanalysis():
 				.Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
 				.Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")
 				# a1 confusion
-				.Define("a1_rho_m","Ztautau::get_invariant_mass(myEvent,5,true,4,true)")
-				.Define("a1_ot_m","Ztautau::get_invariant_mass(myEvent,5,true,0,true)")
-				.Define("pi_m","Ztautau::get_invariant_mass(myEvent,3,false,3,true)")
-				.Define("rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
-				.Define("a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
+				#.Define("pi_m","Ztautau::get_invariant_mass(myEvent,3,false,3,true)")
+				#.Define("rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
+				#.Define("a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
+				# confront invariant mass in reco and MC - diagonal elements of confusion matrix
+				.Define("MC_rho_m","Ztautau::get_MCmeson_mass(myEvent,4,true,4,true)")
+				.Define("MC_a1_m","Ztautau::get_MCmeson_mass(myEvent,5,true,5,true)")
+				.Define("reco_rho_m","Ztautau::get_invariant_mass(myEvent,4,true,4,true)")
+				.Define("reco_a1_m","Ztautau::get_invariant_mass(myEvent,5,true,5,true)")
 				  
                 )
 		
@@ -183,11 +186,10 @@ class RDFanalysis():
             "A1AsPi_e",
         	"PiAsPi_e",
         	"OtAsPi_e",
-			"a1_rho_m",
-			"a1_ot_m",
-			"pi_m",
-			"rho_m",
-			"a1_m"
+			"reco_rho_m",
+			"reco_a1_m",
+			"MC_rho_m",
+			"MC_a1_m"
         	
         	]
         return branchList

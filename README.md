@@ -1,3 +1,13 @@
+
+## Z -> tau tau analysis
+The overall code structure is the following:
+- personalized functions are stored in `FCCAnalyses/analyzer/dataframe/src/Ztautau.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Ztautau.h`
+- `FCCAnalyses/scripts/` contains the preliminary script `analysis.py` which collects necessary information for the optimal variables
+- `matrix*.C` files can be exectued to plot the confusion matrix in its simple, purity or efficiency form
+- `thrust.C` can be executed to plot cos(theta) and phi of the reconstructed Thrust axis
+- files in `FCCAnalyses/scripts/1prong/` contain the macros for 1-prong decays analysis. One can also run `templates.py` and `templates.C` to create and store histograms to re-weight templates of pion decays
+- files in `FCCAnalyses/scripts/sel1/` provide a first selection for E>2 GeV in pion decays and the associated macros to re-plot the confusion matrices
+- `/FCCAnalyses/Ztautau/plots` contains all the created plots
 # FCCAnalyses
 
 [![DOI](https://zenodo.org/badge/177151745.svg)](https://zenodo.org/doi/10.5281/zenodo.4767810)
@@ -8,15 +18,6 @@
 Common framework for FCC related analyses. This framework allows one to write
 full analysis, taking [EDM4hep](https://github.com/key4hep/EDM4hep) input ROOT
 files and producing the plots.
-## Z -> tau tau analysis
-The overall code structure is the following:
-- personalized functions are stored in `FCCAnalyses/analyzer/dataframe/src/Ztautau.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Ztautau.h`
-- `/FCCAnalyses/scripts/` contains the preliminary script `analysis.py` which collects necessary information for the optimal variables
-- `matrix*.C` files can be exectued to plot the confusion matrix in its simple, purity or efficiency form
-- `thrust.C` can be executed to plot cos(theta) and phi of the reconstructed Thrust axis
-- files in `FCCAnalyses/scripts/1prong/` contain the macros for 1-prong decays analysis. One can also run `templates.py` and `templates.C` to create and store histograms to re-weight templates of pion decays
-- files in `FCCAnalyses/scripts/sel1/` provide a first selection for E>2 GeV in pion decays and the associated macros to re-plot the confusion matrices
-- `/FCCAnalyses/Ztautau/plots` contains all the created plots
 
 ## Quick start
 

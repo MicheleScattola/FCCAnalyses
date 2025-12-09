@@ -25,6 +25,7 @@ intLumi = 5000000 # 5 /ab
 bins = (90, 0, 45)
 binst = (20, 0.8, 1)
 binsx = (40, 0, 1)
+binsm = (60, 0, 2)
 
 def build_graph(df, dataset):
 
@@ -40,8 +41,10 @@ def build_graph(df, dataset):
     results.append(df.Histo1D(("OtAsPi_e", "Energy_{#gamma}", *bins), "OtAsPi_e"))
     results.append(df.Histo1D(("A1AsPi_e", "Energy_{#gamma}", *bins), "A1AsPi_e"))
     
-    results.append(df.Histo1D(("mu_sgn", "x_{#mu}", *binsx), "mu_sgn"))
-    results.append(df.Histo1D(("el_sgn", "x_{e}", *binsx), "el_sgn"))
+    results.append(df.Histo1D(("reco_rho_m", "Reconstructed #rho mass [GeV]", *binsm), "reco_rho_m"))
+    results.append(df.Histo1D(("reco_a1_m", "Reconstructed a_{1} mass [GeV]", *binsm), "reco_a1_m"))
+    results.append(df.Histo1D(("MC_rho_m", "MC #rho mass [GeV]", *binsm), "MC_rho_m"))
+    results.append(df.Histo1D(("MC_a1_m", "MC a_{1} mass [GeV]", *binsm), "MC_a1_m"))
 
     return results, weightsum
 

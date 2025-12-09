@@ -174,7 +174,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       ev.m_tauMCindex = i;
       TLorentzVector p4_tau_lab;
       p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
-      ev.mc_tauP4.push_back(p4_tau_lab);
+      ev.mc_tauP4 = p4_tau_lab;
       // cycle daugthers and find event type
       int pb = p.daughters_begin;
       int pe = p.daughters_end;
@@ -393,7 +393,8 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     } */
     
   }
-  ev.mc_piP4.push_back(p4_pi_lab);
+  ev.mc_mesonP4 = p4_pi_lab;
+  ev.mc_mesonMass = p4_pi_lab.M();
   z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
   // weight
   float w_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
@@ -439,7 +440,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
-      ev.mc_piP4.push_back(p4_pi_lab);
+      ev.mc_mesonP4.push_back(p4_pi_lab);
       p4_rho_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0
@@ -449,7 +450,9 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       p4_rho_lab += p4_pi0_lab;
     } 
   }
+  ev.mc_mesonP4 = p4_rho_lab;
   float mRho = p4_rho_lab.M();
+  ev.mc_mesonMass = mRho;
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
   alpha =
       (SM_TAU * SM_TAU - 2 * mRho * mRho) / (SM_TAU * SM_TAU + 2 * mRho * mRho);
@@ -494,7 +497,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
-      ev.mc_piP4.push_back(p4_pi_lab);
+      ev.mc_mesonP4.push_back(p4_pi_lab);
       p4_rho_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0
@@ -504,7 +507,8 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       p4_rho_lab += p4_pi0_lab;
     }
   }
-
+  ev.mc_mesonP4 = p4_rho_lab;
+  ev.mc_mesonMass = p4_rho_lab.M();
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
   // weights
   ev.m_MCweight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
@@ -593,12 +597,7 @@ RVec<float> get_MCpi_e(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // true pi MC energies
-    if (e.mc_piP4.size() != 1 ) cout << "CRITICAL ERROR: piP4 size != 1 , size = " << e.mc_piP4.size() <<  endl;
-    if (e.mc_piP4.size() > 0) {
-      for (const auto &p4 : e.mc_piP4) {
-        out.push_back(p4.E());
-      }
-    }
+    out.push_back(e.mc_mesonP4.E());
   }
   return out;
 };
@@ -623,7 +622,24 @@ RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
   }
   return out;
 };
+// ==========================================
+RVec<float> get_MCmeson_mass(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco) {
 
+  RVec<float> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // meson mass
+    out.push_back(e.mc_mesonMass);
+  }
+  return out;
+};
 // ==========================================
 // MASKS AND FILTERS
 // ==========================================

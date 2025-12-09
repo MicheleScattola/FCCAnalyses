@@ -84,8 +84,9 @@ struct myEvent {
   float m_MCweight_plus = 1.0;  // reweighting for h = +1
   float m_MCweight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
-  RVec<TLorentzVector> mc_tauP4;
-  RVec<TLorentzVector> mc_piP4;
+  TLorentzVector mc_tauP4;
+  TLorentzVector mc_mesonP4;
+  float mc_mesonMass = 0.;
 
   // debug
   int m_debug = 0; 
