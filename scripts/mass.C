@@ -1,13 +1,13 @@
 
 // invariant mass BreitWigner distribution
 double RelativisticBW(double *x, double *par) {
-    double m = x[0];       // invariant mass
-    double M = par[1];     // center of mass E that produces the resonance
+    double xx = x[0];       // invariant mass
+    double M = par[1];     // peak mass
     double G = par[2];     // decay width
     double A = par[0];     // normalization
     
     double num = M * M * G * G; 
-    double den = (m * m - M * M) * (m * m - M * M) + M * M * G * G;
+    double den = (xx * xx - M * M) * (xx * xx - M * M) + M * M * G * G;
     
     return A * num / den;
 }
@@ -58,29 +58,49 @@ void mass() {
 
     aMC->SetTitle("a_{1} Mass: MC vs Reco;Mass [GeV];Entries");
     aMC->SetLineColor(kBlue + 1);
-    aMC->SetFillColorAlpha(kBlue + 1, 0.2); 
+    aMC->SetFillColorAlpha(kBlue + 1, 0.1); 
     aMC->SetLineWidth(2);
     aMC->Draw("HIST E");
     
     aReco->SetLineColor(kRed);
     aReco->SetLineWidth(2);
     // aReco->SetFillColorAlpha(kRed, 0.0);
-    TF1* f = new TF1("f", RelativisticBW, 0, 2, 3);
+    //TF1* f = new TF1("f", RelativisticBW, 0, 2, 3);
 
-    double norm = aReco->Integral() ; 
-    f->SetParameters(norm, 1.23, 0.4); 
-    f->SetParNames("N", "m_{a_{1}}", "#Gamma_{a_{1}}");
+    //double norm = aReco->Integral() * aReco->GetBinWidth(1); 
+    //f->SetParameters(norm, 1.23, 0.4); 
+    //f->SetParNames("N", "m_{a_{1}}", "#Gamma_{a_{1}}");
 
     aReco->Draw("HIST SAMES E");
-    aReco->Fit(f,"R SAME");
-    f->SetLineColor(kMagenta);
-    f->Draw("SAME");
-    C1->Update();
+    //aReco->Fit(f,"R SAME");
+    //f->SetLineColor(kMagenta);
+    //f->Draw("SAME");
     
+    // zoom pad
+    TPad *p = new TPad("pad","zoom",0.15,0.2,0.4,0.6,kWhite,1,0);
+    p->SetLineColor(kBlack);
+    p->SetLineWidth(1);
+    p->Draw();
+    p->cd();
+    TH1F *frame = p->DrawFrame(1.6,0.0,2,2000);
+    frame->GetXaxis()->SetLabelSize(0.1);
+    //frame->GetYaxis()->SetLabelSize(0);
+    frame->GetXaxis()->SetNdivisions(4);
+    TLine *l = new TLine(1.776,0,1.776,2000);
+    l->SetLineColor(kBlack);
+    l->SetLineWidth(2);
+    l->SetLineStyle(9);
+    l->Draw("SAME");
+    aMC->Draw("SAME");
+    aReco->Draw("SAME");
+    
+    C1->cd();
     TLegend* leg1 = new TLegend(0.2, 0.70, 0.4, 0.88);
     leg1->AddEntry(aMC, "MC a_{1}", "f");   
     leg1->AddEntry(aReco, "Reco a_{1}", "l");
     leg1->Draw();
+    
+    C1->Update();
 
     C1->SaveAs(Form("%s/a1_mass.pdf", outdir));
 
@@ -92,23 +112,23 @@ void mass() {
 
     rMC->SetTitle("#rho Mass: MC vs Reco;Mass [GeV];Entries");
     rMC->SetLineColor(kBlue + 1);
-    rMC->SetFillColorAlpha(kBlue + 1, 0.2); 
+    rMC->SetFillColorAlpha(kBlue + 1, 0.1); 
     rMC->SetLineWidth(2);
     rMC->Draw("HIST E");
     
     rReco->SetLineColor(kRed);
     rReco->SetLineWidth(2);
 
-    TF1* g = new TF1("g", RelativisticBW, 0, 2, 3);
+    //TF1* g = new TF1("g", RelativisticBW, 0, 2, 3);
 
-    double norm2 = rReco->Integral() ; 
-    g->SetParameters(norm2, 0.77, 0.15); 
-    g->SetParNames("N", "m_{#rho}", "#Gamma_{#rho}");
+    //double norm2 = rReco->Integral() * rReco->GetBinWidth(1); 
+    //g->SetParameters(norm2, 0.77, 0.15); 
+    //g->SetParNames("N", "m_{#rho}", "#Gamma_{#rho}");
 
     rReco->Draw("HIST SAMES E");
-    rReco->Fit(g,"R SAME");
-    g->SetLineColor(kMagenta);
-    g->Draw("SAME");   
+    //rReco->Fit(g,"R SAME");
+    //g->SetLineColor(kMagenta);
+    //g->Draw("SAME");   
     C2->Update();
     
     TLegend* leg2 = new TLegend(0.65, 0.30, 0.88, 0.48);
