@@ -1,7 +1,15 @@
 
 // invariant mass BreitWigner distribution
-double BreitWigner(double *x, double *par){
-	return TMath::BreitWigner (x[0],par[0],par[1]);
+double RelativisticBW(double *x, double *par) {
+    double m = x[0];       // invariant mass
+    double M = par[1];     // center of mass E that produces the resonance
+    double G = par[2];     // decay width
+    double A = par[0];     // normalization
+    
+    double num = M * M * G * G; 
+    double den = (m * m - M * M) * (m * m - M * M) + M * M * G * G;
+    
+    return A * num / den;
 }
 
 void mass() {
@@ -57,9 +65,12 @@ void mass() {
     aReco->SetLineColor(kRed);
     aReco->SetLineWidth(2);
     // aReco->SetFillColorAlpha(kRed, 0.0);
-    TF1* f = new TF1("f", BreitWigner, 0, 2, 2);
-    f->SetParameters(1.26, 0.4); // initial values
-    f->SetParNames("mass", "#Gamma");
+    TF1* f = new TF1("f", RelativisticBW, 0, 2, 3);
+
+    double norm = aReco->Integral() ; 
+    f->SetParameters(norm, 1.23, 0.4); 
+    f->SetParNames("N", "m_{a_{1}}", "#Gamma_{a_{1}}");
+
     aReco->Draw("HIST SAMES E");
     aReco->Fit(f,"R SAME");
     f->SetLineColor(kMagenta);
@@ -87,8 +98,17 @@ void mass() {
     
     rReco->SetLineColor(kRed);
     rReco->SetLineWidth(2);
-    rReco->Fit("gaus","Q"); 
-    rReco->Draw("HIST SAME S E");   
+
+    TF1* g = new TF1("g", RelativisticBW, 0, 2, 3);
+
+    double norm2 = rReco->Integral() ; 
+    g->SetParameters(norm2, 0.77, 0.15); 
+    g->SetParNames("N", "m_{#rho}", "#Gamma_{#rho}");
+
+    rReco->Draw("HIST SAMES E");
+    rReco->Fit(g,"R SAME");
+    g->SetLineColor(kMagenta);
+    g->Draw("SAME");   
     C2->Update();
     
     TLegend* leg2 = new TLegend(0.65, 0.30, 0.88, 0.48);
