@@ -85,8 +85,8 @@ struct myEvent {
   float m_MCweight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
   TLorentzVector mc_tauP4;
-  TLorentzVector mc_mesonP4;
-  float mc_mesonMass = 0.;
+  TLorentzVector mc_daughterP4;
+  float mc_daughterMass = 0.;
 
   // debug
   int m_debug = 0; 
@@ -153,16 +153,24 @@ RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
 // ==========================================
 RVec<float> get_MCmeson_mass(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
-                       const bool bool_reco);           
-
-// ==========================================
-// MASKS AND FILTERS
-// ==========================================
+                       const bool bool_reco); 
+// ==========================================          
 RVec<float> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
                                const bool bool_mc, const int reco_type,
                                const bool bool_reco);
+// ==========================================
+RVec<float> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco);
+// ==========================================
+// MASKS AND FILTERS
+// ==========================================
 RVec<int> get_pi_mask(const RVec<myEvent> &evs);
 RVec<int> get_weight_mask(const RVec<myEvent> &evs);
+RVec<int> get_debug(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco,
+                               const int debug_mass, const bool bool_debug_mass);
 
 } // namespace Ztautau
 

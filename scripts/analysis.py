@@ -137,26 +137,31 @@ class RDFanalysis():
 				.Define("A1AsPi_e","Ztautau::get_hadron_e(myEvent,5,true,3,true)")
 				.Define("OtAsPi_e","Ztautau::get_hadron_e(myEvent,0,true,3,true)")
 				# pi signal and weights
-				#.Define("pi_sgn","Ztautau::get_MCpi_e(myEvent,3,true,3,false)/45.5")
+				#.Define("pi_sgn","Ztautau::get_MCdaughter_e(myEvent,3,true,3,false)/45.5")
 				#.Define("w_plus","Ztautau::get_weights(1,myEvent,3,true,3,false)")
 				#.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,true,3,false)")
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
 				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
 				# lepton signals
-				.Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
-				.Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")
-				# a1 confusion
-				#.Define("pi_m","Ztautau::get_invariant_mass(myEvent,3,false,3,true)")
-				#.Define("rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
-				#.Define("a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
-				# confront invariant mass in reco and MC - diagonal elements of confusion matrix
-				.Define("MC_rho_m","Ztautau::get_MCmeson_mass(myEvent,4,true,4,true)")
-				.Define("MC_a1_m","Ztautau::get_MCmeson_mass(myEvent,5,true,5,true)")
-				.Define("reco_rho_m","Ztautau::get_invariant_mass(myEvent,4,true,4,true)")
-				.Define("reco_a1_m","Ztautau::get_invariant_mass(myEvent,5,true,5,true)")
-				.Define("rho_pull","MC_rho_m - reco_rho_m")
-				.Define("a1_pull","MC_a1_m - reco_a1_m")
+                .Define("el_sgn","Ztautau::get_MCdaughter_e(myEvent,2,true,1,true)/45.5")
+                .Define("mu_sgn","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true)/45.5")
+				#.Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
+				#.Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")
+				# MC invariant mass
+				.Define("MC_rho_m","Ztautau::get_MCdaughter_mass(myEvent,4,true,4,false)")
+				.Define("MC_a1_m","Ztautau::get_MCdaughter_mass(myEvent,5,true,5,false)")
+                # Reco invariant mass
+				.Define("reco_rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
+				.Define("reco_a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
+                # confront invariant mass in reco and MC - diagonal elements of confusion matrix
+				.Define("rho_pull","Ztautau::get_mass_pull(myEvent,4,true,4,true)")
+				.Define("a1_pull","Ztautau::get_mass_pull(myEvent,5,true,5,true)")
+
+				# debug check. Out of a1 above inv mass limit how many are 3prong or 1prong?
+                # m_debug 2 vs 3
+                .Define("debug_a1_mass","Ztautau::get_debug(myEvent,5,false,5,true,1,true)")
+                
 				  
                 )
 		
@@ -193,7 +198,8 @@ class RDFanalysis():
 			"MC_rho_m",
 			"MC_a1_m",
 			"rho_pull",
-			"a1_pull"
+			"a1_pull",
+            "debug_a1_mass"
 		
         	
         	]
