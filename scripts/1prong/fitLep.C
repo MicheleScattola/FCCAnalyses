@@ -39,10 +39,10 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 	
 	double bin_width = h->GetBinWidth(1);
 	
-	//double xmin = h->GetXaxis()->GetXmin();
-	//double xmax = h->GetXaxis()->GetXmax();
-	double xmin = 0.05;
-	double xmax = 1.0;
+	double xmin = h->GetXaxis()->GetXmin();
+	double xmax = h->GetXaxis()->GetXmax();
+	//double xmin = 0.05;
+	//double xmax = 1.0;
 	
 	// fit using functor
     TemplateFitFunctor fitFunctor(xmin, xmax);
@@ -87,6 +87,7 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 
 	std::cout << "[INFO] Fit obtained for " << hist->GetName() << ":" << endl;
 	std::cout << "****** Polarization P = " << P << " +/- " << Perr << endl;
+	std::cout << "PDF normalized at : " << aux_norm(xmax,P) - aux_norm(xmin,P) << endl;
 	cout << "\n =========================\n" << endl;
 	
 	// Additional drawings
@@ -123,9 +124,7 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
         "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
         
 	if (outname) {
-		TString png = TString(outdir) + TString(outname) + "_fit.png";
 		TString pdf = TString(outdir) + TString(outname) + "_fit.pdf";
-		c->SaveAs(png);
 		c->SaveAs(pdf);
 		
 	}
@@ -151,14 +150,15 @@ void fitLep() {
     ROOT::RDataFrame df(treeName, infile);
 	
 
-	int nBins = 38;
-	double xMin = 0.05;
+	double bin = 0.020; // fixed bin width
+	double xMin = 0.02;
 	double xMax = 1.0;
+	int nBins = std::round((xMax-xMin)/bin);
     
     auto h_data1 = df.Histo1D({"h_data1", "Fit Polarization;x_{#mu};Events", nBins, xMin, xMax}, "mu_sgn");
 	auto h_data2 = df.Histo1D({"h_data2", "Fit Polarization;x_{#el};Events", nBins, xMin, xMax}, "el_sgn");
-    TH1D *h_mu = (TH1D*)h_data1->Clone("copy1");
-	TH1D *h_el = (TH1D*)h_data2->Clone("copy2");
+    TH1D *h_mu = (TH1D*)h_data1->Clone("h_muons");
+	TH1D *h_el = (TH1D*)h_data2->Clone("h_electrons");
 
     if (!h_el) std::cerr << "[WARN] Histogram el_sgn not found" << std::endl;
     if (!h_mu) std::cerr << "[WARN] Histogram mu_sgn not found" << std::endl;

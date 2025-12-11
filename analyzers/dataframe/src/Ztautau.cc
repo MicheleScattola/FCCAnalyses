@@ -313,9 +313,10 @@ int classify_pion(myEvent &ev) {
   }
   }
   if (ev.n_pi == 3) {
+  	ev.m_debug = 3;
     return 5; // Type 5: a1 (3-prong mode)
   }
-  ev.m_debug = 3;
+  
   return 0;
 }
   
@@ -556,7 +557,7 @@ RVec<float> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<float> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool bool_mass) {
+                         const bool bool_reco) {
 
   RVec<float> out;
   for (const auto &e : evs) {
@@ -612,8 +613,8 @@ RVec<float> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
-    // true pi MC energies
-    out.push_back(e.mc_daughterP4.E());
+    // true daughter MC energies
+    out.push_back(e.mc_daughterP4.E()/e.mc_tauP4.E());
   }
   return out;
 };
