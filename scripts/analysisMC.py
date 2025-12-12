@@ -113,8 +113,8 @@ class RDFanalysis():
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,true,3,false)")
 				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,true,3,false)")
 				# lepton signals
-				.Define("el_sgn","Ztautau::getMCdaughter_e(myEvent,2,true,2,false)")
-				.Define("mu_sgn","Ztautau::getMCdaughter_e(myEvent,1,true,1,false)")
+				.Define("el_sgn","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false)")
+				.Define("mu_sgn","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false)")
                 
 				  
                 )

@@ -7,7 +7,7 @@
 #include "TFile.h"
 #include <iostream>
 
-void templates() {
+void templatesMC() {
 	    
     // input
     const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/bkg/p8_ee_Ztautau_ecm91.root";

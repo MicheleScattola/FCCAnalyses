@@ -34,11 +34,11 @@ struct TemplateFitFunctor {
 
 // =============================================================================
 
-void fitPion() {
+void fitPionMC() {
 
     const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/p8_ee_Ztautau_ecm91.root";
     
-    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/templatesMC.root";
+    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/bkg/templatesMC.root";
     
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/MC/";
     std::string treeName = "events";
