@@ -547,6 +547,9 @@ RVec<float> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
+    // impose invariant mass check
+    if(e.m_debug_mass == 1)
+      continue;
     // lepton energy
     if (e.n_mu > 0)
       out.push_back(e.m_muP4[0].E());
@@ -568,7 +571,9 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
-    // check in
+    // impose invariant mass check
+    if(e.m_debug_mass == 1)
+      continue;
     // pion energies
     if (e.n_pi > 0) {
       for (const auto &p4 : e.m_piP4) {
@@ -613,6 +618,9 @@ RVec<float> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
       continue;
     // check reco event
     if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if(e.m_debug_mass == 1)
       continue;
     // collect dressed energy (if the event is mu or el the other P4 vectors are empty)
     float temp=0.0;
@@ -660,6 +668,9 @@ RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
       continue;
     // check reco event
     if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if(e.m_debug_mass == 1)
       continue;
     // get weight based on sign passed
     if (sign > 0)
