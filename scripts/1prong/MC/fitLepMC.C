@@ -34,21 +34,21 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 	h->Sumw2();
 	
 	int N = h->Integral();
-	cout << "\n =========================\n" << endl;
-	cout << "[INFO] Fitting " << hist->GetName() << " with " << N << " entries." << endl;
+	std::cout << "\n =========================\n" << std::endl;
+	std::cout << "[INFO] Fitting " << hist->GetName() << " with " << N << " entries." << std::endl;
 	
 	double bin_width = h->GetBinWidth(1);
 	
-	//double xmin = h->GetXaxis()->GetXmin();
-	//double xmax = h->GetXaxis()->GetXmax();
-	double xmin = 0.05;
-	double xmax = 1.0;
+	double xmin = h->GetXaxis()->GetXmin();
+	double xmax = h->GetXaxis()->GetXmax();
+	//double xmin = 0.05;
+	//double xmax = 1.0;
 	
 	// fit using functor
     TemplateFitFunctor fitFunctor(xmin, xmax);
     
     TF1 *f = new TF1("fit", fitFunctor, xmin, xmax, 3);
-	cout << "Fitting between " << xmin << " and " << xmax << endl;     
+	std::cout << "Fitting between " << xmin << " and " << xmax << std::endl;     
 	// initialize values
 	f->SetParName(0, "P_{#tau}");
 	f->SetParameter(0, -0.1); 
@@ -78,17 +78,17 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 	
 	h->SetStats(1);
 	h->Draw("HIST E");
-	h->Fit(f, "RQ SAME");
+	h->Fit(f, "RQM SAME");
 	f->Draw("SAME");
 	
 	// results
 	double P = f->GetParameter(0);
 	Perr = f->GetParError(0);
 
-	std::cout << "[INFO] Fit obtained for " << hist->GetName() << ":" << endl;
-	std::cout << "****** Polarization P = " << P << " +/- " << Perr << endl;
-	std::cout << "PDF normalized at : " << aux_norm(xmax,P) - aux_norm(xmin,P) << endl;
-	cout << "\n =========================\n" << endl;
+	std::cout << "[INFO] Fit obtained for " << hist->GetName() << ":" << std::endl;
+	std::cout << "****** Polarization P = " << P << " +/- " << Perr << std::endl;
+	std::cout << "PDF normalized at : " << aux_norm(xmax,P) - aux_norm(xmin,P) << std::endl;
+	std::cout << "\n =========================\n" << std::endl;
 	
 	// Additional drawings
     
@@ -121,10 +121,10 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 
 	// file save
 	const char* outdir =
-        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
+        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/MC/";
         
 	if (outname) {
-		TString pdf = TString(outdir) + TString(outname) + "_fit.pdf";
+		TString pdf = TString(outdir) + TString(outname) + "MC_fit.pdf";
 		c->SaveAs(pdf);
 		
 	}
@@ -142,7 +142,7 @@ void fitLep() {
     //gROOT->Reset();
 
     const char* infile =
-        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
+        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/p8_ee_Ztautau_ecm91.root";
 
     TFile* f = TFile::Open(infile, "READ");
 	std::string treeName = "events";
@@ -166,14 +166,14 @@ void fitLep() {
     // Fit for electrons
     if (h_el) {
         TString el = "electron";
-        TString title = "TrueMC #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "#tau #rightarrow e #nu_{e} #nu_{#tau} channel;x_{e};Events";
         Fit_1prong(h_el, el, title);
     }
 
     // Fit for muons
     if (h_mu) {
         TString mu = "muon";
-        TString title = "TrueMC #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "#tau #rightarrow #mu #nu_{#mu} #nu_{#tau} channel;x_{#mu};Events";
         Fit_1prong(h_mu, mu, title);
     }
 

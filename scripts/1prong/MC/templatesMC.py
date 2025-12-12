@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.01},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.005},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -12,7 +12,7 @@ processList = {
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/bkg/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
@@ -111,7 +111,7 @@ class RDFanalysis():
 				#####
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,Particle,Particle1)")
                 
-				# pi signal and weights
+				# TrueMC pi signal and weights
 				.Define("pi_sgn","Ztautau::get_MCdaughter_e(myEvent,3,true,3,false)")
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,true,3,false)")
 				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,true,3,false)")
