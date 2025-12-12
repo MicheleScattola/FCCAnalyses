@@ -32,7 +32,7 @@ class RDFanalysis():
     #analysers function to define the analysers to process
     def analysers(df):
         df2 = (
-             df
+            df
                 
         
 				#MC truth and Reconstructed particles
@@ -83,7 +83,7 @@ class RDFanalysis():
 				.Alias("Electron0", "Electron#0.index")
 
 				# Photons
-out.push_back(e.m_type);				.Alias("Photon0", "Photon#0.index")
+				.Alias("Photon0", "Photon#0.index")
 				
 				# defining pions as charged hadrons with mass selection
 				# selecting candidates (possibly mistaken with a K+ )
