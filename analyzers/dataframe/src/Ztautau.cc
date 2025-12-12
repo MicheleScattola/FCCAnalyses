@@ -651,6 +651,9 @@ RVec<float> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
+    // impose invariant mass check
+    if(e.m_debug_mass == 1)
+      continue;
     // true daughter MC energies
     out.push_back(e.mc_daughterP4.E()/e.mc_tauP4.E());
   }
