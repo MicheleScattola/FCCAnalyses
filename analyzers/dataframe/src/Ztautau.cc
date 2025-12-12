@@ -326,7 +326,8 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
   RVec<int> out;
   out.reserve(evs.size());
   for (const auto &e : evs) {
-    out.push_back(e.m_type);
+    if(e.m_debug_mass != 1) out.push_back(e.m_type);
+    else out.push_back(0);
   }
   return out;
 }
