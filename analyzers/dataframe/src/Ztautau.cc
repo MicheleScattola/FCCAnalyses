@@ -259,7 +259,7 @@ int classify_MC(const RVec<int> &pdgs) {
       n_mu++;
     else if (p == 11)
       n_el++;
-    else if (p == 211)
+    else if (p == 211 || p == 321 || p == 323)
       n_pi++; 
     else if (p == 111)
       n_pi0++;
@@ -391,9 +391,9 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   for (int i = pb; i < pe; i++) {
     int dau_idx = daughters[i];
     const auto &dau = mc[dau_idx];
-    // if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323) {
+    if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323) {
     
-    if (abs(dau.PDG) == 211) {
+    //if (abs(dau.PDG) == 211) {
       // found pion daughter
       ev.m_found = true;
       
@@ -454,7 +454,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     int dau_idx = daughters[i];
     const auto &dau = mc[dau_idx];
     // save pion
-    if (abs(dau.PDG) == 211) {
+    if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323 ) {
       ev.m_found = true;
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
@@ -510,7 +510,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     int dau_idx = daughters[i];
     const auto &dau = mc[dau_idx];
     // save pion
-    if (abs(dau.PDG) == 211) {
+    if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323 ) {
       ev.m_found = true;
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,

@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.03},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.02},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -26,13 +26,13 @@ nCPUS       = -1
 #Optional test file , run with --test
 testFile = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/p8_ee_Ztautau_ecm91/events_080694422.root"
 
-#operations on the TTree
+#operations on the TTreout.push_back(e.m_type);out.push_back(e.m_type);e
 class RDFanalysis():
     #__________________________________________________________
     #analysers function to define the analysers to process
     def analysers(df):
         df2 = (
-            df
+             df
                 
         
 				#MC truth and Reconstructed particles
@@ -83,7 +83,7 @@ class RDFanalysis():
 				.Alias("Electron0", "Electron#0.index")
 
 				# Photons
-				.Alias("Photon0", "Photon#0.index")
+out.push_back(e.m_type);				.Alias("Photon0", "Photon#0.index")
 				
 				# defining pions as charged hadrons with mass selection
 				# selecting candidates (possibly mistaken with a K+ )
@@ -140,8 +140,6 @@ class RDFanalysis():
         branchList = [
         	"MC_event",
         	"event_type_reco",
-        	"debug",
-        	"debug_mass",
         	"pi_mask",
         	"weight_mask",
         	"pi_sgn",
