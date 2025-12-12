@@ -601,6 +601,35 @@ RVec<float> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
+RVec<float> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco) {
+
+  RVec<float> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // collect dressed energy (if the event is mu or el the other P4 vectors are empty)
+    float temp=0.0;
+    for(const auto &p4 : e.m_elP4) {
+      temp += p4.E();
+    }
+    for(const auto &p4 : e.m_muP4) {
+      temp += p4.E();
+    }
+    for(const auto &p4 : e.m_phP4) {
+      temp += p4.E();
+    }
+    out.push_back(temp);
+  }
+
+  return out;
+};
+// ==========================================
 RVec<float> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
                        const bool bool_reco) {

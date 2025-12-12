@@ -147,6 +147,10 @@ RVec<float> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
                        const bool bool_reco);
 // ==========================================
+RVec<float> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco);
+// ==========================================
 RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
                         const int reco_type, const bool bool_reco);

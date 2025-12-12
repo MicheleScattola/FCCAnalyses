@@ -150,8 +150,8 @@ void fitLep() {
     ROOT::RDataFrame df(treeName, infile);
 	
 
-	double bin = 0.020; // fixed bin width
-	double xMin = 0.02;
+	double bin = 0.025; // fixed bin width
+	double xMin = 0.05;
 	double xMax = 1.0;
 	int nBins = std::round((xMax-xMin)/bin);
     
