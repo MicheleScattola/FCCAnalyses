@@ -132,8 +132,8 @@ class RDFanalysis():
 				.Define("OtAsPi_e","Ztautau::get_hadron_e(myEvent,0,true,3,true)")
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_MCdaughter_e(myEvent,3,true,3,false)")
-				#.Define("w_plus","Ztautau::get_weights(1,myEvent,3,true,3,false)")
-				#.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,true,3,false)")
+				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,true,3,false)")
+				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,true,3,false)")
 				#.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				#.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
 				#.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
