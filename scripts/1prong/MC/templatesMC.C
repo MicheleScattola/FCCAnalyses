@@ -74,8 +74,7 @@ void templatesMC() {
     leg->Draw();
 
     // save canvas
-    //c->SaveAs(TString(outdir) + "templates.png");
-    c->SaveAs(TString(outdir) + "templates.pdf");
+    c->SaveAs(TString(outdir) + "templatesMC.pdf");
 
     // SAVING HISTOS FOR FINAL FIT
     TString rootOutName = TString(outdir2) + "templatesMC.root";

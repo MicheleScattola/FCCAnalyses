@@ -39,10 +39,10 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 	
 	double bin_width = h->GetBinWidth(1);
 	
-	double xmin = h->GetXaxis()->GetXmin();
-	double xmax = h->GetXaxis()->GetXmax();
-	//double xmin = 0.05;
-	//double xmax = 1.0;
+	//double xmin = h->GetXaxis()->GetXmin();
+	//double xmax = h->GetXaxis()->GetXmax();
+	double xmin = 0.05;
+	double xmax = 1.0;
 	
 	// fit using functor
     TemplateFitFunctor fitFunctor(xmin, xmax);
@@ -78,7 +78,7 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 	
 	h->SetStats(1);
 	h->Draw("HIST E");
-	h->Fit(f, "RQ SAME");
+	h->Fit(f, "RQM SAME");
 	f->Draw("SAME");
 	
 	// results
@@ -151,10 +151,10 @@ void fitLep() {
 	
 
 	double bin = 0.025; // fixed bin width
-	double xMin = 0.05;
+	double xMin = 0.0;
 	double xMax = 1.0;
-	//int nBins = std::round((xMax-xMin)/bin);
-	int nBins = 38;
+	int nBins = std::round((xMax-xMin)/bin);
+	//int nBins = 38;
     
     auto h_data1 = df.Histo1D({"h_data1", "Fit Polarization;x_{#mu};Events", nBins, xMin, xMax}, "mu_sgn");
 	auto h_data2 = df.Histo1D({"h_data2", "Fit Polarization;x_{#el};Events", nBins, xMin, xMax}, "el_sgn");

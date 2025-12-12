@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.02},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.03},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -78,27 +78,16 @@ class RDFanalysis():
 				
                 # Muons
 				.Alias("Muon0", "Muon#0.index")
-				.Define("muons",   "ReconstructedParticle::get(Muon0, rps)")
-				.Define("muons_costheta","Ztautau::get_elements_by_index(RP_thrustangle,Muon0)")
 
 				# Electrons
 				.Alias("Electron0", "Electron#0.index")
-				.Define("electrons",    "ReconstructedParticle::get(Electron0, rps)")
-				.Define("electrons_costheta","Ztautau::get_elements_by_index(RP_thrustangle,Electron0)")
 
 				# Photons
 				.Alias("Photon0", "Photon#0.index")
-				.Define("photons",   "ReconstructedParticle::get(Photon0, rps)")
-				.Define("photons_e", "ReconstructedParticle::get_e(photons)")
-				.Define("photons_costheta","Ztautau::get_elements_by_index(RP_thrustangle,Photon0)")
 				
 				# defining pions as charged hadrons with mass selection
 				# selecting candidates (possibly mistaken with a K+ )
 				.Define("pions_charged_ids", "Ztautau::sel_pions_id(rps,1)")
-				.Define("pions_charged","ReconstructedParticle::get(pions_charged_ids, rps)")
-				.Define("pi_charged_n","ReconstructedParticle::get_n(pions_charged)")
-				.Define("pi_charged_e","ReconstructedParticle::get_e(pions_charged)")
-				.Define("pi_costheta","Ztautau::get_elements_by_index(RP_thrustangle,pions_charged_ids)")
 				
 				#####
 				# EVENTS IDENTIFICATION
@@ -111,21 +100,10 @@ class RDFanalysis():
 				# MC IDENTIFICATION
 				#####
                 .Define("MC_event","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
-                .Define("debug","RVec<int> {myEvent[0].m_debug,myEvent[1].m_debug}")
-                .Define("debug_mass","RVec<float> {myEvent[0].m_MCPtau,myEvent[1].m_MCPtau}")
                 
 				# masks for later cuts and selections
 				.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
 				.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
-				
-				# parameters are: event collection, MC type, bool MC type, reco type, bool reco type
-				# confusion matrix
-				.Define("ElAsPi_e","Ztautau::get_hadron_e(myEvent,2,true,3,true)")
-				.Define("MuAsPi_e","Ztautau::get_hadron_e(myEvent,1,true,3,true)")
-				.Define("RhoAsPi_e","Ztautau::get_hadron_e(myEvent,4,true,3,true)")
-				.Define("PiAsPi_e","Ztautau::get_hadron_e(myEvent,3,true,3,true)")
-				.Define("A1AsPi_e","Ztautau::get_hadron_e(myEvent,5,true,3,true)")
-				.Define("OtAsPi_e","Ztautau::get_hadron_e(myEvent,0,true,3,true)")
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
@@ -173,12 +151,6 @@ class RDFanalysis():
 			"el_sgn",
             "RP_thrustcostheta",
 			"RP_thrustphi",
-        	"ElAsPi_e",
-        	"MuAsPi_e",
-        	"RhoAsPi_e",
-            "A1AsPi_e",
-        	"PiAsPi_e",
-        	"OtAsPi_e",
 			"reco_rho_m",
 			"reco_a1_m",
 			"reco_pi_m",
