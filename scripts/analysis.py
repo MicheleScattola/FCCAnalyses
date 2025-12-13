@@ -93,7 +93,7 @@ class RDFanalysis():
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
 				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
 				
