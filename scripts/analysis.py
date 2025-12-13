@@ -123,11 +123,11 @@ class RDFanalysis():
 
 				# ALL MC DATA
                 .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true)/45.5")
-                .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false)/45.5")
+                .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,true)/45.5")
                 .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false)")
                 
 				.Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,true)/45.5")
-                .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false)/45.5")
+                .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,true)/45.5")
                 .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false)")
 
 				# MC invariant mass
@@ -144,7 +144,8 @@ class RDFanalysis():
 				# debug check. Out of a1 above inv mass limit how many are 3prong or 1prong?
                 # m_debug 2 vs 3
                 .Define("debug_a1_mass","Ztautau::get_debug(myEvent,5,false,5,true,1,true)")
-                
+                .Define("debug_mu","Ztautau::get_debug_daughters(myEvent,1,true,1,true)")
+                .Define("debug_el","Ztautau::get_debug_daughters(myEvent,2,true,2,true)")
 				  
                 )
 		
@@ -183,7 +184,9 @@ class RDFanalysis():
             "mc_el_x",
             "mc_mu_test",
             "mc_mu_all",
-            "mc_mu_x"
+            "mc_mu_x",
+            "debug_mu",
+            "debug_el"
 		
         	
         	]

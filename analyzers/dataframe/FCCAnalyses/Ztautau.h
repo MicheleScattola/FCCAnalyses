@@ -86,6 +86,7 @@ struct myEvent {
   bool m_found = false;
   TLorentzVector mc_tauP4;    // P4 of mc tau
   TLorentzVector mc_daughterP4;   // P4 of the mc daughter (whole resonance in case)
+  RVec<int> mc_daughters;   // vector of daughters pdgs
   int mc_RP2MC_id = -1;   // corresponding mc id for the 1prong reco particle
   double mc_RP2MC_e = 0.;   // correponding energy
   double mc_daughterMass = 0.;    // mc invariant mass of the mc daughter
@@ -188,6 +189,10 @@ RVec<int> get_debug(const RVec<myEvent> &evs,
                                const int mc_type, const bool bool_mc,
                                const int reco_type, const bool bool_reco,
                                const int debug_mass, const bool bool_debug_mass);
+
+RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco);
 
 } // namespace Ztautau
 

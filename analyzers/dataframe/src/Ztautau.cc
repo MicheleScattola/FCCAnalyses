@@ -204,6 +204,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         const auto &dau = mc[dau_idx];
         dau_pdgs.push_back(abs(dau.PDG));
       }
+      ev.mc_daughters = dau_pdgs;
       // classify
       ev.m_MCtype = classify_MC(dau_pdgs);
       // extract true lepton energy
@@ -915,6 +916,23 @@ RVec<int> get_type_debugmass(const RVec<myEvent> &evs,
     // note this can only work if we remove the reset of type in case of high mass
     // otherwise all types become 0
     out.push_back(e.m_type);
+  }
+  return out;
+}
+
+RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco) {
+  RVec<RVec<int>> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event (inverse)
+    if (bool_reco && e.m_type == reco_type) // inverse search, look for events which are type A on montecarlo and NOT A in reco
+      continue;
+
+    out.push_back(e.mc_daughters);
   }
   return out;
 }
