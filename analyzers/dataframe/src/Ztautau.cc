@@ -85,7 +85,9 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<double> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
                           const RVec<int> &daughters,
-                          const RVec<int> &rp2mc_idx) {
+                          const RVec<int> &rp2mc_idx,
+                          const double &thrust_costheta,
+                          const double &thrust_phi) {
 
   // collect particles
   RVec<edm4hep::ReconstructedParticleData> mu_tot =
@@ -109,7 +111,8 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
   for (int i = 0; i < 2; i++) {
     myEvent ev;
-
+    ev.thrust_costheta = thrust_costheta;
+    ev.thrust_phi = thrust_phi;
     // select particles in hemisphere
     // bool hemisphere starts as true for positive hemi, changing after first
     // loop to false for negative hemi
@@ -933,6 +936,40 @@ RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
       continue;
 
     out.push_back(e.mc_daughters);
+  }
+  return out;
+}
+
+RVec<double> get_debug_costheta(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco) {
+  RVec<double> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event 
+    if (bool_reco && e.m_type != reco_type) 
+      continue;
+
+    out.push_back(e.thrust_costheta);
+  }
+  return out;
+}
+
+RVec<double> get_debug_phi(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco) {
+  RVec<double> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event 
+    if (bool_reco && e.m_type != reco_type) 
+      continue;
+
+    out.push_back(e.thrust_phi);
   }
   return out;
 }

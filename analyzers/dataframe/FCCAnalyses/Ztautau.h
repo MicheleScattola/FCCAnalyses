@@ -94,6 +94,8 @@ struct myEvent {
   // debug
   int m_debug = 0; 
   int m_debug_mass = 0;
+  double thrust_costheta = -999;
+  double thrust_phi = -999;
 };
 
 // return event struct
@@ -103,7 +105,9 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<double> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
                           const RVec<int> &daughters,
-                          const RVec<int> &rp2mc_idx);
+                          const RVec<int> &rp2mc_idx,
+                          const double &thrust_costheta,
+                          const double &thrust_phi);
 // ==========================================
 // helper to fill P4 and add energy & charge
 void fill_collection (myEvent &ev, const auto &input_particles,
@@ -193,7 +197,12 @@ RVec<int> get_debug(const RVec<myEvent> &evs,
 RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
                                const int mc_type, const bool bool_mc,
                                const int reco_type, const bool bool_reco);
-
+RVec<double> get_debug_costheta(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco);
+RVec<double> get_debug_phi(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco);
 } // namespace Ztautau
 
 #endif

@@ -146,6 +146,11 @@ class RDFanalysis():
                 .Define("debug_a1_mass","Ztautau::get_debug(myEvent,5,false,5,true,1,true)")
                 .Define("debug_mu","Ztautau::get_debug_daughters(myEvent,1,true,1,true)")
                 .Define("debug_el","Ztautau::get_debug_daughters(myEvent,2,true,2,true)")
+				# costheta and phi for (3,3) events, are they biased??
+				.Define("debug_costheta_mu","Ztautau::get_debug_costheta(myEvent,1,true,1,true)")
+                .Define("debug_costheta_el","Ztautau::get_debug_costheta(myEvent,2,true,2,true)")
+                .Define("debug_phi_mu","Ztautau::get_debug_phi(myEvent,1,true,1,true)")
+                .Define("debug_phi_el","Ztautau::get_debug_phi(myEvent,2,true,2,true)")
 				  
                 )
 		
@@ -186,7 +191,11 @@ class RDFanalysis():
             "mc_mu_all",
             "mc_mu_x",
             "debug_mu",
-            "debug_el"
+            "debug_el",
+            "debug_costheta_mu",
+            "debug_costheta_el",
+            "debug_phi_mu",
+            "debug_phi_el"
 		
         	
         	]
