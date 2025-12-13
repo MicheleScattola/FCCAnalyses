@@ -173,8 +173,7 @@ void fitLep() {
 	if (h_MCel) {
         TString el = "MCelectron";
         TString title = "TrueMC #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
-        Fit
-		Fit_1prong(h_MCel, el, title);
+        Fit_1prong(h_MCel, el, title);
     }
 	if (h_el_free) {
         TString el = "FREEelectron";
