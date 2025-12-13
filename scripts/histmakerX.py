@@ -38,7 +38,7 @@ def build_graph(df, dataset):
     results.append(df.Histo1D(("mc_el_sgn", "x", *bins), "mc_el_sgn"))
     results.append(df.Histo1D(("mc_mu_sgn", "x", *bins), "mc_mu_sgn"))
     results.append(df.Histo1D(("mc_pi_sgn", "x", *binspi), "mc_pi_sgn"))
-    results.append(df.Histo1D(("el_free", "x", *bins), "el_sgn"))
+    results.append(df.Histo1D(("el_free", "x", *bins), "el_free"))
     results.append(df.Histo1D(("mu_free", "x", *bins), "mu_free"))
     results.append(df.Histo1D(("pi_free", "x", *binspi), "pi_free"))
 
