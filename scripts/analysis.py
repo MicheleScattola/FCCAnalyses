@@ -120,6 +120,16 @@ class RDFanalysis():
                 .Define("pi_free","Ztautau::get_hadron_e(myEvent,3,false,3,true,false)/45.5")
                 .Define("el_free","Ztautau::get_lepton_e(myEvent,2,false,2,true,false)/45.5")
                 .Define("mu_free","Ztautau::get_lepton_e(myEvent,1,false,1,true,false)/45.5")
+
+				# ALL MC DATA
+                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true)/45.5")
+                .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false)/45.5")
+                .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false)")
+                
+				.Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,true)/45.5")
+                .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false)/45.5")
+                .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false)")
+
 				# MC invariant mass
 				.Define("MC_rho_m","Ztautau::get_MCdaughter_mass(myEvent,4,true,4,false)")
 				.Define("MC_a1_m","Ztautau::get_MCdaughter_mass(myEvent,5,true,5,false)")
@@ -167,7 +177,13 @@ class RDFanalysis():
 			"MC_a1_m",
 			"rho_pull",
 			"a1_pull",
-            "debug_a1_mass"
+            "debug_a1_mass",
+            "mc_el_test",
+            "mc_el_all",
+            "mc_el_x",
+            "mc_mu_test",
+            "mc_mu_all",
+            "mc_mu_x"
 		
         	
         	]

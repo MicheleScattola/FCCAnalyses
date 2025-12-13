@@ -42,5 +42,9 @@ def build_graph(df, dataset):
     results.append(df.Histo1D(("mu_free", "x", *bins), "mu_free"))
     results.append(df.Histo1D(("pi_free", "x", *binspi), "pi_free"))
 
+    results.append(df.Histo1D(("mc_el_test", "x", *bins), "mc_el_test"))
+    results.append(df.Histo1D(("mc_el_all", "x", *bins), "mc_el_all"))
+    results.append(df.Histo1D(("mc_el_x", "x", *bins), "mc_el_x"))
+
     return results, weightsum
 

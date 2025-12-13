@@ -781,6 +781,27 @@ RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
     if (masscheck && e.m_debug_mass == 1)
       continue;
     // true daughter MC energies
+    out.push_back(e.mc_daughterP4.E());
+  }
+  return out;
+};
+// ==========================================
+RVec<double> get_MCdaughter_x(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco, const bool masscheck) {
+
+  RVec<double> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if (masscheck && e.m_debug_mass == 1)
+      continue;
+    // true daughter MC energies
     out.push_back(e.mc_daughterP4.E()/e.mc_tauP4.E());
   }
   return out;
