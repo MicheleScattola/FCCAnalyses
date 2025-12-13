@@ -174,7 +174,7 @@ RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
-                       const bool bool_reco, const bool masscheck);
+                       const bool bool_reco);
 // ==========================================
 // MASKS AND FILTERS
 // ==========================================
