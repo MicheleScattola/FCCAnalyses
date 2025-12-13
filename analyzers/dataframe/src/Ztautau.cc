@@ -156,7 +156,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     }
     // if 1 prong add RP2MC energy
     auto &p2mc = mc[ev.mc_RP2MC_id];
-    TlorentzVector rp2mcp4;
+    TLorentzVector rp2mcp4;
     rp2mcp4.SetXYZM(p2mc.momentum.x, p2mc.momentum.y, p2mc.momentum.z,
                            p2mc.mass);
     ev.mc_RP2MC_e = rp2mcp4.E();
