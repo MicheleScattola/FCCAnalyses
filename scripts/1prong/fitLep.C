@@ -142,24 +142,24 @@ void fitLep() {
     //gROOT->Reset();
 
     const char* infile =
-        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
+        "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/histmaker/p8_ee_Ztautau_ecm91.root";
 
-    TFile* f = TFile::Open(infile, "READ");
-	std::string treeName = "events";
-	ROOT::EnableImplicitMT();
-    ROOT::RDataFrame df(treeName, infile);
-	
+	TFile* f = TFile::Open(infile, "READ");
+    if (!f || f->IsZombie()) {
+        std::cerr << "ERROR: could not open file: " << infile << std::endl;
+        return;
+    }
 
-	double bin = 0.025; // fixed bin width
-	double xMin = 0.0;
-	double xMax = 1.0;
-	int nBins = std::round((xMax-xMin)/bin);
-	//int nBins = 38;
+    // Retrieve histograms 
     
-    auto h_data1 = df.Histo1D({"h_data1", "Fit Polarization;x_{#mu};Events", nBins, xMin, xMax}, "mu_sgn");
-	auto h_data2 = df.Histo1D({"h_data2", "Fit Polarization;x_{#el};Events", nBins, xMin, xMax}, "el_sgn");
-    TH1D *h_mu = (TH1D*)h_data1->Clone("h_muons");
-	TH1D *h_el = (TH1D*)h_data2->Clone("h_electrons");
+    TH1D* h_el = (TH1D*)f->Get("el_sgn");
+	TH1D* h_mu = (TH1D*)f->Get("mu_sgn");
+
+	TH1D* h_MCel = (TH1D*)f->Get("mc_el_sgn");
+	TH1D* h_MCmu = (TH1D*)f->Get("mc_mu_sgn");
+
+	TH1D* h_el_free = (TH1D*)f->Get("el_free");
+	TH1D* h_mu_free = (TH1D*)f->Get("mu_free");
 
     if (!h_el) std::cerr << "[WARN] Histogram el_sgn not found" << std::endl;
     if (!h_mu) std::cerr << "[WARN] Histogram mu_sgn not found" << std::endl;
@@ -167,15 +167,36 @@ void fitLep() {
     // Fit for electrons
     if (h_el) {
         TString el = "electron";
-        TString title = "TrueMC #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "#tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
         Fit_1prong(h_el, el, title);
+    }
+	if (h_MCel) {
+        TString el = "MCelectron";
+        TString title = "TrueMC #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        Fit
+		Fit_1prong(h_MCel, el, title);
+    }
+	if (h_el_free) {
+        TString el = "FREEelectron";
+        TString title = "NO m_{#tau} limit: #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        Fit_1prong(h_el_free, el, title);
     }
 
     // Fit for muons
     if (h_mu) {
         TString mu = "muon";
-        TString title = "TrueMC #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "#tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
         Fit_1prong(h_mu, mu, title);
+    }
+	if (h_MCmu) {
+        TString mu = "MCmuon";
+        TString title = "TrueMC #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        Fit_1prong(h_MCmu, mu, title);
+    }
+	if (h_mu_free) {
+        TString mu  = "FREEmuon";
+        TString title = "NO m_{#tau} limit: #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        Fit_1prong(h_mu_free, mu, title);
     }
 
     f->Close();

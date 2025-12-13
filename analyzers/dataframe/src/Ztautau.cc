@@ -16,16 +16,16 @@ namespace Ztautau {
 // THRUST
 //===================================
 // custom getThrustPointing using charge instead of energy
-RVec<float> getThrustPointing(const RVec<float> &charge,
-                              const RVec<float> &thrust,
-                              const RVec<float> &costheta) {
+RVec<double> getThrustPointing(const RVec<double> &charge,
+                              const RVec<double> &thrust,
+                              const RVec<double> &costheta) {
 
   // copy
-  RVec<float> out = thrust;
+  RVec<double> out = thrust;
 
   // build total charges
-  float c1 = 0.;
-  float c2 = 0.;
+  double c1 = 0.;
+  double c2 = 0.;
   for (size_t i = 0; i < charge.size(); i++) {
     if (costheta[i] >= 0) {
       c1 += charge[i];
@@ -82,9 +82,10 @@ RVec<int> sel_pions_id(const RVec<edm4hep::ReconstructedParticleData> &in,
 RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<int> &pi_ids, const RVec<int> &ph_ids,
                           const RVec<edm4hep::ReconstructedParticleData> &rps,
-                          const RVec<float> &rps_costheta,
+                          const RVec<double> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
-                          const RVec<int> &daughters) {
+                          const RVec<int> &daughters,
+                          const RVec<int> &rp2mc_idx) {
 
   // collect particles
   RVec<edm4hep::ReconstructedParticleData> mu_tot =
@@ -96,10 +97,11 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
   RVec<edm4hep::ReconstructedParticleData> ph_tot =
       ReconstructedParticle::get(ph_ids, rps);
   // collect their costheta vectors
-  RVec<float> mu_costheta = get_elements_by_index(rps_costheta, mu_ids);
-  RVec<float> el_costheta = get_elements_by_index(rps_costheta, el_ids);
-  RVec<float> pi_costheta = get_elements_by_index(rps_costheta, pi_ids);
-  RVec<float> ph_costheta = get_elements_by_index(rps_costheta, ph_ids);
+  RVec<double> mu_costheta = get_elements_by_index(rps_costheta, mu_ids);
+  RVec<double> el_costheta = get_elements_by_index(rps_costheta, el_ids);
+  RVec<double> pi_costheta = get_elements_by_index(rps_costheta, pi_ids);
+  RVec<double> ph_costheta = get_elements_by_index(rps_costheta, ph_ids);
+
 
   // cycle on hemisperhes, 0 is positive charge, 1 negative
   RVec<myEvent> out;
@@ -119,6 +121,11 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         ReconstructedParticle::sel_axis(hemisphere)(pi_costheta, pi_tot);
     RVec<edm4hep::ReconstructedParticleData> ph =
         ReconstructedParticle::sel_axis(hemisphere)(ph_costheta, ph_tot);
+    // get ids vector for RP2MC
+    RVec<int> mu_idx = get_idx(hemisphere,mu_costheta,mu_ids);
+    RVec<int> el_idx = get_idx(hemisphere,el_costheta,el_ids);
+    RVec<int> pi_idx = get_idx(hemisphere,pi_costheta,pi_ids);
+    RVec<int> ph_idx = get_idx(hemisphere,ph_costheta,ph_ids);
     // fill struct
     ev.n_mu = mu.size();
     ev.n_el = el.size();
@@ -137,16 +144,22 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     // RECO EVT CLASSIFICATION
     // Leptonic
     if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0 ) {
-      ev.m_type = classify_lep(ev);
+      ev.m_type = classify_lep(ev,mu_idx,el_idx,rp2mc_idx);
     }
     // Hadronic
     else if (ev.n_pi > 0 && ev.n_mu == 0 && ev.n_el == 0) {
-      ev.m_type = classify_pion(ev);
+      ev.m_type = classify_pion(ev,pi_idx,rp2mc_idx);
     }
     
     else if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi != 0 ) {
       ev.m_debug = 11;
     }
+    // if 1 prong add RP2MC energy
+    auto &p2mc = mc[ev.mc_RP2MC_id];
+    TlorentzVector rp2mcp4;
+    rp2mcp4.SetXYZM(p2mc.momentum.x, p2mc.momentum.y, p2mc.momentum.z,
+                           p2mc.mass);
+    ev.mc_RP2MC_e = rp2mcp4.E();
 
     // invariant mass check
     TLorentzVector p4_tot;
@@ -250,6 +263,23 @@ void fill_collection (myEvent &ev, const auto &input_particles,
     out_p4.push_back(tlv);
   }
 }
+// ==========================================
+// helper
+RVec<int> get_idx(const bool &hemi, const RVec<double> &costheta, const RVec<int> &ids){
+  
+  RVec<int> out;
+  if(hemi){
+    for(int i=0;i<costheta.size():i++){
+      if (costheta[i]>=0) out.push_back(ids[i]);
+    }
+  } else if (!hemi) {
+    for(int i=0;i<costheta.size():i++){
+      if (costheta[i]<0) out.push_back(ids[i]);
+    }
+  }
+
+  return out;
+}
 
 // ==========================================
 int classify_MC(const RVec<int> &pdgs) {
@@ -284,13 +314,21 @@ int classify_MC(const RVec<int> &pdgs) {
 }
 
 // ==========================================
-int classify_lep(const myEvent &ev) {
+int classify_lep(myEvent &ev, const RVec<int> &mu_idx, const RVec<int> &el_idx, const RVec<int> &rp2mc_idx) {
   // Check MUON: 1 mu, 0 others
   if (ev.n_mu == 1 && ev.n_el == 0) {
+
+    // check RP2MC and get corresponding 1prong true MC energy
+    int id = mu_idx[0];
+    ev.mc_RP2MC_id = rp2mc_idx[id];
     return 1; // Type 1: Muon
   }
   // Check ELECTRON: 1 el, 0 others
   if (ev.n_mu == 0 && ev.n_el == 1 ) {
+
+    // check RP2MC and get corresponding 1prong true MC energy
+    int id = el_idx[0];
+    ev.mc_RP2MC_id = rp2mc_idx[id];
     return 2; // Type 2: Electron
   }
 
@@ -298,12 +336,15 @@ int classify_lep(const myEvent &ev) {
 }
 
 // ==========================================
-int classify_pion(myEvent &ev) {
+int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_idx) {
 
   // invariant mass check is done in main function
   // classification
   if (ev.n_pi == 1) {
     if (ev.n_ph == 0) {
+      // check RP2MC and get corresponding 1prong true MC energy
+      int id = pi_idx[0];
+      ev.mc_RP2MC_id = rp2mc_idx[id];
       return 3; // Type 3: Single Pion
   } else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
       return 4; // Type 4: Rho (pi + 1-2 gamma)
@@ -336,15 +377,15 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
 // RE-WEIGHTING FUNCTIONS
 // ==========================================
 
-float calc_Ptau(const TLorentzVector &p4_tau) {
-  float costheta = p4_tau.CosTheta();
-  float Ptau = -(SM_Atau * (1 + costheta * costheta) + 2 * SM_Atau * costheta) /
+double calc_Ptau(const TLorentzVector &p4_tau) {
+  double costheta = p4_tau.CosTheta();
+  double Ptau = -(SM_Atau * (1 + costheta * costheta) + 2 * SM_Atau * costheta) /
                (1 + costheta * costheta + 2 * SM_Atau * SM_Atau * costheta);
   return Ptau;
 }
 
 // Function to calculate cos(theta*) using Truth MC 4-vectors
-float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
+double GetCosThetaStar(const TLorentzVector &p4_tau_lab,
                       const TLorentzVector &p4_pi_lab) {
 
   // BoostVector() returns beta of the particle (Lab -> Particle)
@@ -357,7 +398,7 @@ float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
   TVector3 tau_dir_lab = p4_tau_lab.Vect();
 
   // calculate angle between tau and pi boosted in tau rest frame
-  float angle = p4_pi_rest.Vect().Angle(tau_dir_lab);
+  double angle = p4_pi_rest.Vect().Angle(tau_dir_lab);
 
   return cos(angle);
 }
@@ -365,11 +406,11 @@ float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
 void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                  const RVec<int> &daughters) {
 
-  const float charge = ev.m_RecoCharge;
+  const double charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
-  float z = 0.; // costheta star
-  float alpha = 1.;
-  float Ptau = 0.; // recalculated from tau p4
+  double z = 0.; // costheta star
+  double alpha = 1.;
+  double Ptau = 0.; // recalculated from tau p4
 
   // use tau index to find tau directly
   if (tau_idx < 0 || tau_idx >= mc.size()) {
@@ -416,8 +457,8 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_daughterMass = p4_pi_lab.M();
   z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
   // weight
-  float w_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
-  float w_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
+  double w_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
+  double w_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 
   ev.m_MCweight_plus = w_plus;
   ev.m_MCweight_minus = w_minus;
@@ -426,11 +467,11 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                 const RVec<int> &daughters) {
 
-  const float charge = ev.m_RecoCharge;
+  const double charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
-  float z = 0.;       // costheta star
-  float alpha = 0.46; // recalculate
-  float Ptau = 0.;
+  double z = 0.;       // costheta star
+  double alpha = 0.46; // recalculate
+  double Ptau = 0.;
 
   // use tau index to find tau directly
   if (tau_idx < 0 || tau_idx >= mc.size()) {
@@ -469,7 +510,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     } 
   }
   ev.mc_daughterP4 = p4_rho_lab;
-  float mRho = p4_rho_lab.M();
+  double mRho = p4_rho_lab.M();
   ev.mc_daughterMass = mRho;
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
   alpha =
@@ -482,11 +523,11 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                const RVec<int> &daughters) {
 
-  const float charge = ev.m_RecoCharge;
+  const double charge = ev.m_RecoCharge;
   const int tau_idx = ev.m_tauMCindex;
-  float z = 0.;       // costheta star
-  float alpha = 0.12; // recalculate ?? worth it??
-  float Ptau = 0.;
+  double z = 0.;       // costheta star
+  double alpha = 0.12; // recalculate ?? worth it??
+  double Ptau = 0.;
 
   // use tau index to find tau directly
   if (tau_idx < 0 || tau_idx >= mc.size()) {
@@ -503,7 +544,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 
   Ptau = calc_Ptau(p4_tau_lab);
   ev.m_MCPtau = Ptau;
-  TLorentzVector p4_rho_lab;
+  TLorentzVector p4_a1_lab;
 
   for (int i = pb; i < pe; i++) {
     // loop on daughters, find resonance, store p4
@@ -515,31 +556,31 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
-      p4_rho_lab += p4_pi_lab;
+      p4_a1_lab += p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0
       TLorentzVector p4_pi0_lab;
       p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                          dau.mass);
-      p4_rho_lab += p4_pi0_lab;
+      p4_a1_lab += p4_pi0_lab;
     }
   }
-  ev.mc_daughterP4 = p4_rho_lab;
-  ev.mc_daughterMass = p4_rho_lab.M();
-  z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
+  ev.mc_daughterP4 = p4_a1_lab;
+  ev.mc_daughterMass = p4_a1_lab.M();
+  z = GetCosThetaStar(p4_tau_lab, p4_a1_lab);
   // weights
   ev.m_MCweight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
   ev.m_MCweight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 }
 
 // ==========================================
-// EXTRACT OPTIMAL VARIABLES
+// EXTRACT VARIABLES
 // ==========================================
-RVec<float> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco) {
+                         const bool bool_reco, const bool masscheck) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -548,7 +589,7 @@ RVec<float> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // impose invariant mass check
-    if(e.m_debug_mass == 1)
+    if (masscheck && e.m_debug_mass == 1)
       continue;
     // lepton energy
     if (e.n_mu > 0)
@@ -559,11 +600,11 @@ RVec<float> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
-RVec<float> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco) {
+                         const bool bool_reco, const bool masscheck) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -572,7 +613,7 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // impose invariant mass check
-    if(e.m_debug_mass == 1)
+    if (masscheck && e.m_debug_mass == 1)
       continue;
     // pion energies
     if (e.n_pi > 0) {
@@ -585,17 +626,20 @@ RVec<float> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
-RVec<float> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco) {
+                         const bool bool_reco, const bool masscheck) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
       continue;
     // check reco event
     if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invarian mass check
+    if (masscheck && e.m_debug_mass == 1)
       continue;
     // photon energies
     if (e.n_ph > 0) {
@@ -607,11 +651,11 @@ RVec<float> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
-RVec<float> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco) {
+                         const bool bool_reco, const bool masscheck) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -620,10 +664,10 @@ RVec<float> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // impose invariant mass check
-    if(e.m_debug_mass == 1)
+    if (masscheck && e.m_debug_mass == 1)
       continue;
     // collect dressed energy (if the event is mu or el the other P4 vectors are empty)
-    float temp=0.0;
+    double temp=0.0;
     for(const auto &p4 : e.m_elP4) {
       temp += p4.E();
     }
@@ -639,11 +683,11 @@ RVec<float> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
-RVec<float> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
-                       const bool bool_mc, const int reco_type,
-                       const bool bool_reco) {
+RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco, const bool masscheck) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -652,19 +696,20 @@ RVec<float> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // impose invariant mass check
-    if(e.m_debug_mass == 1)
+    if (masscheck && e.m_debug_mass == 1)
       continue;
-    // true daughter MC energies
-    out.push_back(e.mc_daughterP4.E()/e.mc_tauP4.E());
+    // return rp2mc_e
+    out.push_back(e.mc_RP2MC_e);
   }
+
   return out;
 };
 // ==========================================
-RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
+RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
-                        const int reco_type, const bool bool_reco) {
+                        const int reco_type, const bool bool_reco, const bool masscheck) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -673,7 +718,7 @@ RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // impose invariant mass check
-    if(e.m_debug_mass == 1)
+    if (masscheck && e.m_debug_mass == 1)
       continue;
     // get weight based on sign passed
     if (sign > 0)
@@ -684,29 +729,11 @@ RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
   return out;
 };
 // ==========================================
-RVec<float> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
-                       const bool bool_mc, const int reco_type,
-                       const bool bool_reco) {
-
-  RVec<float> out;
-  for (const auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.m_MCtype != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // meson mass
-    out.push_back(e.mc_daughterMass);
-  }
-  return out;
-};
-// ==========================================
-RVec<float> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
                                const bool bool_mc, const int reco_type,
                                const bool bool_reco) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -720,11 +747,11 @@ RVec<float> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
-RVec<float> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
                        const bool bool_reco) {
 
-  RVec<float> out;
+  RVec<double> out;
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -734,6 +761,45 @@ RVec<float> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
       continue;
     // meson mass
     out.push_back(e.mc_daughterMass - e.m_RecoMass);
+  }
+  return out;
+};
+// ==========================================
+RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco, const bool masscheck) {
+
+  RVec<double> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if (masscheck && e.m_debug_mass == 1)
+      continue;
+    // true daughter MC energies
+    out.push_back(e.mc_daughterP4.E()/e.mc_tauP4.E());
+  }
+  return out;
+};
+// ==========================================
+RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco) {
+
+  RVec<double> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.m_MCtype != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // meson mass
+    out.push_back(e.mc_daughterMass);
   }
   return out;
 };

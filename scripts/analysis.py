@@ -41,6 +41,7 @@ class RDFanalysis():
 				.Alias("MCRecoAssociations0", "MCRecoAssociations#0.index")
 				.Alias("MCRecoAssociations1", "MCRecoAssociations#1.index")
 				.Alias("rps", "ReconstructedParticles")
+                .Define("rp2mc_idx","ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, rps)")
                 
                 #initial basic cuts
                 .Filter("rps.size()>=2")
@@ -87,12 +88,12 @@ class RDFanalysis():
 				
 				# defining pions as charged hadrons with mass selection
 				# selecting candidates (possibly mistaken with a K+ )
-				.Define("pions_charged_ids", "Ztautau::sel_pions_id(rps,1)")
+				.Define("Pion0", "Ztautau::sel_pions_id(rps,1)")
 				
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,Particle,Particle1)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx)")
                 
 				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
 				
@@ -102,15 +103,23 @@ class RDFanalysis():
                 .Define("MC_event","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
                 
 				# masks for later cuts and selections
-				.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
-				.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
+				#.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
+				#.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
+                
+				#APPLYING INV MASS CHECK:
 				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
-				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
-				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
+				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true)/45.5")
+                .Define("mc_pi_sgn","Ztautau::get_rp2mc_e(myEvent,3,false,3,true,true)/45.5")
 				# lepton signals
-                .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
-                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")
+                .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true)/45.5")
+                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true)/45.5")
+                .Define("mc_el_sgn","Ztautau::get_rp2mc_e(myEvent,2,false,2,true,true)/45.5")
+                .Define("mc_pi_sgn","Ztautau::get_rp2mc_e(myEvent,1,false,1,true,true)/45.5")
+                
+				#NOT APPLYING INV MASS CHECK:
+                .Define("pi_free","Ztautau::get_hadron_e(myEvent,3,false,3,true,false)/45.5")
+                .Define("el_free","Ztautau::get_lepton_e(myEvent,2,false,2,true,false)/45.5")
+                .Define("mu_free","Ztautau::get_lepton_e(myEvent,1,false,1,true,false)/45.5")
 				# MC invariant mass
 				.Define("MC_rho_m","Ztautau::get_MCdaughter_mass(myEvent,4,true,4,false)")
 				.Define("MC_a1_m","Ztautau::get_MCdaughter_mass(myEvent,5,true,5,false)")
@@ -140,13 +149,15 @@ class RDFanalysis():
         branchList = [
         	"MC_event",
         	"event_type_reco",
-        	"pi_mask",
-        	"weight_mask",
         	"pi_sgn",
-			"w_plus",
-			"w_minus",
 			"mu_sgn",
 			"el_sgn",
+            "mc_pi_sgn",
+            "mc_mu_sgn",
+            "mc_el_sgn",
+            "pi_free",
+            "el_free",
+            "mu_free",
             "RP_thrustcostheta",
 			"RP_thrustphi",
 			"reco_rho_m",

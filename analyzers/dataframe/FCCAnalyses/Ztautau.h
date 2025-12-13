@@ -31,18 +31,18 @@ namespace Ztautau {
 
 namespace rv = ROOT::VecOps;
 
-const float SM_TAU = 1.77686; // tau mass in GeV
-const float SM_PI_CHARGED = 0.13957039;
-const float SM_sin2thetaW = 0.2312;
-const float gv_ga = 1 - 4 * SM_sin2thetaW;
-const float SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
-const float SQRTS = 91.2; // Z pole energy
-const float E_TAU = SQRTS / 2; // tau energy at Z pole
+const double SM_TAU = 1.77686; // tau mass in GeV
+const double SM_PI_CHARGED = 0.13957039;
+const double SM_sin2thetaW = 0.23148;
+const double gv_ga = 1 - 4 * SM_sin2thetaW;
+const double SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
+const double SQRTS = 91.2; // Z pole energy
+const double E_TAU = SQRTS / 2; // tau energy at Z pole
 //===================================
 // custom getThrustPointing using charge instead of energy
-RVec<float> getThrustPointing(const RVec<float> &charge,
-                              const RVec<float> &thrust,
-                              const RVec<float> &costheta);
+RVec<double> getThrustPointing(const RVec<double> &charge,
+                              const RVec<double> &thrust,
+                              const RVec<double> &costheta);
 
 //===================================
 // select pion indices as hadron with mass = 0.13957039
@@ -70,9 +70,9 @@ struct myEvent {
 
   // RECO
   int n_mu = 0, n_el = 0, n_pi = 0, n_ph = 0; // particle counts
-  float m_RecoCharge = 0.;                    // total charge in hemisphere
-  float m_RecoEnergy = 0.;                    // total energy in hemisphere
-  float m_RecoMass = 0.;                      // total invariant mass in hemisphere
+  double m_RecoCharge = 0.;                    // total charge in hemisphere
+  double m_RecoEnergy = 0.;                    // total energy in hemisphere
+  double m_RecoMass = 0.;                      // total invariant mass in hemisphere
   RVec<TLorentzVector> m_muP4, m_elP4, m_piP4,
       m_phP4;     // particle TLorentzVectors
   int m_type = 0; // event reco type
@@ -80,13 +80,15 @@ struct myEvent {
   // MC
   int m_tauMCindex = -1;        // tau MC index
   int m_MCtype = 0;             // event mc type
-  float m_MCPtau = 0.;        // tau polarisation from MC
-  float m_MCweight_plus = 1.0;  // reweighting for h = +1
-  float m_MCweight_minus = 1.0; // reweighting for h = -1
+  double m_MCPtau = 0.;        // tau polarization from MC
+  double m_MCweight_plus = 1.0;  // reweighting for h = +1
+  double m_MCweight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
-  TLorentzVector mc_tauP4;
-  TLorentzVector mc_daughterP4;
-  float mc_daughterMass = 0.;
+  TLorentzVector mc_tauP4;    // P4 of mc tau
+  TLorentzVector mc_daughterP4;   // P4 of the mc daughter (whole resonance in case)
+  int mc_RP2MC_id = -1;   // corresponding mc id for the 1prong reco particle
+  double mc_RP2MC_e = 0.;   // correponding energy
+  double mc_daughterMass = 0.;    // mc invariant mass of the mc daughter
 
   // debug
   int m_debug = 0; 
@@ -97,7 +99,7 @@ struct myEvent {
 RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<int> &pi_ids, const RVec<int> &ph_ids,
                           const RVec<edm4hep::ReconstructedParticleData> &rps,
-                          const RVec<float> &rps_costheta,
+                          const RVec<double> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
                           const RVec<int> &daughters);
 // ==========================================
@@ -105,18 +107,20 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 void fill_collection (myEvent &ev, const auto &input_particles,
                             RVec<TLorentzVector> &out_p4);
 // ==========================================
-int classify_lep(const myEvent &ev);
-int classify_pion(
-    myEvent &ev); // NOT CONST, need to add invariant mass information
+// helper
+RVec<int> get_idx(const bool &hemi, const RVec<double> &costheta, const RVec<int> &ids);
+// ==========================================
+int classify_lep(myEvent &ev, const RVec<int> &mu_idx, const RVec<int> &el_idx, const RVec<int> &rp2mc_idx);
+int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_idx)
 int classify_MC(const RVec<int> &pdgs);
 // ==========================================
 RVec<int> get_type_safe(const RVec<myEvent> &evs);
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
 // ==========================================
-float calc_Ptau(const TLorentzVector &p4_tau);
+double calc_Ptau(const TLorentzVector &p4_tau);
 
-float GetCosThetaStar(const TLorentzVector &p4_tau_lab,
+double GetCosThetaStar(const TLorentzVector &p4_tau_lab,
                       const TLorentzVector &p4_pi_lab);
 
 void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
@@ -129,43 +133,47 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                const RVec<int> &daughters);
 
 // ==========================================
-// EXTRACT OPTIMAL VARIABLES
+// EXTRACT VARIABLES
 // ==========================================
-RVec<float> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco);
+                         const bool bool_reco, const bool masscheck);
 
-RVec<float> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco);
+                         const bool bool_reco, const bool masscheck);
 // ==========================================
-RVec<float> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco);
+                         const bool bool_reco, const bool masscheck);
 // ==========================================
-RVec<float> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
-                       const bool bool_mc, const int reco_type,
-                       const bool bool_reco);
-// ==========================================
-RVec<float> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco);
+                         const bool bool_reco, const bool masscheck);
 // ==========================================
-RVec<float> get_weights(const int sign, const RVec<myEvent> &evs,
+RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco, const bool masscheck)
+// ==========================================
+RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
-                        const int reco_type, const bool bool_reco);
-// ==========================================
-RVec<float> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
-                       const bool bool_mc, const int reco_type,
-                       const bool bool_reco); 
+                        const int reco_type, const bool bool_reco, const bool masscheck); 
 // ==========================================          
-RVec<float> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
                                const bool bool_mc, const int reco_type,
                                const bool bool_reco);
 // ==========================================
-RVec<float> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
                        const bool bool_reco);
+// ==========================================
+RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco, const bool masscheck);
+// ==========================================
+RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
+                       const bool bool_mc, const int reco_type,
+                       const bool bool_reco, const bool masscheck);
 // ==========================================
 // MASKS AND FILTERS
 // ==========================================
