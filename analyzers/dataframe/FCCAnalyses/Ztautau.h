@@ -101,7 +101,8 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<edm4hep::ReconstructedParticleData> &rps,
                           const RVec<double> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
-                          const RVec<int> &daughters);
+                          const RVec<int> &daughters,
+                          const RVec<int> &rp2mc_idx);
 // ==========================================
 // helper to fill P4 and add energy & charge
 void fill_collection (myEvent &ev, const auto &input_particles,
