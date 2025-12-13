@@ -111,7 +111,7 @@ void fill_collection (myEvent &ev, const auto &input_particles,
 RVec<int> get_idx(const bool &hemi, const RVec<double> &costheta, const RVec<int> &ids);
 // ==========================================
 int classify_lep(myEvent &ev, const RVec<int> &mu_idx, const RVec<int> &el_idx, const RVec<int> &rp2mc_idx);
-int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_idx)
+int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_idx);
 int classify_MC(const RVec<int> &pdgs);
 // ==========================================
 RVec<int> get_type_safe(const RVec<myEvent> &evs);
@@ -153,7 +153,7 @@ RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck)
+                         const bool bool_reco, const bool masscheck);
 // ==========================================
 RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
