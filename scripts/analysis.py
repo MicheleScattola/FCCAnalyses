@@ -114,7 +114,7 @@ class RDFanalysis():
                 .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true)/45.5")
                 .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true)/45.5")
                 .Define("mc_el_sgn","Ztautau::get_rp2mc_e(myEvent,2,false,2,true,true)/45.5")
-                .Define("mc_pi_sgn","Ztautau::get_rp2mc_e(myEvent,1,false,1,true,true)/45.5")
+                .Define("mc_mu_sgn","Ztautau::get_rp2mc_e(myEvent,1,false,1,true,true)/45.5")
                 
 				#NOT APPLYING INV MASS CHECK:
                 .Define("pi_free","Ztautau::get_hadron_e(myEvent,3,false,3,true,false)/45.5")
