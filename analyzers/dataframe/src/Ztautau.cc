@@ -269,11 +269,11 @@ RVec<int> get_idx(const bool &hemi, const RVec<double> &costheta, const RVec<int
   
   RVec<int> out;
   if(hemi){
-    for(int i=0;i<costheta.size():i++){
+    for(int i=0;i<costheta.size();i++){
       if (costheta[i]>=0) out.push_back(ids[i]);
     }
   } else if (!hemi) {
-    for(int i=0;i<costheta.size():i++){
+    for(int i=0;i<costheta.size();i++){
       if (costheta[i]<0) out.push_back(ids[i]);
     }
   }
