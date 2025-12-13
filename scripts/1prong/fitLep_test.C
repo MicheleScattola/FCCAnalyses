@@ -137,7 +137,7 @@ void Fit_1prong(TH1D *hist, const char *outname, const char *title) {
 
 // FINAL ROOT VOID
 
-void fitLep() {
+void fitLep_test() {
 
     //gROOT->Reset();
 
