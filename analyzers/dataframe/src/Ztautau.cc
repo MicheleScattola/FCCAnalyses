@@ -582,9 +582,16 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 // ==========================================
 RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck) {
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -606,9 +613,16 @@ RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck) {
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -632,9 +646,16 @@ RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck) {
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -657,9 +678,16 @@ RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck) {
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -689,9 +717,16 @@ RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck) {
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -711,9 +746,16 @@ RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
-                        const int reco_type, const bool bool_reco, const bool masscheck) {
+                        const int reco_type, const bool bool_reco, const bool masscheck,
+                        const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -771,9 +813,16 @@ RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
-                       const bool bool_reco, const bool masscheck) {
+                       const bool bool_reco, const bool masscheck,
+                        const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)
@@ -792,9 +841,16 @@ RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_MCdaughter_x(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
-                       const bool bool_reco, const bool masscheck) {
+                       const bool bool_reco, const bool masscheck,
+                        const bool symmetric) {
 
   RVec<double> out;
+  // choose only symmetric events if asked
+  if(symmetric && bool_mc){
+    if(evs[0].m_MCtype != evs[1].m_MCtype) return out;
+  } else if (symmetric && bool_reco){
+      if(evs[0].m_type != evs[1].m_type) return out;
+  }
   for (const auto &e : evs) {
     // check mc event
     if (bool_mc && e.m_MCtype != mc_type)

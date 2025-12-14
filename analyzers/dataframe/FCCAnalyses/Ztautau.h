@@ -143,27 +143,33 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 // ==========================================
 RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck);
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric);
 
 RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck);
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric);
 // ==========================================
 RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck);
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric);
 // ==========================================
 RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck);
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric);
 // ==========================================
 RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck);
+                         const bool bool_reco, const bool masscheck,
+                          const bool symmetric);
 // ==========================================
 RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
-                        const int reco_type, const bool bool_reco, const bool masscheck); 
+                        const int reco_type, const bool bool_reco, const bool masscheck,
+                        const bool symmetric); 
 // ==========================================          
 RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
                                const bool bool_mc, const int reco_type,
@@ -175,11 +181,13 @@ RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
-                       const bool bool_reco, const bool masscheck);
+                       const bool bool_reco, const bool masscheck,
+                        const bool symmetric);
 // ==========================================
 RVec<double> get_MCdaughter_x(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
-                       const bool bool_reco, const bool masscheck);
+                       const bool bool_reco, const bool masscheck,
+                        const bool symmetric);
 // ==========================================
 RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
