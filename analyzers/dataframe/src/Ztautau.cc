@@ -243,7 +243,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       // now exit the loop
       break;
     }
-    if(ev.mc_daughtherP4.M()>1.8) ev.mc_debug_mass = 1;
+    if(ev.mc_daughterP4.M()>1.8) ev.mc_debug_mass = 1;
 
     // push back and change hemisphere
     out.push_back(ev);
