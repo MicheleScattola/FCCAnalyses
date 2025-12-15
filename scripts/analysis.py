@@ -122,9 +122,9 @@ class RDFanalysis():
                 .Define("mu_free","Ztautau::get_lepton_e(myEvent,1,false,1,true,false,false)/45.5")
 
 				# ALL MC DATA
-                # diagonal events in confusion matrix
-                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,false,false)/45.5")
-                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,false,false)/45.5")
+                # MC events with RECO inv mass limit
+                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,true,false)/45.5")
+                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,true,false)/45.5")
                 # all MC events
                 .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,false)/45.5")
                 .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,false)/45.5")

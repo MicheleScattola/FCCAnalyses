@@ -172,7 +172,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     for(auto &p : ev.m_phP4) p4_tot += p;
     
     ev.m_RecoMass = p4_tot.M(); 
-    if (ev.m_RecoMass > 1.8){
+    if (ev.m_RecoMass > 2){
       ev.m_debug_mass = 1; // high mass
       //ev.m_type = 0; // reset type
     }
@@ -243,6 +243,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       // now exit the loop
       break;
     }
+    if(ev.mc_daughtherP4.M()>1.8) ev.mc_debug_mass = 1;
 
     // push back and change hemisphere
     out.push_back(ev);
@@ -990,7 +991,9 @@ RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
     // check reco event (inverse)
     if (bool_reco && e.m_type == reco_type) // inverse search, look for events which are type A on montecarlo and NOT A in reco
       continue;
-
+    // check for invariant mass 
+    if (e.m_debug_mass == 0)
+      continue;
     out.push_back(e.mc_daughters);
   }
   return out;

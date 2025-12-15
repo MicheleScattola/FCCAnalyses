@@ -164,7 +164,7 @@ void fitLep_test() {
     // Fit for electrons
     if (h_el_test) {
         TString el = "testEL";
-        TString title = "Diagonal events - TrueMC energy: e channel;x_{e};Events";
+        TString title = "MC + Reco inv mass limit : e channel;x_{e};Events";
         Fit_1prong(h_el_test, el, title);
     }
 	if (h_MCel) {
@@ -181,7 +181,7 @@ void fitLep_test() {
     // Fit for muons
     if (h_mu_test) {
         TString mu = "testMU";
-        TString title = "Diagonal events - TrueMC energy: #mu channel;x_{#mu};Events";
+        TString title = "MC + Reco inv mass limit : #mu channel;x_{#mu};Events";
         Fit_1prong(h_mu_test, mu, title);
     }
 	if (h_MCmu) {

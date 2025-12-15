@@ -90,6 +90,7 @@ struct myEvent {
   int mc_RP2MC_id = -1;   // corresponding mc id for the 1prong reco particle
   double mc_RP2MC_e = 0.;   // correponding energy
   double mc_daughterMass = 0.;    // mc invariant mass of the mc daughter
+  int mc_debug_mass = 0;
 
   // debug
   int m_debug = 0; 
