@@ -216,14 +216,14 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         for (int i = pb; i < pe; i++) {
           int dau_idx = daughters[i];
           const auto &dau = mc[dau_idx];
-          if (abs(dau.PDG) == 13 || abs(dau.PDG) == 11) {
-            // found lepton daughter
+          if (abs(dau.PDG) == 13 || abs(dau.PDG) == 11 || abs(dau.PDG) == 22) {
+            // found lepton daughter OR BREHMSSTRALUNG PHOTON
             ev.m_found = true;
             TLorentzVector p4_lep;
             p4_lep.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                            dau.mass);
-            ev.mc_daughterP4 = p4_lep;
-            ev.mc_daughterMass = p4_lep.M();
+            ev.mc_daughterP4 += p4_lep;
+            ev.mc_daughterMass += p4_lep.M();
           }
         }
       }
@@ -406,6 +406,31 @@ double GetCosThetaStar(const TLorentzVector &p4_tau_lab,
   double angle = p4_pi_rest.Vect().Angle(tau_dir_lab);
 
   return cos(angle);
+}
+
+void lepton_weight(myEvent &ev) {
+
+  double Ptau = 0.; // recalculated from tau p4
+
+  // use tau index to find tau directly
+  if (tau_idx < 0 || tau_idx >= mc.size()) {
+    cerr << "[ERROR]: Invalid tau index" << endl;
+    return;
+  }
+  // tau found
+  TLorentzVector p4_tau_lab = ev.mc_tauP4;
+  Ptau = calc_Ptau(p4_tau_lab);
+  ev.m_MCPtau = Ptau;
+  double x = ev.mc_daughterP4.E()/ev.mc_tauP4.E();
+
+  double a = (5.0-9.0*x*x+4.0*x*x*x);
+  double b = (1.0-9.0*x*x+8.0*x*x*x);
+  // weight
+  double w_plus = (1 + b/a) / (1 + Ptau * (b/a));
+  double w_minus = (1 - b/a) / (1 + Ptau * (b/a));
+
+  ev.m_MCweight_plus = w_plus;
+  ev.m_MCweight_minus = w_minus;
 }
 
 void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,

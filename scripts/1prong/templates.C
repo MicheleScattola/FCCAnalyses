@@ -6,62 +6,50 @@
 #include "TString.h"
 #include "TFile.h"
 #include <iostream>
+#include <string>
 
-void templates() {
-	    
-    // input
-    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
-    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/";
-    
-    
-    std::string treeName = "events"; 
-    
-    int nBins = 40;
-    double xMin = 0.0;
-    double xMax = 1.0;
+// Helper function to handle plotting and saving for each particle
+void create_and_save(ROOT::RDF::RNode df, 
+                     TFile* fOut,
+                     const std::string& var_sgn, 
+                     const std::string& w_plus, 
+                     const std::string& w_minus, 
+                     const std::string& label, 
+                     const std::string& suffix, 
+                     const char* outdir,
+                     int nBins, double xMin, double xMax) {
 
-    
-    // Histos
-    ROOT::RDataFrame df(treeName, infile);
+    // pointers to RResultPtr
+    auto h_plus_ptr  = df.Histo1D({("h_plus_"+suffix).c_str(),  ("Template Helicity +1 (" + label + ");x;Events").c_str(), nBins, xMin, xMax}, var_sgn, w_plus);
+    auto h_minus_ptr = df.Histo1D({("h_minus_"+suffix).c_str(), ("Template Helicity -1 (" + label + ");x;Events").c_str(), nBins, xMin, xMax}, var_sgn, w_minus);
 
-    auto h_plus_ptr  = df.Histo1D({"h_plus",  "Template Helicity +1;x_{#pi};Events", nBins, xMin, xMax}, "pi_sgn", "w_plus");
-    auto h_minus_ptr = df.Histo1D({"h_minus", "Template Helicity -1;x_{#pi};Events", nBins, xMin, xMax}, "pi_sgn", "w_minus");
+    // Clone and detach from RDataFrame
+    TH1D *h_plus  = (TH1D*)h_plus_ptr->Clone(("h_template_"+suffix+"_plus").c_str());
+    TH1D *h_minus = (TH1D*)h_minus_ptr->Clone(("h_template_"+suffix+"_minus").c_str());
 
-    // extract histos from pointers
-    TH1D *h_plus  = (TH1D*)h_plus_ptr->Clone("h_template_plus");
-    TH1D *h_minus = (TH1D*)h_minus_ptr->Clone("h_template_minus");
-    
     // Normalization
-    h_plus->Scale(1.0 / h_plus->Integral());
-    h_minus->Scale(1.0 / h_minus->Integral());
+    if (h_plus->Integral() > 0)  h_plus->Scale(1.0 / h_plus->Integral());
+    if (h_minus->Integral() > 0) h_minus->Scale(1.0 / h_minus->Integral());
 
-    // Plots
-    gStyle->SetOptStat(0); 
-
-    TCanvas *c = new TCanvas("c_templates", "Polarization Templates", 900, 600);
-    c->SetSupportGL(true);
-    c->cd();
-	
-    
+    // Styling
     h_plus->SetLineColor(kBlue);
     h_plus->SetLineWidth(2);
-    h_plus->SetFillColorAlpha(kBlue, 0.5); 
-    //h_plus->SetFillStyle(3006);
+    h_plus->SetFillColorAlpha(kBlue, 0.3); 
 
     h_minus->SetLineColor(kRed);
     h_minus->SetLineWidth(2);
-    //h_minus->SetLineStyle(2); 
-    h_minus->SetFillColorAlpha(kRed, 0.5); 
-    //h_minus->SetFillStyle(3007);
-    
-    h_plus->SetTitle("Polarization Templates;x (re-weighted);Probability Density");
-    
+    h_minus->SetFillColorAlpha(kRed, 0.3);
 
-    
+    // Plotting
+    TCanvas *c = new TCanvas(("c_" + suffix).c_str(), ("Polarization Templates " + label).c_str(), 900, 600);
+    c->cd();
+
+    // Determine Y range
     double max_y = std::max(h_plus->GetMaximum(), h_minus->GetMaximum());
-    h_plus->SetMaximum(max_y * 1.2); // +20% margin
+    h_plus->SetMaximum(max_y * 1.25);
     h_plus->SetMinimum(0.);
+    
+    h_plus->SetTitle(("Polarization Templates " + label + ";x (re-weighted);Probability Density").c_str());
 
     h_plus->Draw("HIST");
     h_minus->Draw("HIST SAME");
@@ -69,22 +57,61 @@ void templates() {
     // Legend
     TLegend *leg = new TLegend(0.65, 0.75, 0.88, 0.88);
     leg->SetBorderSize(0);
-    leg->AddEntry(h_plus,  "Helicity +1", "l");
-    leg->AddEntry(h_minus, "Helicity -1", "l");
+    leg->AddEntry(h_plus,  "Helicity +1", "f");
+    leg->AddEntry(h_minus, "Helicity -1", "f");
     leg->Draw();
 
-    // save canvas
-    //c->SaveAs(TString(outdir) + "templates.png");
-    c->SaveAs(TString(outdir) + "templates.pdf");
+    // save pdf
+    c->SaveAs(TString(outdir) + "templates_" + suffix + ".pdf");
 
-    // SAVING HISTOS FOR FINAL FIT
-    TString rootOutName = TString(outdir2) + "templates.root";
-    TFile *fOut = new TFile(rootOutName, "RECREATE");
+    // write to file
+    fOut->cd();
     h_plus->Write();
     h_minus->Write();
+
+    // Cleanup
+    delete c;
+    delete leg;
+    // Note: Do not delete h_plus/h_minus here if they are managed by the file, 
+    // but since we Cloned them manually, usually we rely on file closure or explicit delete.
+    // For macros, leaving them is often safer to avoid double-free with ROOT ownership.
+}
+
+void templates() {
+        
+    // Settings
+    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/p8_ee_Ztautau_ecm91.root";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
+    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/";
+    
+    std::string treeName = "events"; 
+    
+    int nBins = 44;
+    double xMin = 0.0;
+    double xMax = 1.1; 
+
+    // Style
+    gStyle->SetOptStat(0); 
+
+    // Open Dataframe
+    ROOT::RDataFrame df(treeName, infile);
+
+    // Open Output ROOT File (Single file for all histos)
+    TString rootOutName = TString(outdir2) + "templates.root";
+    TFile *fOut = new TFile(rootOutName, "RECREATE");
+
+    std::cout << "Processing Pions..." << std::endl;
+    create_and_save(df, fOut, "pi_sgn", "w_plus_pi", "w_minus_pi", "Pions", "pi", outdir, nBins, xMin, xMax);
+
+    std::cout << "Processing Muons..." << std::endl;
+    create_and_save(df, fOut, "mu_sgn", "w_plus_mu", "w_minus_mu", "Muons", "mu", outdir, nBins, xMin, xMax);
+
+    std::cout << "Processing Electrons..." << std::endl;
+    create_and_save(df, fOut, "el_sgn", "w_plus_el", "w_minus_el", "Electrons", "el", outdir, nBins, xMin, xMax);
+
+    // Close file
     fOut->Close();
 
-    std::cout << "\n[INFO] Templates created and saved in: " << rootOutName << std::endl;
-    std::cout << "       - h_template_plus" << std::endl;
-    std::cout << "       - h_template_minus" << std::endl;
+    std::cout << "\n[INFO] All templates created and saved in: " << rootOutName << std::endl;
+    std::cout << "[INFO] PDFs saved in: " << outdir << std::endl;
 }

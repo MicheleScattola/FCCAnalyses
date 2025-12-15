@@ -130,6 +130,8 @@ double calc_Ptau(const TLorentzVector &p4_tau);
 double GetCosThetaStar(const TLorentzVector &p4_tau_lab,
                       const TLorentzVector &p4_pi_lab);
 
+void lepton_weight(myEvent &ev);
+
 void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                  const RVec<int> &daughters);
 

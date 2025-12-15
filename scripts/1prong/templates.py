@@ -101,9 +101,17 @@ class RDFanalysis():
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,Particle,Particle1)")
                 
 				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
-				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
-				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
+				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,false)/45.5")
+				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,false,3,true,true,false)")
+				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,false,3,true,true,false)")
+                
+				# lep signal and weights
+                .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,false)/45.5")
+                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.5")
+                .Define("w_plus_el","Ztautau::get_weights(1,myEvent,2,false,2,true,true,false)")
+				.Define("w_minus_el","Ztautau::get_weights(-1,myEvent,2,false,2,true,true,false)")
+                .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,false,1,true,true,false)")
+				.Define("w_minus_mu","Ztautau::get_weights(-1,myEvent,1,false,1,true,true,false)")
 				
 				  
                 )
@@ -118,8 +126,12 @@ class RDFanalysis():
     def output():
         branchList = [
         	"pi_sgn",
-			"w_plus",
-			"w_minus"
+			"w_plus_pi",
+			"w_minus_pi",
+            "w_plus_el",
+            "w_minus_el",
+            "w_plus_mu",
+            "w_minus_mu"
         	
         	]
         return branchList
