@@ -123,8 +123,8 @@ class RDFanalysis():
 
 				# ALL MC DATA
                 # MC events with RECO inv mass limit
-                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,true,false)/45.5")
-                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,true,false)/45.5")
+                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true,false)/45.5")
+                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,true,false)/45.5")
                 # all MC events
                 .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,false)/45.5")
                 .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,false)/45.5")
