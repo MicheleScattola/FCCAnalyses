@@ -107,27 +107,29 @@ class RDFanalysis():
 				#.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
                 
 				#APPLYING INV MASS CHECK:
-				# pi signal and weights
+				# pi signal
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,false)/45.5")
-                .Define("mc_pi_sgn","Ztautau::get_rp2mc_e(myEvent,3,false,3,true,true,false)/45.5")
 				# lepton signals
                 .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,false)/45.5")
                 .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.5")
+                # signal with RP2MC energy
                 .Define("mc_el_sgn","Ztautau::get_rp2mc_e(myEvent,2,false,2,true,true,false)/45.5")
                 .Define("mc_mu_sgn","Ztautau::get_rp2mc_e(myEvent,1,false,1,true,true,false)/45.5")
-                
+                .Define("mc_pi_sgn","Ztautau::get_rp2mc_e(myEvent,3,false,3,true,true,false)/45.5")
 				#NOT APPLYING INV MASS CHECK:
                 .Define("pi_free","Ztautau::get_hadron_e(myEvent,3,false,3,true,false,false)/45.5")
                 .Define("el_free","Ztautau::get_lepton_e(myEvent,2,false,2,true,false,false)/45.5")
                 .Define("mu_free","Ztautau::get_lepton_e(myEvent,1,false,1,true,false,false)/45.5")
 
 				# ALL MC DATA
+                # diagonal events in confusion matrix
                 .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,false,false)/45.5")
+                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,false,false)/45.5")
+                # all MC events
                 .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,false)/45.5")
-                .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
-                
-				.Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,false,false)/45.5")
                 .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,false)/45.5")
+                # now with MC E_tau
+                .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
                 .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
                 
 				# CHECK CONFRONT SYMMETRIC VS NON SYMMETRIC EVTS
@@ -151,10 +153,10 @@ class RDFanalysis():
                 .Define("debug_mu","Ztautau::get_debug_daughters(myEvent,1,true,1,false)")
                 .Define("debug_el","Ztautau::get_debug_daughters(myEvent,2,true,2,false)")
 				# costheta and phi for (3,3) events, are they biased??
-				.Define("debug_costheta_mu","Ztautau::get_debug_costheta(myEvent,1,true,1,false)")
-                .Define("debug_costheta_el","Ztautau::get_debug_costheta(myEvent,2,true,2,false)")
-                .Define("debug_phi_mu","Ztautau::get_debug_phi(myEvent,1,true,1,false)")
-                .Define("debug_phi_el","Ztautau::get_debug_phi(myEvent,2,true,2,false)")
+				.Define("debug_costheta_mu","Ztautau::get_debug_costheta(myEvent,1,true,3,true)")
+                .Define("debug_costheta_el","Ztautau::get_debug_costheta(myEvent,2,true,3,true)")
+                .Define("debug_phi_mu","Ztautau::get_debug_phi(myEvent,1,true,3,true)")
+                .Define("debug_phi_el","Ztautau::get_debug_phi(myEvent,2,true,3,true)")
 				  
                 )
 		

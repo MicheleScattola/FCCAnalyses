@@ -167,34 +167,34 @@ void fitLep() {
     // Fit for electrons
     if (h_el) {
         TString el = "electron";
-        TString title = "#tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "Reco events + Reco energy : e channel;x_{e};Events";
         Fit_1prong(h_el, el, title);
     }
 	if (h_MCel) {
         TString el = "MCelectron";
-        TString title = "TrueMC #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "Reco events + MC energy : e channel;x_{e};Events";
         Fit_1prong(h_MCel, el, title);
     }
 	if (h_el_free) {
         TString el = "FREEelectron";
-        TString title = "NO m_{#tau} limit: #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "Reco NO invariant mass limit : e channel;x_{e};Events";
         Fit_1prong(h_el_free, el, title);
     }
 
     // Fit for muons
     if (h_mu) {
         TString mu = "muon";
-        TString title = "#tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "Reco events + Reco energy : #mu channel;x_{#mu};Events";
         Fit_1prong(h_mu, mu, title);
     }
 	if (h_MCmu) {
         TString mu = "MCmuon";
-        TString title = "TrueMC #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "Reco events + MC energy : #mu channel;x_{#mu};Events";
         Fit_1prong(h_MCmu, mu, title);
     }
 	if (h_mu_free) {
         TString mu  = "FREEmuon";
-        TString title = "NO m_{#tau} limit: #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "Reco NO invariant mass limit : #mu channel;x_{#mu};Events";
         Fit_1prong(h_mu_free, mu, title);
     }
 

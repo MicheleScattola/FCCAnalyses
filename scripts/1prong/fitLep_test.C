@@ -164,34 +164,34 @@ void fitLep_test() {
     // Fit for electrons
     if (h_el_test) {
         TString el = "testEL";
-        TString title = "#tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "Diagonal events - TrueMC energy: e channel;x_{e};Events";
         Fit_1prong(h_el_test, el, title);
     }
 	if (h_MCel) {
         TString el = "mcEL";
-        TString title = "TrueMC #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "MC events + MC energy : e channel;x_{e};Events";
         Fit_1prong(h_MCel, el, title);
     }
 	if (h_el_x) {
         TString el = "xEL";
-        TString title = "MC E_{e} and E_{#tau}: #tau #rightarrow e #nu_{e} #nu_{#tau};x_{e};Events";
+        TString title = "MC + MC E_{#tau}: e channel;x_{e};Events";
         Fit_1prong(h_el_x, el, title);
     }
 
     // Fit for muons
     if (h_mu_test) {
         TString mu = "testMU";
-        TString title = "#tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "Diagonal events - TrueMC energy: #mu channel;x_{#mu};Events";
         Fit_1prong(h_mu_test, mu, title);
     }
 	if (h_MCmu) {
         TString mu = "mcMU";
-        TString title = "TrueMC #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "MC events + MC energy : #mu channel;x_{#mu};Events";
         Fit_1prong(h_MCmu, mu, title);
     }
 	if (h_mu_x) {
         TString mu  = "xMU";
-        TString title = "MC E_{#mu} and E_{#tau}: #tau #rightarrow #mu #nu_{#mu} #nu_{#tau};x_{#mu};Events";
+        TString title = "MC + MC E_{#tau}: #mu channel;x_{#mu};Events";
         Fit_1prong(h_mu_x, mu, title);
     }
 
