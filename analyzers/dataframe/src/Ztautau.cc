@@ -412,11 +412,6 @@ void lepton_weight(myEvent &ev) {
 
   double Ptau = 0.; // recalculated from tau p4
 
-  // use tau index to find tau directly
-  if (tau_idx < 0 || tau_idx >= mc.size()) {
-    cerr << "[ERROR]: Invalid tau index" << endl;
-    return;
-  }
   // tau found
   TLorentzVector p4_tau_lab = ev.mc_tauP4;
   Ptau = calc_Ptau(p4_tau_lab);
