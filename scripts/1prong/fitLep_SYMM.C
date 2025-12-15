@@ -162,7 +162,7 @@ void fitLep_SYMM() {
     }
 
     if (h_reco) {
-        TString mu = "testMU";
+        TString mu = "SYMM_el_RECO";
         TString title = "symmetric events RECO;x_{#mu};Events";
         Fit_1prong(h_reco, mu, title);
     }
