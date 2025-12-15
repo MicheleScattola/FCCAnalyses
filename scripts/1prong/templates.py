@@ -41,10 +41,9 @@ class RDFanalysis():
 				.Alias("MCRecoAssociations0", "MCRecoAssociations#0.index")
 				.Alias("MCRecoAssociations1", "MCRecoAssociations#1.index")
 				.Alias("rps", "ReconstructedParticles")
-				.Define("rps_types","ReconstructedParticle::get_type(rps)")
-				.Define("rps_MC_index",
+				.Define("rp2mc_idx",
   "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, rps)")
-				
+			
 				#PDG ids of reconstructed particles
                 .Define("AssociatedMCpdg","RVec<int> pdgs; for(auto idx : MCRecoAssociations1) pdgs.push_back(Particle[idx].PDG); return pdgs;")
                 
@@ -93,12 +92,12 @@ class RDFanalysis():
 				
 				# defining pions as charged hadrons with mass selection
 				# selecting candidates (possibly mistaken with a K+ )
-				.Define("pions_charged_ids", "Ztautau::sel_pions_id(rps,1)")
+				.Define("Pion0", "Ztautau::sel_pions_id(rps,1)")
 				
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,Particle,Particle1)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,false)/45.5")
@@ -128,8 +127,10 @@ class RDFanalysis():
         	"pi_sgn",
 			"w_plus_pi",
 			"w_minus_pi",
+            "el_sgn",
             "w_plus_el",
             "w_minus_el",
+            "mu_sgn",
             "w_plus_mu",
             "w_minus_mu"
         	

@@ -228,7 +228,9 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         }
       }
       // weight calculation
-      if (ev.m_MCtype == 3) {
+      if (ev.m_MCtype == 1 || ev.m_MCtype == 2 ) {
+      	lepton_weight(ev);
+      }	else if (ev.m_MCtype == 3) {
         pion_weight(ev, mc, daughters);
       } else if (ev.m_MCtype == 4) {
         rho_weight(ev, mc, daughters);
