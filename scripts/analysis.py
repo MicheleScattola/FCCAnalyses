@@ -135,6 +135,8 @@ class RDFanalysis():
 				# CHECK CONFRONT SYMMETRIC VS NON SYMMETRIC EVTS
                 .Define("el_symmMC","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,true)/45.5")
                 .Define("el_symmRECO","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,true)/45.5")
+                .Define("mu_symmMC","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,true)/45.5")
+                .Define("mu_symmRECO","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,true)/45.5")
 
 				# MC invariant mass
 				.Define("MC_rho_m","Ztautau::get_MCdaughter_mass(myEvent,4,true,4,false)")
@@ -153,8 +155,8 @@ class RDFanalysis():
                 .Define("debug_mu","Ztautau::get_debug_daughters(myEvent,1,true,1,false)")
                 .Define("debug_el","Ztautau::get_debug_daughters(myEvent,2,true,2,false)")
 				# costheta and phi for (3,3) events, are they biased??
-				.Define("debug_costheta_mu","Ztautau::get_debug_costheta(myEvent,1,true,3,true)")
-                .Define("debug_costheta_el","Ztautau::get_debug_costheta(myEvent,2,true,3,true)")
+				.Define("debug_costheta_mu","Ztautau::get_debug_costheta(myEvent,1,true,3,false)")
+                .Define("debug_costheta_el","Ztautau::get_debug_costheta(myEvent,2,true,3,false)")
                 .Define("debug_phi_mu","Ztautau::get_debug_phi(myEvent,1,true,3,true)")
                 .Define("debug_phi_el","Ztautau::get_debug_phi(myEvent,2,true,3,true)")
 				  
@@ -203,7 +205,9 @@ class RDFanalysis():
             "debug_phi_mu",
             "debug_phi_el",
             "el_symmMC",
-            "el_symmRECO"
+            "el_symmRECO",
+            "mu_symmMC",
+            "mu_symmRECO"
 		
         	
         	]

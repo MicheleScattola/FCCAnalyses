@@ -152,19 +152,33 @@ void fitLep_SYMM() {
 
     // Retrieve histograms 
     
-    TH1D* h_mc = (TH1D*)f->Get("el_symmMC");
-	TH1D* h_reco = (TH1D*)f->Get("el_symmRECO");
+    TH1D* h_el_mc = (TH1D*)f->Get("el_symmMC");
+	TH1D* h_el_reco = (TH1D*)f->Get("el_symmRECO");
+	TH1D* h_mu_mc = (TH1D*)f->Get("mu_symmMC");
+	TH1D* h_mu_reco = (TH1D*)f->Get("mu_symmRECO");
 
-    if (h_mc) {
+    if (h_el_mc) {
         TString el = "SYMM_el_MC";
         TString title = "symmetric events MC;x_{e};Events";
-        Fit_1prong(h_mc, el, title);
+        Fit_1prong(h_el_mc, el, title);
     }
 
-    if (h_reco) {
-        TString mu = "SYMM_el_RECO";
+    if (h_el_reco) {
+        TString el = "SYMM_el_RECO";
+        TString title = "symmetric events RECO;x_{e};Events";
+        Fit_1prong(h_el_reco, el, title);
+    }
+
+	if (h_mu_mc) {
+        TString mu = "SYMM_mu_MC";
+        TString title = "symmetric events MC;x_{#mu};Events";
+        Fit_1prong(h_mu_mc, mu, title);
+    }
+
+    if (h_mu_reco) {
+        TString mu = "SYMM_mu_RECO";
         TString title = "symmetric events RECO;x_{#mu};Events";
-        Fit_1prong(h_reco, mu, title);
+        Fit_1prong(h_mu_reco, mu, title);
     }
 
     f->Close();
