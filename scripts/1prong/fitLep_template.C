@@ -34,7 +34,7 @@ struct TemplateFitFunctor {
 
 // =============================================================================
 
-void fit() {
+void fitLep_template() {
 
     const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     
@@ -46,8 +46,8 @@ void fit() {
     // recover template
     TFile *fTemp = TFile::Open(infile_templates, "READ");
     
-    TH1D *h_plus  = (TH1D*)fTemp->Get("h_plus_el");
-    TH1D *h_minus = (TH1D*)fTemp->Get("h_minus_el");
+    TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_el_plus");
+    TH1D *h_minus = (TH1D*)fTemp->Get("h_template_el_minus");
     
     h_plus->SetDirectory(0);
     h_minus->SetDirectory(0);
