@@ -34,7 +34,7 @@ struct TemplateFitFunctor {
 
 // =============================================================================
 
-void fitLep_template() {
+void fitEL_template() {
 
     const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     
