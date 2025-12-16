@@ -1014,8 +1014,7 @@ RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
     if (bool_reco && e.m_type == reco_type) // inverse search, look for events which are type A on montecarlo and NOT A in reco
       continue;
     // check for invariant mass 
-    if (e.m_debug_mass == 0)
-      continue;
+    
     out.push_back(e.mc_daughters);
   }
   return out;
