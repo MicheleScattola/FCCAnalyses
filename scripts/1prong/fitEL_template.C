@@ -61,7 +61,7 @@ void fitEL_template() {
     ROOT::EnableImplicitMT();
     ROOT::RDataFrame df(treeName, infile_data);
     
-    auto h_data_ptr = df.Histo1D({"h_data", "Fit Polarization;x_{e};Events", nBins, xMin, xMax}, "el_sgn");
+    auto h_data_ptr = df.Histo1D({"h_data", "Template fit: e channel;x_{e};Events", nBins, xMin, xMax}, "el_sgn");
     TH1D *h_data = (TH1D*)h_data_ptr->Clone("h_data_final");
 
     // fit using functor

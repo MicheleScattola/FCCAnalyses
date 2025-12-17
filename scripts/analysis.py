@@ -133,9 +133,9 @@ class RDFanalysis():
                 .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
                 
 				# CHECK CONFRONT SYMMETRIC VS NON SYMMETRIC EVTS
-                .Define("el_symmMC","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,true)/45.5")
+                .Define("el_symmMC","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,true)")
                 .Define("el_symmRECO","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,true)/45.5")
-                .Define("mu_symmMC","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,true)/45.5")
+                .Define("mu_symmMC","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,true)")
                 .Define("mu_symmRECO","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,true)/45.5")
 
 				# MC invariant mass

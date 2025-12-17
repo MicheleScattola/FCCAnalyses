@@ -216,14 +216,14 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         for (int i = pb; i < pe; i++) {
           int dau_idx = daughters[i];
           const auto &dau = mc[dau_idx];
-          if (abs(dau.PDG) == 13 || abs(dau.PDG) == 11 || abs(dau.PDG) == 22) {
-            // found lepton daughter OR BREHMSSTRALUNG PHOTON
+          if (abs(dau.PDG) == 13 || abs(dau.PDG) == 11 ) {
+            // found lepton daughter 
             ev.m_found = true;
             TLorentzVector p4_lep;
             p4_lep.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                            dau.mass);
-            ev.mc_daughterP4 += p4_lep;
-            ev.mc_daughterMass += p4_lep.M();
+            ev.mc_daughterP4 = p4_lep;
+            ev.mc_daughterMass = p4_lep.M();
           }
         }
       }
@@ -470,14 +470,6 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                         dau.mass);
       p4_pi_lab += p_temp;
     }
-    /* INCLUDE FSR PHOTONS??
-    else if (abs(dau.PDG) == 22){
-    cout << "Found FSR photon in pion decay!" << endl;
-		TLorentzVector p_temp;
-		p_temp.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
-				        dau.mass);
-		p4_pi_lab += p_temp;
-    } */
     
   }
   ev.mc_daughterP4 = p4_pi_lab;
@@ -540,8 +532,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   double mRho = p4_rho_lab.M();
   ev.mc_daughterMass = mRho;
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
-  alpha =
-      (SM_TAU * SM_TAU - 2 * mRho * mRho) / (SM_TAU * SM_TAU + 2 * mRho * mRho);
+  alpha = (SM_TAU * SM_TAU - 2 * mRho * mRho) / (SM_TAU * SM_TAU + 2 * mRho * mRho);
   // weights
   ev.m_MCweight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
   ev.m_MCweight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);

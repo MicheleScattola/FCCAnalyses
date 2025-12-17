@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.02},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.005},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -41,6 +41,12 @@ class RDFanalysis():
 				.Alias("MCRecoAssociations0", "MCRecoAssociations#0.index")
 				.Alias("MCRecoAssociations1", "MCRecoAssociations#1.index")
 				.Alias("rps", "ReconstructedParticles")
+				.Define("rps_types","ReconstructedParticle::get_type(rps)")
+				.Define("rp2mc_idx",
+  "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, rps)")
+				
+				#PDG ids of reconstructed particles
+                .Define("AssociatedMCpdg","RVec<int> pdgs; for(auto idx : MCRecoAssociations1) pdgs.push_back(Particle[idx].PDG); return pdgs;")
                 
                 #initial basic cuts
                 .Filter("rps.size()>=2")
@@ -78,44 +84,32 @@ class RDFanalysis():
 				
                 # Muons
 				.Alias("Muon0", "Muon#0.index")
-				.Define("muons",   "ReconstructedParticle::get(Muon0, rps)")
-				.Define("muons_costheta","Ztautau::get_elements_by_index(RP_thrustangle,Muon0)")
 
 				# Electrons
 				.Alias("Electron0", "Electron#0.index")
-				.Define("electrons",    "ReconstructedParticle::get(Electron0, rps)")
-				.Define("electrons_costheta","Ztautau::get_elements_by_index(RP_thrustangle,Electron0)")
 
 				# Photons
 				.Alias("Photon0", "Photon#0.index")
-				.Define("photons",   "ReconstructedParticle::get(Photon0, rps)")
-				.Define("photons_e", "ReconstructedParticle::get_e(photons)")
-				.Define("photons_costheta","Ztautau::get_elements_by_index(RP_thrustangle,Photon0)")
 				
 				# defining pions as charged hadrons with mass selection
 				# selecting candidates (possibly mistaken with a K+ )
-				.Define("pions_charged_ids", "Ztautau::sel_pions_id(rps,1)")
-				.Define("pions_charged","ReconstructedParticle::get(pions_charged_ids, rps)")
-				.Define("pi_charged_n","ReconstructedParticle::get_n(pions_charged)")
-				.Define("pi_charged_e","ReconstructedParticle::get_e(pions_charged)")
-				.Define("pi_costheta","Ztautau::get_elements_by_index(RP_thrustangle,pions_charged_ids)")
+				.Define("Pion0", "Ztautau::sel_pions_id(rps,1)")
 				
-				#####
-				# EVENTS IDENTIFICATION
-				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,pions_charged_ids,Photon0,rps,RP_thrustangle,Particle,Particle1)")
-				
-				#####
-				# MC IDENTIFICATION
-				#####
-				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_MCdaughter_e(myEvent,3,true,3,false)")
-				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,true,3,false)")
-				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,true,3,false)")
-				# lepton signals
-				.Define("el_sgn","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false)")
-				.Define("mu_sgn","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
+				# pi signal and weights
+				.Define("pi_sgn","Ztautau::get_MCdaughter_x(myEvent,3,true,3,false,false,false)")
+				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,true,3,false,false,false)")
+				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,true,3,false,false,false)")
+                
+				# lep signal and weights
+                .Define("el_sgn","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
+                .Define("w_plus_el","Ztautau::get_weights(1,myEvent,2,true,2,false,false,false)")
+                .Define("w_minus_el","Ztautau::get_weights(-1,myEvent,2,true,2,false,false,false)")
+                .Define("mu_sgn","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
+                .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,true,1,false,false,false)")
+                .Define("w_minus_mu","Ztautau::get_weights(-1,myEvent,1,true,1,false,false,false)")
+				
 				  
                 )
 		
@@ -129,11 +123,14 @@ class RDFanalysis():
     def output():
         branchList = [
         	"pi_sgn",
-			"w_plus",
-			"w_minus",
-			"mu_sgn",
-			"el_sgn"
-		
+			"w_plus_pi",
+			"w_minus_pi",
+            "el_sgn",
+            "w_plus_el",
+            "w_minus_el",
+            "mu_sgn",
+            "w_plus_mu",
+            "w_minus_mu"
         	
         	]
         return branchList
