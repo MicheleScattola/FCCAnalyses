@@ -38,7 +38,7 @@ void fitPion() {
 
     const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     
-    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/templates.root";
+    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/templates.root";
     
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
     std::string treeName = "events";
@@ -46,8 +46,8 @@ void fitPion() {
     // recover template
     TFile *fTemp = TFile::Open(infile_templates, "READ");
     
-    TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_plus");
-    TH1D *h_minus = (TH1D*)fTemp->Get("h_template_minus");
+    TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_pi_plus");
+    TH1D *h_minus = (TH1D*)fTemp->Get("h_template_pi_minus");
     
     h_plus->SetDirectory(0);
     h_minus->SetDirectory(0);
@@ -158,7 +158,7 @@ void fitPion() {
     h_data->SetMarkerColor(kBlack);
     h_data->SetMarkerStyle(20);
     h_data->SetMarkerSize(0.8);
-    h_data->SetTitle("Tau Polarization Fit;x_{#pi};Events");
+    h_data->SetTitle("Template fit: #pi channel;x_{#pi};Events");
     h_data->SetMinimum(0.);
     
 

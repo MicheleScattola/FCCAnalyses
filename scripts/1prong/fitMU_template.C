@@ -38,7 +38,7 @@ void fitMU_template() {
 
     const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     
-    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/templates.root";
+    const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/templates.root";
     
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
     std::string treeName = "events";

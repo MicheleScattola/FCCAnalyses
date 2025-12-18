@@ -77,17 +77,17 @@ void create_and_save(ROOT::RDF::RNode df,
     // For macros, leaving them is often safer to avoid double-free with ROOT ownership.
 }
 
-void templates() {
+void templatesMC() {
         
     // Settings
-    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
-    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/bkg/";
+    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/p8_ee_Ztautau_ecm91.root";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/templates/";
+    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/";
     
     std::string treeName = "events"; 
     
-    int nBins = 38;
-    double xMin = 0.05;
+    int nBins = 39;
+    double xMin = 0.025;
     double xMax = 1.0; 
 
     // Style

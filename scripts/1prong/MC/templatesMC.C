@@ -80,14 +80,14 @@ void create_and_save(ROOT::RDF::RNode df,
 void templatesMC() {
         
     // Settings
-    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/bkg/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/MC/bkg/";
-    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/bkg/";
+    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/p8_ee_Ztautau_ecm91.root";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/MC/templates/";
+    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/";
     
     std::string treeName = "events"; 
     
-    int nBins = 40;
-    double xMin = 0.0;
+    int nBins = 39;
+    double xMin = 0.025;
     double xMax = 1.0; 
 
     // Style
