@@ -77,7 +77,7 @@ void create_and_save(ROOT::RDF::RNode df,
     // For macros, leaving them is often safer to avoid double-free with ROOT ownership.
 }
 
-void templatesMC() {
+void templates() {
         
     // Settings
     const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/p8_ee_Ztautau_ecm91.root";
