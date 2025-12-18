@@ -34,7 +34,7 @@ struct TemplateFitFunctor {
 
 // =============================================================================
 
-void fitPionMC() {
+void fitMuMC() {
 
     const char* infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/p8_ee_Ztautau_ecm91.root";
     
@@ -46,8 +46,8 @@ void fitPionMC() {
     // recover template
     TFile *fTemp = TFile::Open(infile_templates, "READ");
     
-    TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_plus");
-    TH1D *h_minus = (TH1D*)fTemp->Get("h_template_minus");
+    TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_mu_plus");
+    TH1D *h_minus = (TH1D*)fTemp->Get("h_template_mu_minus");
     
     h_plus->SetDirectory(0);
     h_minus->SetDirectory(0);
@@ -61,7 +61,7 @@ void fitPionMC() {
     ROOT::EnableImplicitMT();
     ROOT::RDataFrame df(treeName, infile_data);
     
-    auto h_data_ptr = df.Histo1D({"h_data", "Fit Polarization;x_{#pi};Events", nBins, xMin, xMax}, "pi_sgn");
+    auto h_data_ptr = df.Histo1D({"h_data", "Template fit: #mu channel;x_{#mu};Events", nBins, xMin, xMax}, "el_sgn");
     TH1D *h_data = (TH1D*)h_data_ptr->Clone("h_data_final");
 
     // fit using functor
@@ -158,7 +158,7 @@ void fitPionMC() {
     h_data->SetMarkerColor(kBlack);
     h_data->SetMarkerStyle(20);
     h_data->SetMarkerSize(0.8);
-    h_data->SetTitle("TrueMC #pi channel;x_{#pi};Events");
+    h_data->SetTitle("TrueMC #mu channel;x_{#mu};Events");
     h_data->SetMinimum(0.);
     
 
@@ -189,7 +189,7 @@ void fitPionMC() {
 
     // save
     //c->SaveAs(TString(outdir) + "polarization_fit_result_histo.png");
-    c->SaveAs(TString(outdir) + "TrueMC_pi_fit.pdf");
+    c->SaveAs(TString(outdir) + "TrueMC_mu_fit.pdf");
 
     delete h_result_plus;
     delete h_result_minus;

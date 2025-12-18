@@ -780,6 +780,14 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
     // impose invariant mass check
     if (masscheck && e.m_debug_mass == 1)
       continue;
+    // if true MC evt is leptonic and I am looking for reco hadronic weights, return 0 weights
+    // we have some leptonic contamination in hadronic reco types, leptonics evts are clean.
+    // IS THIS CORRECT FOR REWEIGHTING??
+    if ( (e.m_MCtype ==1 || e.m_MCtype ==2) && (reco_type ==3 || reco_type ==4 || reco_type ==5) )
+      {
+        out.push_back(0.0);
+        continue;
+      }
     // get weight based on sign passed
     if (sign > 0)
       out.push_back(e.m_MCweight_plus);

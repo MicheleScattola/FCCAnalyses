@@ -12,7 +12,7 @@ processList = {
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/bkg/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
