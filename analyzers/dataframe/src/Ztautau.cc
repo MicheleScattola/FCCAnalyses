@@ -611,11 +611,13 @@ RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
                           const bool symmetric) {
 
   RVec<double> out;
-  // choose only symmetric events if asked
-  if(symmetric && bool_mc){
-    if(evs[0].mc_type != evs[1].mc_type) return out;
-  } else if (symmetric && bool_reco){
-      if(evs[0].m_type != evs[1].m_type) return out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if(symmetric){
+    // skip any 'other' non-classified event
+    if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
+    // check 1 hadronic + 1 leptonic
+    if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
+        ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
   }
   for (const auto &e : evs) {
     // check mc event
@@ -642,11 +644,13 @@ RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                           const bool symmetric) {
 
   RVec<double> out;
-  // choose only symmetric events if asked
-  if(symmetric && bool_mc){
-    if(evs[0].mc_type != evs[1].mc_type) return out;
-  } else if (symmetric && bool_reco){
-      if(evs[0].m_type != evs[1].m_type) return out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if(symmetric){
+    // skip any 'other' non-classified event
+    if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
+    // check 1 hadronic + 1 leptonic
+    if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
+        ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
   }
   for (const auto &e : evs) {
     // check mc event
@@ -675,11 +679,13 @@ RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
                           const bool symmetric) {
 
   RVec<double> out;
-  // choose only symmetric events if asked
-  if(symmetric && bool_mc){
-    if(evs[0].mc_type != evs[1].mc_type) return out;
-  } else if (symmetric && bool_reco){
-      if(evs[0].m_type != evs[1].m_type) return out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if(symmetric){
+    // skip any 'other' non-classified event
+    if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
+    // check 1 hadronic + 1 leptonic
+    if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
+        ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
   }
   for (const auto &e : evs) {
     // check mc event
@@ -707,11 +713,13 @@ RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
                           const bool symmetric) {
 
   RVec<double> out;
-  // choose only symmetric events if asked
-  if(symmetric && bool_mc){
-    if(evs[0].mc_type != evs[1].mc_type) return out;
-  } else if (symmetric && bool_reco){
-      if(evs[0].m_type != evs[1].m_type) return out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if(symmetric){
+    // skip any 'other' non-classified event
+    if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
+    // check 1 hadronic + 1 leptonic
+    if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
+        ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
   }
   for (const auto &e : evs) {
     // check mc event
