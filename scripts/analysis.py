@@ -65,6 +65,8 @@ class RDFanalysis():
 				.Define("RP_thrustcostheta","return EVT_thrust[5]/ sqrt(EVT_thrust[1]*EVT_thrust[1]   + EVT_thrust[3]*EVT_thrust[3]   + EVT_thrust[5]*EVT_thrust[5])")
 				.Define("RP_thrustphi", "return atan2(EVT_thrust[3],EVT_thrust[1])")
 				
+				.Filter("abs(RP_thrustcostheta)<0.95")
+				
 				#####
 				# RECONSTRUCTED PARTICLES
 				#####
@@ -108,29 +110,29 @@ class RDFanalysis():
                 
 				#APPLYING INV MASS CHECK:
 				# pi signal
-				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,false)/45.5")
+				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,true)/45.5")
 				# lepton signals
-                .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,false)/45.5")
-                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.5")
+                .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,true)/45.5")
+                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,true)/45.5")
                 # signal with RP2MC energy
-                .Define("mc_el_sgn","Ztautau::get_rp2mc_e(myEvent,2,false,2,true,true,false)/45.5")
-                .Define("mc_mu_sgn","Ztautau::get_rp2mc_e(myEvent,1,false,1,true,true,false)/45.5")
-                .Define("mc_pi_sgn","Ztautau::get_rp2mc_e(myEvent,3,false,3,true,true,false)/45.5")
+                .Define("mc_el_sgn","Ztautau::get_rp2mc_e(myEvent,2,false,2,true,true,true)/45.5")
+                .Define("mc_mu_sgn","Ztautau::get_rp2mc_e(myEvent,1,false,1,true,true,true)/45.5")
+                .Define("mc_pi_sgn","Ztautau::get_rp2mc_e(myEvent,3,false,3,true,true,true)/45.5")
 				#NOT APPLYING INV MASS CHECK:
-                .Define("pi_free","Ztautau::get_hadron_e(myEvent,3,false,3,true,false,false)/45.5")
-                .Define("el_free","Ztautau::get_lepton_e(myEvent,2,false,2,true,false,false)/45.5")
-                .Define("mu_free","Ztautau::get_lepton_e(myEvent,1,false,1,true,false,false)/45.5")
+                .Define("pi_free","Ztautau::get_hadron_e(myEvent,3,false,3,true,false,true)/45.5")
+                .Define("el_free","Ztautau::get_lepton_e(myEvent,2,false,2,true,false,true)/45.5")
+                .Define("mu_free","Ztautau::get_lepton_e(myEvent,1,false,1,true,false,true)/45.5")
 
 				# ALL MC DATA
                 # MC events with RECO inv mass limit
-                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true,false)/45.5")
-                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,true,false)/45.5")
+                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true,true)/45.5")
+                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,true,true)/45.5")
                 # all MC events
-                .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,false)/45.5")
-                .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,false)/45.5")
+                .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,true)/45.5")
+                .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,true)/45.5")
                 # now with MC E_tau
-                .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
-                .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
+                .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,true)")
+                .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,true)")
                 
 				# CHECK CONFRONT SYMMETRIC VS NON SYMMETRIC EVTS
                 .Define("el_symmMC","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,true)")

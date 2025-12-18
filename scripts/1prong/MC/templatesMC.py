@@ -98,17 +98,17 @@ class RDFanalysis():
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
 				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_MCdaughter_x(myEvent,3,true,3,false,false,false)")
-				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,true,3,false,false,false)")
-				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,true,3,false,false,false)")
+				.Define("pi_sgn","Ztautau::get_MCdaughter_x(myEvent,3,true,3,false,false,true)")
+				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,true,3,false,false,true)")
+				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,true,3,false,false,true)")
                 
 				# lep signal and weights
-                .Define("el_sgn","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
-                .Define("w_plus_el","Ztautau::get_weights(1,myEvent,2,true,2,false,false,false)")
-                .Define("w_minus_el","Ztautau::get_weights(-1,myEvent,2,true,2,false,false,false)")
-                .Define("mu_sgn","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
-                .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,true,1,false,false,false)")
-                .Define("w_minus_mu","Ztautau::get_weights(-1,myEvent,1,true,1,false,false,false)")
+                .Define("el_sgn","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,true)")
+                .Define("w_plus_el","Ztautau::get_weights(1,myEvent,2,true,2,false,false,true)")
+                .Define("w_minus_el","Ztautau::get_weights(-1,myEvent,2,true,2,false,false,true)")
+                .Define("mu_sgn","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,true)")
+                .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,true,1,false,false,true)")
+                .Define("w_minus_mu","Ztautau::get_weights(-1,myEvent,1,true,1,false,false,true)")
 				
 				  
                 )

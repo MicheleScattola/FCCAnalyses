@@ -78,11 +78,11 @@ struct myEvent {
   int m_type = 0; // event reco type
 
   // MC
-  int m_tauMCindex = -1;        // tau MC index
-  int m_MCtype = 0;             // event mc type
-  double m_MCPtau = 0.;        // tau polarization from MC
-  double m_MCweight_plus = 1.0;  // reweighting for h = +1
-  double m_MCweight_minus = 1.0; // reweighting for h = -1
+  int mc_tau_index = -1;        // tau MC index
+  int mc_type = 0;             // event mc type
+  double mc_Ptau = 0.;        // tau polarization from MC
+  double mc_weight_plus = 1.0;  // reweighting for h = +1
+  double mc_weight_minus = 1.0; // reweighting for h = -1
   bool m_found = false;
   TLorentzVector mc_tauP4;    // P4 of mc tau
   TLorentzVector mc_daughterP4;   // P4 of the mc daughter (whole resonance in case)
