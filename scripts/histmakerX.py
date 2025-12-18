@@ -22,7 +22,7 @@ intLumi = 5000000 # 5 /ab
 
 
 # define some binning for various histograms
-bins = (44, 0, 11)
+bins = (44, 0, 1.1)
 binspi = (38, 0.05, 1)
 
 def build_graph(df, dataset):
