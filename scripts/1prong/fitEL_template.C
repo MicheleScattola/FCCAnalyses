@@ -67,7 +67,7 @@ void fitEL_template() {
     // fit using functor
     TemplateFitFunctor fitFunctor(h_plus, h_minus);
     
-    TF1 *f_fit = new TF1("f_pol_fit", fitFunctor, 0.05, 1.0, 2);
+    TF1 *f_fit = new TF1("f_pol_fit", fitFunctor, xMin, xMax, 2);
     f_fit->SetParName(0, "N_plus");
     f_fit->SetParName(1, "N_minus");
 
@@ -158,7 +158,7 @@ void fitEL_template() {
     h_data->SetMarkerColor(kBlack);
     h_data->SetMarkerStyle(20);
     h_data->SetMarkerSize(0.8);
-    h_data->SetTitle("Tau Polarization Fit;x_{e};Events");
+    h_data->SetTitle("Template fit: e channel;x_{e};Events");
     h_data->SetMinimum(0.);
     
 

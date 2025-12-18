@@ -67,7 +67,7 @@ void fitElMC() {
     // fit using functor
     TemplateFitFunctor fitFunctor(h_plus, h_minus);
     
-    TF1 *f_fit = new TF1("f_pol_fit", fitFunctor, 0.05, 1.0, 2);
+    TF1 *f_fit = new TF1("f_pol_fit", fitFunctor, xMin, xMax, 2);
     f_fit->SetParName(0, "N_plus");
     f_fit->SetParName(1, "N_minus");
 
