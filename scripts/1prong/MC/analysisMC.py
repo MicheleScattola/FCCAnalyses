@@ -99,16 +99,10 @@ class RDFanalysis():
                 
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_MCdaughter_x(myEvent,3,true,3,false,false,false)")
-				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,true,3,false,false,false)")
-				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,true,3,false,false,false)")
                 
 				# lep signal and weights
                 .Define("el_sgn","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
-                .Define("w_plus_el","Ztautau::get_weights(1,myEvent,2,true,2,false,false,false)")
-                .Define("w_minus_el","Ztautau::get_weights(-1,myEvent,2,true,2,false,false,false)")
                 .Define("mu_sgn","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
-                .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,true,1,false,false,false)")
-                .Define("w_minus_mu","Ztautau::get_weights(-1,myEvent,1,true,1,false,false,false)")
 				
 				  
                 )
@@ -123,14 +117,8 @@ class RDFanalysis():
     def output():
         branchList = [
         	"pi_sgn",
-			"w_plus_pi",
-			"w_minus_pi",
             "el_sgn",
-            "w_plus_el",
-            "w_minus_el",
-            "mu_sgn",
-            "w_plus_mu",
-            "w_minus_mu"
+            "mu_sgn"
         	
         	]
         return branchList
