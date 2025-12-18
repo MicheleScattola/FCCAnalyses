@@ -125,14 +125,14 @@ class RDFanalysis():
 
 				# ALL MC DATA
                 # MC events with RECO inv mass limit
-                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true,true)/45.5")
-                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,true,true)/45.5")
+                .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true,false)/45.5")
+                .Define("mc_mu_test","Ztautau::get_MCdaughter_e(myEvent,1,true,1,true,true,false)/45.5")
                 # all MC events
-                .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,true)/45.5")
-                .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,true)/45.5")
+                .Define("mc_el_all","Ztautau::get_MCdaughter_e(myEvent,2,true,2,false,false,false)/45.5")
+                .Define("mc_mu_all","Ztautau::get_MCdaughter_e(myEvent,1,true,1,false,false,false)/45.5")
                 # now with MC E_tau
-                .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,true)")
-                .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,true)")
+                .Define("mc_el_x","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
+                .Define("mc_mu_x","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
                 
 				# CHECK CONFRONT SYMMETRIC VS NON SYMMETRIC EVTS
                 .Define("el_symmMC","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,true)")
