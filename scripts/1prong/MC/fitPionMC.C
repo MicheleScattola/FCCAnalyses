@@ -46,8 +46,8 @@ void fitPionMC() {
     // recover template
     TFile *fTemp = TFile::Open(infile_templates, "READ");
     
-    TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_plus");
-    TH1D *h_minus = (TH1D*)fTemp->Get("h_template_minus");
+    TH1D *h_plus  = (TH1D*)fTemp->Get("h_template_pi_plus");
+    TH1D *h_minus = (TH1D*)fTemp->Get("h_template_pi_minus");
     
     h_plus->SetDirectory(0);
     h_minus->SetDirectory(0);
