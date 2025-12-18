@@ -398,6 +398,7 @@ void lepton_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                  const RVec<int> &daughters) {
 
   double Ptau = 0.; // recalculated from tau p4
+  const int tau_idx = ev.mc_tau_index;
 
   // use tau index to find tau directly
   if (tau_idx < 0 || tau_idx >= mc.size()) {

@@ -102,7 +102,7 @@ class RDFanalysis():
 				#####
 				# MC IDENTIFICATION
 				#####
-                .Define("MC_event","RVec<int> {myEvent[0].m_MCtype,myEvent[1].m_MCtype}")
+                .Define("MC_event","RVec<int> {myEvent[0].mc_type,myEvent[1].mc_type}")
                 
 				# masks for later cuts and selections
 				#.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")

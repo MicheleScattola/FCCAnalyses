@@ -86,8 +86,8 @@ void templates() {
     
     std::string treeName = "events"; 
     
-    int nBins = 39;
-    double xMin = 0.025;
+    int nBins = 19;
+    double xMin = 0.05;
     double xMax = 1.0; 
 
     // Style
