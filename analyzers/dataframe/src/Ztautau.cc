@@ -698,12 +698,12 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   const int tau_idx = ev.mc_tau_index;
   double Ptau = 0.;
   
-  // Vectors to hold components
+  // tlv to be filled
   TLorentzVector p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab;
   bool found_pip = false;
   bool found_pi0 = false;
 
-  // 1. Find Tau and Ptau
+  // Find Tau and Ptau
   if (tau_idx < 0 || tau_idx >= mc.size()) {
     cerr << "[ERROR]: Invalid tau index" << endl;
     return;
@@ -714,7 +714,7 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   Ptau = calc_Ptau(p4_tau_lab);
   ev.mc_Ptau = Ptau;
 
-  // 2. Cycle daughters to build Rho, Pi+, Pi0
+  // Cycle daughters to build Rho, Pi+, Pi0
   int pb = p.daughters_begin;
   int pe = p.daughters_end;
 
@@ -741,7 +741,7 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     }
   }
 
-  // 3. Validation and Calculation
+  
   if (found_pip && found_pi0) {
     ev.m_found = true;
     
@@ -761,7 +761,7 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     // H=-1 (Ptau=-1) -> W ~ 1 - omega
     // ---------------------------------------------------------
     
-    // Denominator is the "natural" distribution with the actual polarization Ptau
+    
     double weight_denom = 1.0 + Ptau * omega;
     if (fabs(weight_denom) < 1e-6) weight_denom = 1.0; // safety
 
