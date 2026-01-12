@@ -210,6 +210,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       ev.mc_daughters = dau_pdgs;
       // classify
       ev.mc_type = classify_MC(dau_pdgs);
+      
       // weight calculation
       // weights also set trueMC daughter p4 and mass
       if (ev.mc_type == 1 || ev.mc_type == 2 ) {
@@ -354,7 +355,7 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
   
   
 
-RVec<int> get_type_safe(const RVec<myEvent> &evs) {
+RVec<int> get_type_safe(const RVec<myEvent> &evs,) {
   RVec<int> out;
   out.reserve(evs.size());
   for (const auto &e : evs) {
@@ -602,17 +603,170 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_weight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 }
 
+// optimal variable for rho decays
+double calculate_omega_rho(const TLorentzVector &p4_tau, 
+                     const TLorentzVector &p4_rho, 
+                     const TLorentzVector &p4_pip, 
+                     const TLorentzVector &p4_pi0) {
+
+  
+  // 1. Get Mass and Energies from the 4-vectors
+  // NOTE: For Reco, these are the RECONSTRUCTED quantities
+  double m_rho = p4_rho.M();
+  double E_rho = p4_rho.E();
+  double E_tau = 45.5;
+  // double E_tau = p4_tau.E();
+  double P_rho = p4_rho.P();
+
+  // should I check m_rho ??
+
+  // 2. Calculate cos(psi_tau) [Angle of rho in tau rest frame]
+  // cos_psi_tau = (2x - 1 - m_rho^2/m_tau^2) / (1 - m_rho^2/m_tau^2)
+  // where x = E_rho / E_tau
+  
+  double cos_psi_tau = (2.0 * E_rho/E_tau - 1.0 - (m_rho*m_rho)/(SM_TAU*SM_TAU) ) / (1.0 - (m_rho*m_rho)/(SM_TAU*SM_TAU) );
+
+  // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
+  // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
+  
+  double cos_psi_rho = (m_rho / sqrt(m_rho*m_rho - 4.0*SM_PI*SM_PI)) * (p4_pip.E() - p4_pi0.E()) / P_rho;
+
+
+  // 4. Compute Omega
+  double psi_tau = acos(cos_psi_tau);
+
+  // Wigner Rotation Angle eta 
+  // tan(eta/2) = (m_rho/m_tau) * tan(psi_tau/2)
+  double tan_theta_2 = tan(psi_tau / 2.0);
+  double eta = 2.0 * atan( (m_rho / SM_TAU) * tan_theta_2 );
+
+  // Precompute trig terms for w functions
+  double cos_eta     = cos(eta);
+  double sin_eta     = sin(eta);
+  double cos_theta_2 = cos(psi_tau / 2.0); 
+  double sin_theta_2 = sin(psi_tau / 2.0);
+
+  // Calculate w_0 and w_1 components 
+  // w0+
+  double term0p = SM_TAU * cos_eta * cos_theta_2 + SM_TAU * sin_eta * sin_theta_2;
+  double w0_plus = term0p * term0p;
+
+  // w0-
+  double term0m = SM_TAU * cos_eta * sin_theta_2 - SM_TAU * sin_eta * cos_theta_2;
+  double w0_minus = term0m * term0m;
+
+  // w1+
+  double term1p = SM_TAU * sin_eta * cos_theta_2 - SM_TAU * cos_eta * sin_theta_2;
+  double w1_plus = (term1p * term1p) + (SM_TAU * SM_TAU * sin_theta_2 * sin_theta_2);
+
+  // w1-
+  double term1m = SM_TAU * sin_eta * sin_theta_2 + SM_TAU * cos_eta * cos_theta_2;
+  double w1_minus = (term1m * term1m) + (SM_TAU * SM_TAU * cos_theta_2 * cos_theta_2);
+
+  // Calculate h functions 
+  double h0 = 2.0 * cos_psi_rho * cos_psi_rho;
+  double h1 = 1.0 - cos_psi_rho * cos_psi_rho;
+
+  // Calculate W+ and W- 
+  double W_plus  = w1_plus * h1 + w0_plus * h0 + w1_plus * h1;
+  double W_minus = w1_minus * h1 + w0_minus * h0 + w1_minus * h1;
+
+
+  return (W_plus - W_minus) / (W_plus + W_minus);
+}
+
+void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
+                const RVec<int> &daughters) {
+
+  const int tau_idx = ev.mc_tau_index;
+  double Ptau = 0.;
+  
+  // Vectors to hold components
+  TLorentzVector p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab;
+  bool found_pip = false;
+  bool found_pi0 = false;
+
+  // 1. Find Tau and Ptau
+  if (tau_idx < 0 || tau_idx >= mc.size()) {
+    cerr << "[ERROR]: Invalid tau index" << endl;
+    return;
+  }
+  const auto &p = mc[tau_idx];
+  p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
+  
+  Ptau = calc_Ptau(p4_tau_lab);
+  ev.mc_Ptau = Ptau;
+
+  // 2. Cycle daughters to build Rho, Pi+, Pi0
+  int pb = p.daughters_begin;
+  int pe = p.daughters_end;
+
+  for (int i = pb; i < pe; i++) {
+    int dau_idx = daughters[i];
+    const auto &dau = mc[dau_idx];
+    
+    // Create temp 4-vector
+    TLorentzVector p4_dau;
+    p4_dau.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z, dau.mass);
+
+    // Check PDG
+    // Charged Pion (211) or Kaon (321) treated as pion for rho approx
+    if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321) { 
+      p4_pip_lab = p4_dau;
+      found_pip = true;
+    } 
+    // Neutral Pion (111)
+    else if (abs(dau.PDG) == 111) {
+      p4_pi0_lab = p4_dau;
+      found_pi0 = true;
+    }
+  }
+
+  // 3. Validation and Calculation
+  if (found_pip && found_pi0) {
+    ev.m_found = true;
+    
+    // Reconstruct Rho 4-vector from daughters
+    p4_rho_lab = p4_pip_lab + p4_pi0_lab;
+
+    // Store MC info in event struct
+    ev.mc_daughterP4 = p4_rho_lab;
+    ev.mc_daughterMass = p4_rho_lab.M();
+
+    double omega = calculate_omega_rho(p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
+
+    // ---------------------------------------------------------
+    // ASSIGN WEIGHTS
+    // W ~ 1 + Ptau * omega
+    // H=+1 (Ptau=+1) -> W ~ 1 + omega
+    // H=-1 (Ptau=-1) -> W ~ 1 - omega
+    // ---------------------------------------------------------
+    
+    // Denominator is the "natural" distribution with the actual polarization Ptau
+    double weight_denom = 1.0 + Ptau * omega;
+    if (fabs(weight_denom) < 1e-6) weight_denom = 1.0; // safety
+
+    ev.mc_weight_plus  = (1.0 + omega) / weight_denom;
+    ev.mc_weight_minus = (1.0 - omega) / weight_denom;
+
+  } else {
+    // Fallback if daughters not found correctly
+    ev.mc_weight_plus = 1.0;
+    ev.mc_weight_minus = 1.0;
+  }
+}
+
 // ==========================================
 // EXTRACT VARIABLES
 // ==========================================
 RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco, const bool masscheck,
-                          const bool symmetric) {
+                          const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
@@ -641,11 +795,11 @@ RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco, const bool masscheck,
-                          const bool symmetric) {
+                          const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
@@ -672,15 +826,57 @@ RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
 
   return out;
 };
+
+// ==========================================
+RVec<double> get_omega_rho(const RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco, const bool masscheck,
+                          const bool asymmetric) {
+
+  RVec<double> out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if(asymmetric){
+    // skip any 'other' non-classified event
+    if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
+    // check 1 hadronic + 1 leptonic
+    if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
+        ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
+  }
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invarian mass check
+    if (masscheck && e.m_debug_mass == 1)
+      continue;
+    // omega_rho
+    TLorentzVector p4_tau, p4_rho, p4_pip, p4_pi0;
+    for (const auto &p : e.m_piP4) {
+      p4_pip += p;
+    }
+    for (const auto &p : e.m_phP4) {
+      p4_pi0 += p;
+    }
+    p4_rho = p4_pip + p4_pi0;
+    p4_tau = e.mc_tauP4;
+    double omega = calculate_omega_rho(p4_tau, p4_rho, p4_pip, p4_pi0);
+    out.push_back(omega);
+  }
+  return out;
+};
+
 // ==========================================
 RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco, const bool masscheck,
-                          const bool symmetric) {
+                          const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
@@ -710,11 +906,11 @@ RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco, const bool masscheck,
-                          const bool symmetric) {
+                          const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
@@ -751,11 +947,11 @@ RVec<double> get_dressed_e(const RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco, const bool masscheck,
-                          const bool symmetric) {
+                          const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
@@ -782,11 +978,11 @@ RVec<double> get_rp2mc_e(const RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
                         const int reco_type, const bool bool_reco, const bool masscheck,
-                        const bool symmetric) {
+                        const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
@@ -860,11 +1056,11 @@ RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
                        const bool bool_reco, const bool masscheck,
-                        const bool symmetric) {
+                        const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
@@ -890,11 +1086,11 @@ RVec<double> get_MCdaughter_e(const RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_MCdaughter_x(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_mc, const int reco_type,
                        const bool bool_reco, const bool masscheck,
-                        const bool symmetric) {
+                        const bool asymmetric) {
 
   RVec<double> out;
   // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(symmetric){
+  if(asymmetric){
     // skip any 'other' non-classified event
     if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
     // check 1 hadronic + 1 leptonic
