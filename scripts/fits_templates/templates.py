@@ -104,7 +104,7 @@ class RDFanalysis():
 				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,false,3,true,true,false)")
 				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,false,3,true,true,false)")
 				# rho signal
-                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,true)")
+                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
                 .Define("w_plus_rho","Ztautau::get_weights(1,myEvent,4,false,4,true,true,false)")
 				.Define("w_minus_rho","Ztautau::get_weights(-1,myEvent,4,false,4,true,true,false)")
                 
