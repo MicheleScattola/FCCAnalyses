@@ -31,6 +31,10 @@ void create_and_save(ROOT::RDF::RNode df,
     if (h_plus->Integral() > 0)  h_plus->Scale(1.0 / h_plus->Integral());
     if (h_minus->Integral() > 0) h_minus->Scale(1.0 / h_minus->Integral());
 
+    cout << "[INFO] Created templates for " << label << ": " 
+         << " Helicity +1 Integral = " << h_plus->Integral() 
+         << ", Helicity -1 Integral = " << h_minus->Integral() << endl;
+
     // Styling
     h_plus->SetLineColor(kBlue);
     h_plus->SetLineWidth(2);
@@ -72,9 +76,6 @@ void create_and_save(ROOT::RDF::RNode df,
     // Cleanup
     delete c;
     delete leg;
-    // Note: Do not delete h_plus/h_minus here if they are managed by the file, 
-    // but since we Cloned them manually, usually we rely on file closure or explicit delete.
-    // For macros, leaving them is often safer to avoid double-free with ROOT ownership.
 }
 
 void templates() {
