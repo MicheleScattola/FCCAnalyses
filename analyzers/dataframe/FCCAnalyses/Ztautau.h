@@ -145,7 +145,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                 const RVec<int> &daughters);               
 
-double calculate_omega_rho(const TLorentzVector &p4_tau, 
+double calculate_omega_rho(const myEvent &ev, const TLorentzVector &p4_tau, 
                      const TLorentzVector &p4_rho, 
                      const TLorentzVector &p4_pip, 
                      const TLorentzVector &p4_pi0);
@@ -168,7 +168,7 @@ RVec<double> get_omega_rho(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco, const bool masscheck,
                           const bool asymmetric);
-                          
+
 // ==========================================
 RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,

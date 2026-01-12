@@ -604,7 +604,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 }
 
 // optimal variable for rho decays
-double calculate_omega_rho(const TLorentzVector &p4_tau, 
+double calculate_omega_rho(const myEvent &ev, TLorentzVector &p4_tau, 
                      const TLorentzVector &p4_rho, 
                      const TLorentzVector &p4_pip, 
                      const TLorentzVector &p4_pi0) {
@@ -631,6 +631,12 @@ double calculate_omega_rho(const TLorentzVector &p4_tau,
   
   double cos_psi_rho = (m_rho / sqrt(m_rho*m_rho - 4.0*SM_PI*SM_PI)) * (p4_pip.E() - p4_pi0.E()) / P_rho;
 
+  if(cos_psi_rho > 1.0 || cos_psi_rho < -1.0){
+    cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho << " , reco evt = " << ev.m_type << endl;
+  }
+  if(cos_psi_tau > 1.0 || cos_psi_tau < -1.0){
+    cerr << "[WARNING]: cos(psi_tau) out of bounds: " << cos_psi_tau << " , reco evt = " << ev.m_type << endl;
+  } 
 
   // 4. Compute Omega
   double psi_tau = acos(cos_psi_tau);
@@ -672,7 +678,12 @@ double calculate_omega_rho(const TLorentzVector &p4_tau,
   double W_minus = w1_minus * h1 + w0_minus * h0 + w1_minus * h1;
 
 
-  return (W_plus - W_minus) / (W_plus + W_minus);
+  double omega =  (W_plus - W_minus) / (W_plus + W_minus);
+
+  if(omega > 1.0) cerr << "[WARNING]: omega > 1.0 (" << omega << ")" << endl;
+  if(omega < -1.0) cerr << "[WARNING]: omega < -1.0 (" << omega << ")" << endl;
+
+  return omega;
 }
 
 void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
@@ -733,7 +744,7 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     ev.mc_daughterP4 = p4_rho_lab;
     ev.mc_daughterMass = p4_rho_lab.M();
 
-    double omega = calculate_omega_rho(p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
+    double omega = calculate_omega_rho(ev,p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
 
     // ---------------------------------------------------------
     // ASSIGN WEIGHTS
@@ -862,7 +873,7 @@ RVec<double> get_omega_rho(const RVec<myEvent> &evs, const int mc_type,
     }
     p4_rho = p4_pip + p4_pi0;
     p4_tau = e.mc_tauP4;
-    double omega = calculate_omega_rho(p4_tau, p4_rho, p4_pip, p4_pi0);
+    double omega = calculate_omega_rho(e,p4_tau, p4_rho, p4_pip, p4_pi0);
     out.push_back(omega);
   }
   return out;
