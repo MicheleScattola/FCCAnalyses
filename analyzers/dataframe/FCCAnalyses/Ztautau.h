@@ -86,6 +86,8 @@ struct myEvent {
   bool m_found = false;
   TLorentzVector mc_tauP4;    // P4 of mc tau
   TLorentzVector mc_daughterP4;   // P4 of the mc daughter (whole resonance in case)
+  TLorentzVector mc_pi0P4;
+  TLorentzVector mc_piP4;
   RVec<int> mc_daughters;   // vector of daughters pdgs
   int mc_RP2MC_id = -1;   // corresponding mc id for the 1prong reco particle
   double mc_RP2MC_e = 0.;   // correponding energy

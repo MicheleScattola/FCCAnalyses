@@ -101,6 +101,11 @@ class RDFanalysis():
 				.Define("pi_sgn","Ztautau::get_MCdaughter_x(myEvent,3,true,3,false,false,false)")
 				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,true,3,false,false,false)")
 				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,true,3,false,false,false)")
+
+				# rho signal
+                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,true,4,false,false,false)")
+                .Define("w_plus_rho","Ztautau::get_weights(1,myEvent,4,true,4,false,false,false)")
+				.Define("w_minus_rho","Ztautau::get_weights(-1,myEvent,4,true,4,false,false,false)")
                 
 				# lep signal and weights
                 .Define("el_sgn","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")

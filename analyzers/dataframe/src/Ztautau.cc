@@ -730,11 +730,13 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     // Charged Pion (211) or Kaon (321) treated as pion for rho approx
     if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321) { 
       p4_pip_lab = p4_dau;
+      ev.mc_piP4 = p4_dau;
       found_pip = true;
     } 
     // Neutral Pion (111)
     else if (abs(dau.PDG) == 111) {
       p4_pi0_lab = p4_dau;
+      ev.mc_pi0P4 = p4_dau;
       found_pi0 = true;
     }
   }
@@ -871,12 +873,22 @@ RVec<double> get_omega_rho(const RVec<myEvent> &evs, const int mc_type,
       continue;
     // omega_rho
     TLorentzVector p4_tau, p4_rho, p4_pip, p4_pi0;
-    for (const auto &p : e.m_piP4) {
-      p4_pip += p;
+    if (bool_reco || (bool_reco && bool_mc)){
+      // fill with reco p4
+      for (const auto &p : e.m_piP4) {
+        p4_pip += p;
+      }
+      for (const auto &p : e.m_phP4) {
+        p4_pi0 += p;
+      }
     }
-    for (const auto &p : e.m_phP4) {
-      p4_pi0 += p;
+
+    if (bool_mc && !bool_reco){
+      // fill with mc p4
+      p4_pip = e.mc_piP4;
+      p4_pi0 = e.mc_pi0P4;
     }
+    
     p4_rho = p4_pip + p4_pi0;
     p4_tau = e.mc_tauP4;
     double omega = calculate_omega_rho(e,p4_tau, p4_rho, p4_pip, p4_pi0);

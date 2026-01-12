@@ -109,6 +109,12 @@ void templatesMC() {
     std::cout << "Processing Electrons..." << std::endl;
     create_and_save(df, fOut, "el_sgn", "w_plus_el", "w_minus_el", "Electrons", "el", outdir, nBins, xMin, xMax);
 
+    auto nans = df.Define("is_nan", "std::isnan(rho_sgn[0])").Filter("is_nan").Count();
+    std::cout << "Number of NaN events in rho_sgn: " << *nans << std::endl;
+    auto df_clean = df.Filter("!std::isnan(rho_sgn[0]) && !std::isnan(w_plus_rho[0])", "NaN Filter");
+    std::cout << "Processing Rho..." << std::endl;
+    create_and_save(df_clean, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, 40, -1., 1.);
+
     // Close file
     fOut->Close();
 
