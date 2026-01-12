@@ -109,6 +109,10 @@ void templates() {
     std::cout << "Processing Electrons..." << std::endl;
     create_and_save(df, fOut, "el_sgn", "w_plus_el", "w_minus_el", "Electrons", "el", outdir, nBins, xMin, xMax);
 
+    std::cout << "Processing Rho..." << std::endl;
+    create_and_save(df, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, 40, -1., 1.);
+
+
     // Close file
     fOut->Close();
 

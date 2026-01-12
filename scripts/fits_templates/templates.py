@@ -103,6 +103,10 @@ class RDFanalysis():
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,false)/45.5")
 				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,false,3,true,true,false)")
 				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,false,3,true,true,false)")
+				# rho signal
+                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,true)")
+                .Define("w_plus_rho","Ztautau::get_weights(1,myEvent,4,false,4,true,true,false)")
+				.Define("w_minus_rho","Ztautau::get_weights(-1,myEvent,4,false,4,true,true,false)")
                 
 				# lep signal and weights
                 .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,false)/45.5")
@@ -132,7 +136,10 @@ class RDFanalysis():
             "w_minus_el",
             "mu_sgn",
             "w_plus_mu",
-            "w_minus_mu"
+            "w_minus_mu",
+            "rho_sgn",
+			"w_plus_rho",
+            "w_minus_rho",
         	
         	]
         return branchList
