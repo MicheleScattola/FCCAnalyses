@@ -100,6 +100,9 @@ class RDFanalysis():
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_MCdaughter_x(myEvent,3,true,3,false,false,false)")
                 
+				# pi signal and weights
+				.Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
+                
 				# lep signal and weights
                 .Define("el_sgn","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")
                 .Define("mu_sgn","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
@@ -118,7 +121,8 @@ class RDFanalysis():
         branchList = [
         	"pi_sgn",
             "el_sgn",
-            "mu_sgn"
+            "mu_sgn",
+            "rho_sgn"
         	
         	]
         return branchList
