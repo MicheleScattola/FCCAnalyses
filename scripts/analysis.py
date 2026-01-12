@@ -123,6 +123,9 @@ class RDFanalysis():
                 .Define("el_free","Ztautau::get_lepton_e(myEvent,2,false,2,true,false,true)/45.5")
                 .Define("mu_free","Ztautau::get_lepton_e(myEvent,1,false,1,true,false,true)/45.5")
 
+				# rho signal
+                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,true)")
+
 				# ALL MC DATA
                 # MC events with RECO inv mass limit
                 .Define("mc_el_test","Ztautau::get_MCdaughter_e(myEvent,2,true,2,true,true,false)/45.5")
@@ -178,6 +181,7 @@ class RDFanalysis():
         	"pi_sgn",
 			"mu_sgn",
 			"el_sgn",
+            "rho_sgn",
             "mc_pi_sgn",
             "mc_mu_sgn",
             "mc_el_sgn",

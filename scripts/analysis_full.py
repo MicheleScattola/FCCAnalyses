@@ -119,6 +119,8 @@ class RDFanalysis():
 				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				.Define("w_plus","Ztautau::get_weights(1,myEvent,3,false,3,true)")
 				.Define("w_minus","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
+                # rho signal
+                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true)/45.5")
 				# lepton signals
                 .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true)/45.5")
                 .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true)/45.5")
