@@ -355,7 +355,7 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
   
   
 
-RVec<int> get_type_safe(const RVec<myEvent> &evs,) {
+RVec<int> get_type_safe(const RVec<myEvent> &evs) {
   RVec<int> out;
   out.reserve(evs.size());
   for (const auto &e : evs) {
