@@ -135,7 +135,10 @@ class RDFanalysis():
             "w_minus_el",
             "mu_sgn",
             "w_plus_mu",
-            "w_minus_mu"
+            "w_minus_mu",
+            "rho_sgn",
+            "w_plus_rho",
+            "w_minus_rho"
         	
         	]
         return branchList
