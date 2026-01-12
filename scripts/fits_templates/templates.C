@@ -28,13 +28,13 @@ void create_and_save(ROOT::RDF::RNode df,
     TH1D *h_minus = (TH1D*)h_minus_ptr->Clone(("h_template_"+suffix+"_minus").c_str());
 
     // Normalization
-    if (h_plus->Integral() > 0)  h_plus->Scale(1.0 / h_plus->Integral());
-    if (h_minus->Integral() > 0) h_minus->Scale(1.0 / h_minus->Integral());
-
+    
     cout << "[INFO] Created templates for " << label << ": " 
          << " Helicity +1 Integral = " << h_plus->Integral() 
          << ", Helicity -1 Integral = " << h_minus->Integral() << endl;
 
+    if (h_plus->Integral() > 0)  h_plus->Scale(1.0 / h_plus->Integral());
+    if (h_minus->Integral() > 0) h_minus->Scale(1.0 / h_minus->Integral());    
     // Styling
     h_plus->SetLineColor(kBlue);
     h_plus->SetLineWidth(2);
@@ -109,9 +109,12 @@ void templates() {
 
     std::cout << "Processing Electrons..." << std::endl;
     create_and_save(df, fOut, "el_sgn", "w_plus_el", "w_minus_el", "Electrons", "el", outdir, nBins, xMin, xMax);
-
+    
+    auto nans = df.Define("is_nan", "std::isnan(rho_sgn[0])").Filter("is_nan").Count();
+    std::cout << "Number of NaN events in rho_sgn: " << *nans << std::endl;
+    auto df_clean = df.Filter("!std::isnan(rho_sgn[0]) && !std::isnan(w_plus_rho[0])", "NaN Filter");
     std::cout << "Processing Rho..." << std::endl;
-    create_and_save(df, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, 40, -1., 1.);
+    create_and_save(df_clean, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, 40, -1., 1.);
 
 
     // Close file
