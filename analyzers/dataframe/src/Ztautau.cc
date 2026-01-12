@@ -218,7 +218,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       }	else if (ev.mc_type == 3) {
         pion_weight(ev, mc, daughters);
       } else if (ev.mc_type == 4) {
-        new_rho_weight(ev, mc, daughters);
+        rho_weight(ev, mc, daughters);
       } else if (ev.mc_type == 5) {
         a1_weight(ev, mc, daughters);
       }
