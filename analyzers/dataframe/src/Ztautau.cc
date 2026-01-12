@@ -626,10 +626,16 @@ double calculate_omega_rho(const myEvent &ev, TLorentzVector &p4_tau,
   
   double cos_psi_tau = (2.0 * E_rho/E_tau - 1.0 - (m_rho*m_rho)/(SM_TAU*SM_TAU) ) / (1.0 - (m_rho*m_rho)/(SM_TAU*SM_TAU) );
 
+  if (cos_psi_tau > 1.0)  cos_psi_tau = 1.0;
+  if (cos_psi_tau < -1.0) cos_psi_tau = -1.0;
+
   // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
   // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
   
   double cos_psi_rho = (m_rho / sqrt(m_rho*m_rho - 4.0*SM_PI*SM_PI)) * (p4_pip.E() - p4_pi0.E()) / P_rho;
+
+  if (cos_psi_rho > 1.0)  cos_psi_rho = 1.0;
+  if (cos_psi_rho < -1.0) cos_psi_rho = -1.0;
 
   if(cos_psi_rho > 1.0 || cos_psi_rho < -1.0){
     cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho << " , reco evt = " << ev.m_type << endl;
