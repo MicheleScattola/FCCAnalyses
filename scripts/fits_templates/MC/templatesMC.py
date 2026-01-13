@@ -49,7 +49,7 @@ class RDFanalysis():
                 .Define("AssociatedMCpdg","RVec<int> pdgs; for(auto idx : MCRecoAssociations1) pdgs.push_back(Particle[idx].PDG); return pdgs;")
                 
                 #initial basic cuts
-                .Filter("rps.size()>=2")
+                #.Filter("rps.size()>=2")
 				
 				#####
 				# THRUST
@@ -79,7 +79,6 @@ class RDFanalysis():
 				.Define("Q_pos", 'Algorithms::getAxisCharge(true, 0.)(RP_thrustangle, RP_charge, RP_px, RP_py, RP_pz)')
 				.Define("Q_neg", 'Algorithms::getAxisCharge(false,0.)(RP_thrustangle, RP_charge, RP_px, RP_py, RP_pz)')
 				
-				.Filter("Q_pos>0 && Q_neg<0")
 				
 				
                 # Muons

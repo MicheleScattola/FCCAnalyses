@@ -49,7 +49,7 @@ class RDFanalysis():
                 .Define("AssociatedMCpdg","RVec<int> pdgs; for(auto idx : MCRecoAssociations1) pdgs.push_back(Particle[idx].PDG); return pdgs;")
                 
                 #initial basic cuts
-                .Filter("rps.size()>=2")
+                #.Filter("rps.size()>=2")
 				
 				#####
 				# THRUST
@@ -79,8 +79,6 @@ class RDFanalysis():
 				.Define("Q_pos", 'Algorithms::getAxisCharge(true, 0.)(RP_thrustangle, RP_charge, RP_px, RP_py, RP_pz)')
 				.Define("Q_neg", 'Algorithms::getAxisCharge(false,0.)(RP_thrustangle, RP_charge, RP_px, RP_py, RP_pz)')
 				
-				.Filter("Q_pos>0 && Q_neg<0")
-				
 				
                 # Muons
 				.Alias("Muon0", "Muon#0.index")
@@ -101,7 +99,7 @@ class RDFanalysis():
 				.Define("pi_sgn","Ztautau::get_MCdaughter_x(myEvent,3,true,3,false,false,false)")
                 
 				# pi signal and weights
-				.Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
+				.Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,true,4,false,false,false)")
                 
 				# lep signal and weights
                 .Define("el_sgn","Ztautau::get_MCdaughter_x(myEvent,2,true,2,false,false,false)")

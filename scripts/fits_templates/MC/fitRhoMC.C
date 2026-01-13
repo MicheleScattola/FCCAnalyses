@@ -158,7 +158,7 @@ void fitRhoMC() {
     h_data->SetMarkerColor(kBlack);
     h_data->SetMarkerStyle(20);
     h_data->SetMarkerSize(0.8);
-    h_data->SetTitle("TrueMC #pi channel;x_{#rho};Events");
+    h_data->SetTitle("TrueMC #rho channel;x_{#rho};Events");
     h_data->SetMinimum(0.);
     
 

@@ -86,8 +86,8 @@ void templatesMC() {
     
     std::string treeName = "events"; 
     
-    int nBins = 38;
-    double xMin = 0.05;
+    int nBins = 40;
+    double xMin = 0.0;
     double xMax = 1.0; 
 
     // Style
