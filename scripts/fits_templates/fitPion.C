@@ -40,7 +40,7 @@ void fitPion() {
     
     const char* infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/templates.root";
     
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/";
     std::string treeName = "events";
 
     // recover template
