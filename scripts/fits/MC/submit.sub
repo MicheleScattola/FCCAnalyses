@@ -1,0 +1,31 @@
+# submit.sub -- HTCondor submission file
+
+# The shell script to run
+executable              = run_all.sh
+
+# Pass your current environment (fccanalysis setup, paths, etc.) to the batch node
+getenv                  = True
+
+# Send your python scripts to the batch node so run_all.sh can find them
+transfer_input_files    = make_lists.py, templatesMC.py, analysisMC.py
+
+# Save output/error logs in a folder named 'logs'
+output                  = logs/job.$(ClusterId).out
+error                   = logs/job.$(ClusterId).err
+log                     = logs/job.$(ClusterId).log
+
+# ---------------------------------------------------------
+# RESOURCE REQUESTS (The fix for your crash)
+# ---------------------------------------------------------
+
+# Request 24 GB of RAM (since you crashed at ~21 GB)
+request_memory          = 24 GB
+
+# Request 1 CPU (matches your --n-threads 1 setting)
+request_cpus            = 1
+
+# Time limit: "workday" = 8 hours (safer than "longlunch" since 1 thread is slower)
++JobFlavour             = "longlunch"
+
+# Submit the job
+queue
