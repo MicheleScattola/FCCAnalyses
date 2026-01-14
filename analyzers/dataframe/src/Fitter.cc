@@ -129,10 +129,13 @@ namespace Fitter {
         double scale_m = (f_m * h_data->Integral()) / h_minus->Integral();
         h_plus->Scale(scale_p); h_minus->Scale(scale_m);
         
-        h_plus->SetLineColor(kBlue); h_plus->SetLineStyle(2);
-        h_minus->SetLineColor(kRed); h_minus->SetLineStyle(2);
+        h_plus->SetLineColor(kBlue); h_plus->SetLineStyle(2); h_plus->SetFillColorALpha(kBlue, 0.1);
+        h_minus->SetLineColor(kRed); h_minus->SetLineStyle(2); h_minus->SetFillColorAlpha(kRed, 0.1);
         h_fit->SetLineColor(kBlack); h_fit->SetLineWidth(2);
         h_data->SetMarkerStyle(20);
+
+        // set y axis minimum to 0
+        h_data->SetMinimum(0.);
 
         h_data->Draw("EP");
         h_fit->Draw("HIST SAME");
@@ -208,11 +211,11 @@ namespace Fitter {
         // Draw H+ / H- reference curves
         TF1 *h_p = new TF1("hp", functor, xmin, xmax, 3);
         h_p->SetParameters(1.0, N, h_data->GetBinWidth(1)); // P=+1
-        h_p->SetLineColor(kBlue); h_p->SetLineStyle(2);
+        h_p->SetLineColor(kBlue); h_p->SetLineStyle(2); h_p->SetFillColorAlpha(kBlue, 0.1);
 
         TF1 *h_m = new TF1("hm", functor, xmin, xmax, 3);
         h_m->SetParameters(-1.0, N, h_data->GetBinWidth(1)); // P=-1
-        h_m->SetLineColor(kRed); h_m->SetLineStyle(2);
+        h_m->SetLineColor(kRed); h_m->SetLineStyle(2); h_m->SetFillColorAlpha(kRed, 0.1);
 
         h_data->SetMarkerStyle(20);
         h_data->Draw("EP");
