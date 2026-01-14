@@ -2,9 +2,9 @@
 #analysesList = ['Ztautau']
 
 #List of processes
-processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.01},
-}
+#processList = {
+#    'p8_ee_Ztautau_ecm91':{'fraction':0.01},
+#}
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
 #prodTag     = "FCCee/winter2023/IDEA/"
@@ -15,7 +15,7 @@ procDict = "FCCee_procDict_winter2023_IDEA.json"
 outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
-inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
+#inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 
 #Optional
 nCPUS       = -1
