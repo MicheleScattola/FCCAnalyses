@@ -1,4 +1,4 @@
-#include "include/Fitter.h" // Adjust path if your header is elsewhere
+#include "FCCAnalyses/Fitter.h" // Adjust path if your header is elsewhere
 #include <string>
 #include <iostream>
 
@@ -71,7 +71,7 @@ void fitALL() {
                 treeName, "mu_sgn", 
                 "Muon Channel (Analytic)", 
                 "x_{#mu}",
-                0.0, 1.0  // xmin, xmax
+                0.025, 1.0  // xmin, xmax
     );
 
     // --- Electron Channel (Analytic) ---
@@ -80,7 +80,7 @@ void fitALL() {
                 treeName, "el_sgn", 
                 "Electron Channel (Analytic)", 
                 "x_{e}",
-                0.0, 1.0  // xmin, xmax
+                0.25, 1.0  // xmin, xmax
     );
 
     std::cout << ">>> All fits completed." << std::endl;
