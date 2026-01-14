@@ -129,7 +129,7 @@ namespace Fitter {
         double scale_m = (f_m * h_data->Integral()) / h_minus->Integral();
         h_plus->Scale(scale_p); h_minus->Scale(scale_m);
         
-        h_plus->SetLineColor(kBlue); h_plus->SetLineStyle(2); h_plus->SetFillColorALpha(kBlue, 0.1);
+        h_plus->SetLineColor(kBlue); h_plus->SetLineStyle(2); h_plus->SetFillColorAlpha(kBlue, 0.1);
         h_minus->SetLineColor(kRed); h_minus->SetLineStyle(2); h_minus->SetFillColorAlpha(kRed, 0.1);
         h_fit->SetLineColor(kBlack); h_fit->SetLineWidth(2);
         h_data->SetMarkerStyle(20);
