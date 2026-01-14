@@ -82,7 +82,7 @@ void create_and_save(ROOT::RDF::RNode df,
     leg->Draw();
 
     // save pdf
-    c->SaveAs(TString(outdir) + "templates_" + suffix + "_split.pdf");
+    c->SaveAs(TString(outdir) + "templatesMC_" + suffix + ".pdf");
 
     // write to file
     fOut->cd();
@@ -97,14 +97,14 @@ void create_and_save(ROOT::RDF::RNode df,
 void templatesMC() {
         
     // Settings
-    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/templates/";
-    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/templates/";
+    const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/p8_ee_Ztautau_ecm91.root";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/MC/templates/";
+    const char* outdir2 = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/";
     
     std::string treeName = "events"; 
     
-    int nBins = 38;
-    double xMin = 0.05;
+    int nBins = 40;
+    double xMin = 0.0;
     double xMax = 1.0; 
 
     // Style
@@ -116,7 +116,7 @@ void templatesMC() {
 
     // Open Output ROOT File (Single file for all histos)
     // Note: I renamed the file to templatesMC_split.root to avoid confusion
-    TString rootOutName = TString(outdir2) + "templatesMC_split.root";
+    TString rootOutName = TString(outdir2) + "templatesMC.root";
     TFile *fOut = new TFile(rootOutName, "RECREATE");
 
     // Processing Pions
