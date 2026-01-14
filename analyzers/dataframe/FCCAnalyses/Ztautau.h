@@ -232,6 +232,7 @@ RVec<double> get_debug_costheta(const RVec<myEvent> &evs,
 RVec<double> get_debug_phi(const RVec<myEvent> &evs,
                                const int mc_type, const bool bool_mc,
                                const int reco_type, const bool bool_reco);
+
 } // namespace Ztautau
 
 #endif
