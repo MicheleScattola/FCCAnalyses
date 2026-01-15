@@ -615,7 +615,7 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 }
 
 // optimal variable for rho decays
-double calculate_omega_rho(const myEvent &ev, TLorentzVector &p4_tau, 
+double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau, 
                      const TLorentzVector &p4_rho, 
                      const TLorentzVector &p4_pip, 
                      const TLorentzVector &p4_pi0) {
@@ -721,7 +721,7 @@ double calculate_omega_rho(const myEvent &ev, TLorentzVector &p4_tau,
 
 // omega_rho with p4 angles instead of kinematic variables, possible only for MC
 // how to implement p4_tau for reco???? TODO
-double geometric_omega_rho(const myEvent &ev, TLorentzVector &p4_tau, 
+double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau, 
                      const TLorentzVector &p4_rho, 
                      const TLorentzVector &p4_pip, 
                      const TLorentzVector &p4_pi0) {
@@ -737,7 +737,7 @@ double geometric_omega_rho(const myEvent &ev, TLorentzVector &p4_tau,
   // cos_psi_tau = (2x - 1 - m_rho^2/m_tau^2) / (1 - m_rho^2/m_tau^2)
   // where x = E_rho / E_tau
   
-  double cos_psi_tau = getCosThetaStar(p4_tau, p4_rho);
+  double cos_psi_tau = GetCosThetaStar(p4_tau, p4_rho);
 
   if (cos_psi_tau > 1.0)  cos_psi_tau = 1.0;
   if (cos_psi_tau < -1.0) cos_psi_tau = -1.0;
@@ -745,7 +745,7 @@ double geometric_omega_rho(const myEvent &ev, TLorentzVector &p4_tau,
   // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
   // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
   
-  double cos_psi_rho = getCosThetaStar(p4_rho, p4_pip);
+  double cos_psi_rho = GetCosThetaStar(p4_rho, p4_pip);
 
   if (cos_psi_rho > 1.0)  cos_psi_rho = 1.0;
   if (cos_psi_rho < -1.0) cos_psi_rho = -1.0;

@@ -147,13 +147,13 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                 const RVec<int> &daughters);               
 
-double calculate_omega_rho(const myEvent &ev, const TLorentzVector &p4_tau, 
+double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau, 
                      const TLorentzVector &p4_rho, 
                      const TLorentzVector &p4_pip, 
                      const TLorentzVector &p4_pi0);
 
 // omega_rho with p4 angles instead of kinematic variables, possible only for MC
-double geometric_omega_rho(const myEvent &ev, TLorentzVector &p4_tau, 
+double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau, 
                      const TLorentzVector &p4_rho, 
                      const TLorentzVector &p4_pip, 
                      const TLorentzVector &p4_pi0);
