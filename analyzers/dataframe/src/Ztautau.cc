@@ -485,6 +485,9 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     }
     // adding possible photons
     else if (abs(dau.PDG) == 22) {
+      TLorentzVector p_temp;
+      p_temp.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                        dau.mass);
       p4_pi_lab += p_temp; 
       cout << "[INFO]: photon found in pion MC decay!" << endl;
     }
@@ -1272,7 +1275,7 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 
 // ==========================================
-RVec<double> get_Ptau(const int sign, const RVec<myEvent> &evs,
+RVec<double> get_Ptau(const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
                         const int reco_type, const bool bool_reco, const bool masscheck,
                         const bool asymmetric) {

@@ -222,7 +222,7 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
                        const bool bool_reco);
 
 // ==========================================
-RVec<double> get_Ptau(const int sign, const RVec<myEvent> &evs,
+RVec<double> get_Ptau(const RVec<myEvent> &evs,
                         const int mc_type, const bool bool_mc,
                         const int reco_type, const bool bool_reco, const bool masscheck,
                         const bool asymmetric);

@@ -18,7 +18,7 @@ outputName = "p8_ee_Ztautau_ecm91"
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 
 #Optional
-nCPUS       = 4
+nCPUS       = 1
 runBatch    = True
 batchQueue = "longlunch"
 compGroup = "group_u_FCC.local_gen"
@@ -113,6 +113,8 @@ class RDFanalysis():
                 .Define("mu_sgn","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
                 .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,true,1,false,false,false)")
                 .Define("w_minus_mu","Ztautau::get_weights(-1,myEvent,1,true,1,false,false,false)")
+
+				.Define("Ptau_pion", "Ztautau::get_Ptau(myEvent,3,true,3,false,false,false)")
 				
 				  
                 )
@@ -137,7 +139,8 @@ class RDFanalysis():
             "w_minus_mu",
             "rho_sgn",
             "w_plus_rho",
-            "w_minus_rho"
+            "w_minus_rho",
+            "Ptau_pion"
         	
         	]
         return branchList
