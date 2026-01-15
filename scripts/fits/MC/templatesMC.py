@@ -7,9 +7,9 @@ processList = {
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
-prodTag     = "FCCee/winter2023/IDEA/"
+#prodTag     = "FCCee/winter2023/IDEA/"
 # Link to the dictonary that contains all the cross section informations etc... (mandatory)
-#procDict = "FCCee_procDict_winter2023_IDEA.json"
+procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
 outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/"

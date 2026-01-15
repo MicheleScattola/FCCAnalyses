@@ -108,3 +108,7 @@ benchmark*json
 # Graphviz graphs
 *.dot
 *.png
+*.root
+BatchOutputs/
+logs/
+.__afs*
