@@ -23,7 +23,7 @@ if len(all_files) == 0:
 
 # Split: 10 for templates, 100 for data
 templates_files = all_files[0:10]
-analysis_files  = all_files[10:40]
+analysis_files  = all_files[10:50]
 
 write_list("files_templates.txt", templates_files)
 write_list("files_data.txt",      analysis_files)

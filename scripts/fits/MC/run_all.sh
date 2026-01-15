@@ -11,13 +11,13 @@ echo ">>> 2. Running Templates (First 10 files)..."
 # We use -i (or --input) which is the modern flag for direct root files
 cat files_templates.txt | xargs fccanalysis run templatesMC.py \
     --output /afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/p8_ee_Ztautau_ecm91.root \
-    --n-threads 2 \
+    --n-threads 4 \
     --files-list 
 
-echo ">>> 3. Running Data Analysis (Next 30 files)..."
+echo ">>> 3. Running Data Analysis (Next 40 files)..."
 cat files_data.txt | xargs fccanalysis run analysisMC.py \
     --output /afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/p8_ee_Ztautau_ecm91.root \
-    --n-threads 2 \
+    --n-threads 4 \
     --files-list 
 
 echo ">>> DONE."

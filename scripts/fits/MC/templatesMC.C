@@ -42,6 +42,9 @@ void create_and_save(ROOT::RDF::RNode df,
     TH1D *h_plus  = (TH1D*)h_plus_ptr->Clone(("h_template_"+suffix+"_plus").c_str());
     TH1D *h_minus = (TH1D*)h_minus_ptr->Clone(("h_template_"+suffix+"_minus").c_str());
 
+    // Print histogram entry counts
+    std::cout << "[INFO] " << label << " - h_plus entries: " << h_plus->GetEntries() << ", h_minus entries: " << h_minus->GetEntries() << std::endl;
+
     // Safety check for empty histograms (NaN protection)
     if (h_plus->Integral() <= 0 || h_minus->Integral() <= 0) {
         std::cerr << "[WARNING] Empty histogram for " << label << ". Skipping normalization." << std::endl;

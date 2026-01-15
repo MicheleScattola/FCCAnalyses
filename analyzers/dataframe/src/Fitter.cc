@@ -42,8 +42,43 @@ namespace Fitter {
         }
     };
 
-    // =========================================================
-    // IMPLEMENTATION 1: TEMPLATE FIT
+    // Functor for Template Fit (Linear Combination)
+    // Models Data = Norm * [ ((1+P)/2)*H_plus + ((1-P)/2)*H_minus ]
+    struct TemplateFunctor {
+        TH1D *h_p, *h_m; 
+        
+        // Constructor takes pointers to the template histograms
+        TemplateFunctor(TH1D* p, TH1D* m) : h_p(p), h_m(m) {}
+
+        double operator()(double *x, double *par) {
+            double xx = x[0];
+            
+            // 1. Find the bin corresponding to x
+            // We assume templates and data have identical binning
+            int bin = h_p->FindBin(xx);
+            
+            // 2. Get bin contents (Probability)
+            double y_p = h_p->GetBinContent(bin);
+            double y_m = h_m->GetBinContent(bin);
+
+            // 3. Define Parameters
+            // par[0] = Normalization (Total Data Events)
+            // par[1] = Polarization P (Range: -1 to +1)
+            double N = par[0];
+            double P = par[1];
+
+            // 4. Calculate Linear Combination
+            // P = (N+ - N-) / (N+ + N-)
+            // Coeffs: c+ = (1+P)/2, c- = (1-P)/2
+            double weight_p = (1.0 + P) / 2.0;
+            double weight_m = (1.0 - P) / 2.0;
+
+            return N * (weight_p * y_p + weight_m * y_m);
+        }
+    };
+
+// =========================================================
+    // IMPLEMENTATION 1: TEMPLATE FIT (Using TF1 Linear Combo)
     // =========================================================
     FitResult fit(const std::string& infile_data,
                   const std::string& infile_templates,
@@ -77,6 +112,11 @@ namespace Fitter {
         h_plus->SetDirectory(0); h_minus->SetDirectory(0);
         fTemp->Close();
 
+        // --- CRITICAL STEP: Normalize Templates to Unity ---
+        // This ensures par[0] represents the total number of events in Data
+        if (h_plus->Integral() > 0)  h_plus->Scale(1.0 / h_plus->Integral());
+        if (h_minus->Integral() > 0) h_minus->Scale(1.0 / h_minus->Integral());
+
         // 2. Get Data
         ROOT::EnableImplicitMT();
         ROOT::RDataFrame df(treeName, infile_data);
@@ -91,68 +131,85 @@ namespace Fitter {
         auto h_data_ptr = df.Histo1D({"h_data", (plot_title + ";" + x_axis_title + ";Events").c_str(), nBins, xMin, xMax}, dataColName);
         TH1D *h_data = (TH1D*)h_data_ptr->Clone("data");
         h_data->SetDirectory(0);
+        h_data->Sumw2(); // Handle weights correctly
 
-        // 3. TFractionFitter
-        TObjArray *mc = new TObjArray(2);
-        mc->Add(h_plus); mc->Add(h_minus);
-        TFractionFitter* fitter = new TFractionFitter(h_data, mc);
-        fitter->Constrain(0, 0.0, 1.0);
-        fitter->Constrain(1, 0.0, 1.0);
+        // 3. TF1 Linear Fit (Replaces TFractionFitter)
+        TemplateFunctor functor(h_plus, h_minus);
+        // "2" is the number of parameters (Norm, P)
+        TF1 *f_fit = new TF1("f_template", functor, xMin, xMax, 2);
+        
+        // Setup Parameters
+        f_fit->SetParName(0, "Norm");
+        f_fit->SetParName(1, "P_tau");
+        
+        // Initialize: Norm = Data Integral, P = 0
+        f_fit->SetParameter(0, h_data->Integral());
+        f_fit->SetParameter(1, -0.15); // Start guess
+        
+        // Fit! 
+        // L = Log Likelihood (Better for low stats bins)
+        // S = Save result
+        // Q = Quiet
+        TFitResultPtr fitStatus = h_data->Fit(f_fit, "L S Q");
 
-        Int_t status = fitter->Fit();
-        if (status != 0) {
+        if ((Int_t)fitStatus != 0) {
             std::cerr << "[Fitter] Template Fit failed." << std::endl;
-            delete fitter; delete mc; delete h_data; delete h_plus; delete h_minus;
-            return result;
+             // clean up...
+             return result;
         }
 
         // 4. Results
-        double f_p, err_p, f_m, err_m;
-        fitter->GetResult(0, f_p, err_p);
-        fitter->GetResult(1, f_m, err_m);
-        
-        result.P_tau = f_p - f_m;
-        result.P_err = 2.0 * err_p;
-        result.f_plus = f_p;
-        result.f_minus = f_m;
+        double P_val = f_fit->GetParameter(1);
+        double P_err = f_fit->GetParError(1);
+        double Norm  = f_fit->GetParameter(0);
+
+        result.P_tau = P_val;
+        result.P_err = P_err;
+        // Calculated fractions based on P
+        result.f_plus  = (1.0 + P_val) / 2.0; 
+        result.f_minus = (1.0 - P_val) / 2.0;
         result.success = true;
 
-        std::cout << "[Fitter] " << plot_title << " (Template) | P_tau: " << result.P_tau << " +/- " << result.P_err << std::endl;
+        std::cout << "[Fitter] " << plot_title << " (Template TF1) | P_tau: " << result.P_tau << " +/- " << result.P_err << std::endl;
 
-        // 5. Plotting (Simplified for brevity)
+        // 5. Plotting
         gStyle->SetOptStat(0);
         TCanvas *c = new TCanvas("c", "Fit", 800, 600);
-        TH1D* h_fit = (TH1D*)fitter->GetPlot();
         
-        // Reconstruct components for drawing
-        double scale_p = (f_p * h_data->Integral()) / h_plus->Integral();
-        double scale_m = (f_m * h_data->Integral()) / h_minus->Integral();
-        h_plus->Scale(scale_p); h_minus->Scale(scale_m);
+        // Scale templates for visualization to match the fit Norm
+        // (Remember we normalized them to 1.0 earlier)
+        TH1D* h_plus_plot = (TH1D*)h_plus->Clone("h_plus_plot");
+        TH1D* h_minus_plot = (TH1D*)h_minus->Clone("h_minus_plot");
         
-        h_plus->SetLineColor(kBlue); h_plus->SetLineStyle(2); h_plus->SetFillColorAlpha(kBlue, 0.1);
-        h_minus->SetLineColor(kRed); h_minus->SetLineStyle(2); h_minus->SetFillColorAlpha(kRed, 0.1);
-        h_fit->SetLineColor(kBlack); h_fit->SetLineWidth(2);
+        double scale_p = Norm * result.f_plus;
+        double scale_m = Norm * result.f_minus;
+        
+        h_plus_plot->Scale(scale_p);
+        h_minus_plot->Scale(scale_m);
+        
+        h_plus_plot->SetLineColor(kBlue); h_plus_plot->SetLineStyle(2); h_plus_plot->SetFillColorAlpha(kBlue, 0.1);
+        h_minus_plot->SetLineColor(kRed); h_minus_plot->SetLineStyle(2); h_minus_plot->SetFillColorAlpha(kRed, 0.1);
+        
+        f_fit->SetLineColor(kBlack); f_fit->SetLineWidth(2);
         h_data->SetMarkerStyle(20);
-
-        // set y axis minimum to 0
         h_data->SetMinimum(0.);
 
         h_data->Draw("EP");
-        h_fit->Draw("HIST SAME");
-        h_plus->Draw("HIST SAME");
-        h_minus->Draw("HIST SAME");
+        f_fit->Draw("SAME"); // Draw the TF1 function directly
+        h_plus_plot->Draw("HIST SAME");
+        h_minus_plot->Draw("HIST SAME");
 
         TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
         leg->AddEntry(h_data, "Data", "lp");
-        leg->AddEntry(h_fit, "Global Fit", "l");
-        leg->AddEntry(h_plus, "H=+1", "l");
-        leg->AddEntry(h_minus, "H=-1", "l");
+        leg->AddEntry(f_fit, "Global Fit", "l");
+        leg->AddEntry(h_plus_plot, "H=+1", "l");
+        leg->AddEntry(h_minus_plot, "H=-1", "l");
         leg->AddEntry((TObject*)0, Form("P = %.3f #pm %.3f", result.P_tau, result.P_err), "");
         leg->Draw();
 
         c->SaveAs((outdir + output_filename).c_str());
         
-        delete c; delete fitter; delete mc; delete h_data; delete h_plus; delete h_minus;
+        delete c; delete f_fit; delete h_data; delete h_plus; delete h_minus; delete h_plus_plot; delete h_minus_plot;
         return result;
     }
 
