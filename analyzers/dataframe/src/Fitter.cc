@@ -191,17 +191,18 @@ namespace Fitter {
         h_minus_plot->SetLineColor(kRed); h_minus_plot->SetLineStyle(2); h_minus_plot->SetFillColorAlpha(kRed, 0.1);
         
         f_fit->SetLineColor(kBlack); f_fit->SetLineWidth(2);
-        h_data->SetMarkerStyle(20);
+        h_data->SetLineColor(kBlack);
+        h_data->SetLineWidth(2);
         h_data->SetMinimum(0.);
 
-        h_data->Draw("EP");
-        f_fit->Draw("SAME"); // Draw the TF1 function directly
+        h_data->Draw("HIST");
+        //f_fit->Draw("SAME"); // Draw the TF1 function directly
         h_plus_plot->Draw("HIST SAME");
         h_minus_plot->Draw("HIST SAME");
 
         TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
         leg->AddEntry(h_data, "Data", "lp");
-        leg->AddEntry(f_fit, "Global Fit", "l");
+        //leg->AddEntry(f_fit, "Global Fit", "l");
         leg->AddEntry(h_plus_plot, "H=+1", "l");
         leg->AddEntry(h_minus_plot, "H=-1", "l");
         leg->AddEntry((TObject*)0, Form("P = %.3f #pm %.3f", result.P_tau, result.P_err), "");

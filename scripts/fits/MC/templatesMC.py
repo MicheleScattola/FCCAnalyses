@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.01},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.02,'chunks':4},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -15,13 +15,13 @@ prodTag     = "FCCee/winter2023/IDEA/"
 outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
-#inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
+inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 
 #Optional
-nCPUS       = -1
-#runBatch    = False
-#batchQueue = "longlunch"
-#compGroup = "group_u_FCC.local_gen"
+nCPUS       = 4
+runBatch    = True
+batchQueue = "longlunch"
+compGroup = "group_u_FCC.local_gen"
 
 #Optional test file , run with --test
 testFile = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/p8_ee_Ztautau_ecm91/events_080694422.root"
