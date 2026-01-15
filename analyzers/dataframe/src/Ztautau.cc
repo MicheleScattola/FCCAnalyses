@@ -483,6 +483,11 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                         dau.mass);
       p4_pi_lab += p_temp;
     }
+    // adding possible photons
+    else if (abs(dau.PDG) == 22) {
+      p4_pi_lab += p_temp; 
+      cout << "[INFO]: photon found in pion MC decay!" << endl;
+    }
     
   }
   ev.mc_daughterP4 = p4_pi_lab;
@@ -533,12 +538,14 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
       p4_rho_lab += p4_pi_lab;
+      ev.mc_piP4 = p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0
       TLorentzVector p4_pi0_lab;
       p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                          dau.mass);
       p4_rho_lab += p4_pi0_lab;
+      ev.mc_pi0P4 = p4_pi0_lab;
     } 
   }
   ev.mc_daughterP4 = p4_rho_lab;
@@ -627,13 +634,115 @@ double calculate_omega_rho(const myEvent &ev, TLorentzVector &p4_tau,
   
   double cos_psi_tau = (2.0 * E_rho/E_tau - 1.0 - (m_rho*m_rho)/(SM_TAU*SM_TAU) ) / (1.0 - (m_rho*m_rho)/(SM_TAU*SM_TAU) );
 
+  if (cos_psi_tau > 1.0) {
+    cos_psi_tau = 1.0;
+    //flag bad event
+    ev.m_debug = 99;
+  }
+  if (cos_psi_tau < -1.0) {
+    cos_psi_tau = -1.0;
+    //flag bad event
+    ev.m_debug = 99;
+  }
+
+  // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
+  // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
+  
+  double cos_psi_rho = (m_rho / sqrt(m_rho*m_rho - 4.0*SM_PI*SM_PI)) * (p4_pip.E() - p4_pi0.E()) / P_rho;
+
+  if (cos_psi_rho > 1.0) {
+    cos_psi_rho = 1.0;
+    //flag bad event
+    ev.m_debug = 99;
+  }
+  if (cos_psi_rho < -1.0) {
+    cos_psi_rho = -1.0;
+    //flag bad event
+    ev.m_debug = 99;
+  }
+
+  if(cos_psi_rho > 1.0 || cos_psi_rho < -1.0){
+    cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho << " , reco evt = " << ev.m_type << endl;
+  }
+  if(cos_psi_tau > 1.0 || cos_psi_tau < -1.0){
+    cerr << "[WARNING]: cos(psi_tau) out of bounds: " << cos_psi_tau << " , reco evt = " << ev.m_type << endl;
+  } 
+
+  // 4. Compute Omega
+  double psi_tau = acos(cos_psi_tau);
+
+  // Wigner Rotation Angle eta 
+  // tan(eta/2) = (m_rho/m_tau) * tan(psi_tau/2)
+  double tan_theta_2 = tan(psi_tau / 2.0);
+  double eta = 2.0 * atan( (m_rho / SM_TAU) * tan_theta_2 );
+
+  // Precompute trig terms for w functions
+  double cos_eta     = cos(eta);
+  double sin_eta     = sin(eta);
+  double cos_theta_2 = cos(psi_tau / 2.0); 
+  double sin_theta_2 = sin(psi_tau / 2.0);
+
+  // Calculate w_0 and w_1 components 
+  // w0+
+  double term0p = SM_TAU * cos_eta * cos_theta_2 + SM_TAU * sin_eta * sin_theta_2;
+  double w0_plus = term0p * term0p;
+
+  // w0-
+  double term0m = SM_TAU * cos_eta * sin_theta_2 - SM_TAU * sin_eta * cos_theta_2;
+  double w0_minus = term0m * term0m;
+
+  // w1+
+  double term1p = SM_TAU * sin_eta * cos_theta_2 - SM_TAU * cos_eta * sin_theta_2;
+  double w1_plus = (term1p * term1p) + (SM_TAU * SM_TAU * sin_theta_2 * sin_theta_2);
+
+  // w1-
+  double term1m = SM_TAU * sin_eta * sin_theta_2 + SM_TAU * cos_eta * cos_theta_2;
+  double w1_minus = (term1m * term1m) + (SM_TAU * SM_TAU * cos_theta_2 * cos_theta_2);
+
+  // Calculate h functions 
+  double h0 = 2.0 * cos_psi_rho * cos_psi_rho;
+  double h1 = 1.0 - cos_psi_rho * cos_psi_rho;
+
+  // Calculate W+ and W- 
+  double W_plus  = w1_plus * h1 + w0_plus * h0 + w1_plus * h1;
+  double W_minus = w1_minus * h1 + w0_minus * h0 + w1_minus * h1;
+
+
+  double omega =  (W_plus - W_minus) / (W_plus + W_minus);
+
+  if(omega > 1.0) cerr << "[WARNING]: omega > 1.0 (" << omega << ")" << endl;
+  if(omega < -1.0) cerr << "[WARNING]: omega < -1.0 (" << omega << ")" << endl;
+
+  return omega;
+}
+
+// omega_rho with p4 angles instead of kinematic variables, possible only for MC
+// how to implement p4_tau for reco???? TODO
+double geometric_omega_rho(const myEvent &ev, TLorentzVector &p4_tau, 
+                     const TLorentzVector &p4_rho, 
+                     const TLorentzVector &p4_pip, 
+                     const TLorentzVector &p4_pi0) {
+
+  
+  // 1. Get Mass and Energies from the 4-vectors
+  double m_rho = p4_rho.M();
+  double E_rho = p4_rho.E();
+  double E_tau = p4_tau.E();
+  double P_rho = p4_rho.P();
+
+  // 2. Calculate cos(psi_tau) [Angle of rho in tau rest frame]
+  // cos_psi_tau = (2x - 1 - m_rho^2/m_tau^2) / (1 - m_rho^2/m_tau^2)
+  // where x = E_rho / E_tau
+  
+  double cos_psi_tau = getCosThetaStar(p4_tau, p4_rho);
+
   if (cos_psi_tau > 1.0)  cos_psi_tau = 1.0;
   if (cos_psi_tau < -1.0) cos_psi_tau = -1.0;
 
   // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
   // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
   
-  double cos_psi_rho = (m_rho / sqrt(m_rho*m_rho - 4.0*SM_PI*SM_PI)) * (p4_pip.E() - p4_pi0.E()) / P_rho;
+  double cos_psi_rho = getCosThetaStar(p4_rho, p4_pip);
 
   if (cos_psi_rho > 1.0)  cos_psi_rho = 1.0;
   if (cos_psi_rho < -1.0) cos_psi_rho = -1.0;
@@ -874,6 +983,7 @@ RVec<double> get_omega_rho(const RVec<myEvent> &evs, const int mc_type,
       continue;
     // omega_rho
     TLorentzVector p4_tau, p4_rho, p4_pip, p4_pi0;
+
     if (bool_reco || (bool_reco && bool_mc)){
       // fill with reco p4
       for (const auto &p : e.m_piP4) {
@@ -882,21 +992,27 @@ RVec<double> get_omega_rho(const RVec<myEvent> &evs, const int mc_type,
       for (const auto &p : e.m_phP4) {
         p4_pi0 += p;
       }
+
+      p4_rho = p4_pip + p4_pi0;
+      p4_tau = e.mc_tauP4;
+      double omega = calculate_omega_rho(e,p4_tau, p4_rho, p4_pip, p4_pi0);
+      out.push_back(omega);
     }
 
     if (bool_mc && !bool_reco){
       // fill with mc p4
       p4_pip = e.mc_piP4;
       p4_pi0 = e.mc_pi0P4;
+      p4_tau = e.mc_tauP4;
+      double omega = geometric_omega_rho(e,p4_tau, p4_rho, p4_pip, p4_pi0);
+      out.push_back(omega);
     }
     
-    p4_rho = p4_pip + p4_pi0;
-    p4_tau = e.mc_tauP4;
-    double omega = calculate_omega_rho(e,p4_tau, p4_rho, p4_pip, p4_pi0);
-    out.push_back(omega);
+    
   }
   return out;
 };
+
 
 // ==========================================
 RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
@@ -1029,15 +1145,6 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
     // impose invariant mass check
     if (masscheck && e.m_debug_mass == 1)
       continue;
-    // if true MC evt is leptonic and I am looking for reco hadronic weights, return 0 weights
-    // we have some leptonic contamination in hadronic reco types, leptonics evts are clean.
-    // IS THIS CORRECT FOR REWEIGHTING??
-    /* if ( (e.mc_type ==1 || e.mc_type ==2) && (reco_type ==3 || reco_type ==4 || reco_type ==5) )
-      {
-        out.push_back(0.0);
-        continue;
-      }
-        */
     // get weight based on sign passed
     if (sign > 0)
       out.push_back(e.mc_weight_plus);
@@ -1163,6 +1270,37 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 // MASKS AND FILTERS
 // ==========================================
+
+// ==========================================
+RVec<double> get_Ptau(const int sign, const RVec<myEvent> &evs,
+                        const int mc_type, const bool bool_mc,
+                        const int reco_type, const bool bool_reco, const bool masscheck,
+                        const bool asymmetric) {
+
+  RVec<double> out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if(asymmetric){
+    // skip any 'other' non-classified event
+    if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
+    // check 1 hadronic + 1 leptonic
+    if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
+        ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
+  }
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if (masscheck && e.m_debug_mass == 1)
+      continue;
+    
+    out.push_back(e.mc_Ptau);
+  }
+  return out;
+};
 
 RVec<int> get_pi_mask(const RVec<myEvent> &evs) {
   RVec<int> mask;
