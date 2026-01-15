@@ -974,7 +974,7 @@ RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
     if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
         ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
   }
-  for (const auto &e : evs) {
+  for (auto &e : evs) {
     // check mc event
     if (bool_mc && e.mc_type != mc_type)
       continue;
