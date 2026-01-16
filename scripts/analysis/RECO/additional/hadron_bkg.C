@@ -21,6 +21,7 @@ void hadron_bkg() {
     //gStyle->SetPalette(kRedBlue);       
     TGaxis::SetMaxDigits(3);
     gStyle->SetPadRightMargin(0.05);
+
     // 3. Load Data
     ROOT::EnableImplicitMT();
     ROOT::RDataFrame df("events", inputPath);
@@ -28,6 +29,12 @@ void hadron_bkg() {
     // Range 0 to 47 GeV with bin width 0.5 -> 94 bins
     auto hModel = [](const char* name, const char* title) {
         return ROOT::RDF::TH1DModel(name, title, 94, 0, 47);
+    };
+    // Helper lambda for styling
+    auto styleHisto = [](TH1D* h, int color) {
+        h->SetLineColor(color);
+        h->SetLineWidth(2);
+        h->SetFillColorAlpha(color, 0.4); 
     };
 
     // 4. Create Histograms (Lazy Evaluation)
@@ -48,32 +55,26 @@ void hadron_bkg() {
     // =======================================================
     TCanvas *cPi = new TCanvas("cPi", "Pion Channel", 1000, 800);
      
-    // Using HIST PLC PFC:
-    // PLC picks Line Color from Palette
-    // PFC picks Fill Color from Palette (transparency applied via gStyle)
+    // set styles
     h_PiAsPi->GetXaxis()->SetTitle("Energy [GeV]");
     h_PiAsPi->GetYaxis()->SetTitle("Events");
     h_PiAsPi->GetYaxis()->SetRangeUser(0, h_ElAsPi->GetMaximum() * 1.1);
 
-    h_PiAsPi->Draw("HIST PLC PFC"); 
-    h_ElAsPi->Draw("HIST SAME PLC PFC");
-    h_MuAsPi->Draw("HIST SAME PLC PFC");
-    h_RhoAsPi->Draw("HIST SAME PLC PFC");
-    h_A1AsPi->Draw("HIST SAME PLC PFC");
+    styleHisto(h_PiAsPi.GetPtr(),  kGreen); 
+    styleHisto(h_ElAsPi.GetPtr(),  kRed);
+    styleHisto(h_MuAsPi.GetPtr(),  kMagenta);
+    styleHisto(h_RhoAsPi.GetPtr(), kBlue);
+    styleHisto(h_A1AsPi.GetPtr(),  KAzure);
 
-    cPi->Modified();
-    cPi->Update();
+    h_PiAsPi->Draw("HIST"); 
+    h_ElAsPi->Draw("HIST SAME");
+    h_MuAsPi->Draw("HIST SAME");
+    h_RhoAsPi->Draw("HIST SAME");
+    h_A1AsPi->Draw("HIST SAME");
     
-    h_PiAsPi->SetFillColorAlpha(h_PiAsPi->GetFillColor(), 0.5);
-    h_ElAsPi->SetFillColorAlpha(h_ElAsPi->GetFillColor(), 0.5);
-    h_MuAsPi->SetFillColorAlpha(h_MuAsPi->GetFillColor(), 0.5);
-    h_RhoAsPi->SetFillColorAlpha(h_RhoAsPi->GetFillColor(), 0.5);
-    h_A1AsPi->SetFillColorAlpha(h_A1AsPi->GetFillColor(), 0.5);
-
-    cPi->Modified();
-    cPi->Update();
+    gPad->BuildLegend();
     gPad->RedrawAxis();
-    gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
+
     cPi->SaveAs(Form("%sPion_Bkg.pdf", outDir));
 
 
@@ -90,26 +91,23 @@ void hadron_bkg() {
     h_Rest->Add(h_RhoAsRho.GetPtr(), -1);
     h_Rest->Add(h_A1AsRho.GetPtr(), -1);
 
+    // set styles
     h_RhoAsRho->GetXaxis()->SetTitle("Energy [GeV]");
     h_RhoAsRho->GetYaxis()->SetTitle("Events");
     h_RhoAsRho->GetYaxis()->SetRangeUser(0, h_RhoAsRho->GetMaximum() * 1.3);
 
-    h_RhoAsRho->Draw("HIST PLC PFC");
-    h_PiAsRho->Draw("HIST SAME PLC PFC");
-    h_A1AsRho->Draw("HIST SAME PLC PFC");
-    h_Rest->Draw("HIST SAME PLC PFC");
+    styleHisto(h_RhoAsRho.GetPtr(), kBlue);   
+    styleHisto(h_PiAsRho.GetPtr(),  kGreen);     
+    styleHisto(h_A1AsRho.GetPtr(),  kAzure);
+    styleHisto(h_Rest.GetPtr(),     kGray+2);
 
-    cRho->Update();
-
-    h_RhoAsRho->SetFillColorAlpha(h_RhoAsRho->GetFillColor(), 0.5);
-    h_A1AsRho->SetFillColorAlpha(h_A1AsRho->GetFillColor(), 0.5);
-    h_PiAsRho->SetFillColorAlpha(h_PiAsRho->GetFillColor(), 0.5);
-    h_Rest->SetFillColorAlpha(h_Rest->GetFillColor(), 0.5);
+    h_RhoAsRho->Draw("HIST");
     
-    cRho->Modified();
-    cRho->Update();
+    h_A1AsRho->Draw("HIST SAME");
+    h_Rest->Draw("HIST SAME");
+    h_PiAsRho->Draw("HIST SAME");
     
-    gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
+    gPad->BuildLegend();
     gPad->RedrawAxis();
     
     cRho->SaveAs(Form("%sRho_Bkg.pdf", outDir));
