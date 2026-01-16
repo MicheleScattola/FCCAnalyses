@@ -143,14 +143,14 @@ namespace Fitter {
         f_fit->SetParName(1, "P_tau");
         
         // Initialize: Norm = Data Integral, P = 0
-        f_fit->SetParameter(0, h_data->Integral());
+        f_fit->FixParameter(0, h_data->Integral());
         f_fit->SetParameter(1, -0.15); // Start guess
         
         // Fit! 
         // L = Log Likelihood (Better for low stats bins)
         // S = Save result
         // Q = Quiet
-        TFitResultPtr fitStatus = h_data->Fit(f_fit, "L S Q");
+        TFitResultPtr fitStatus = h_data->Fit(f_fit, "L Q");
 
         if ((Int_t)fitStatus != 0) {
             std::cerr << "[Fitter] Template Fit failed." << std::endl;
