@@ -13,7 +13,9 @@ root -l -b -q fitALL.C
 
 echo ">>> 3. Generating confusion matrices..."
 
-root -l -b -q confusion.C
+root -l -b -q matrix.C
+root -l -b -q matrix_eff.C
+root -l -b -q matrix_pur.C
 
 echo ">>> 4. Generating additional plots..."
 
