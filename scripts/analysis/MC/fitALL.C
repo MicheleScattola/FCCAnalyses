@@ -7,8 +7,8 @@ void fitALL() {
     // =========================================================================
     // 1. CONFIGURATION
     // =========================================================================
-    const std::string infile_data = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/p8_ee_Ztautau_ecm91.root";
-    const std::string infile_templates = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/templatesMC.root";
+    const std::string infile_data = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/p8_ee_Ztautau_ecm91.root";
+    const std::string infile_templates = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/templates/templatesMC.root";
     const std::string outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/MC/nofilters/";
     const std::string treeName = "events";
 
