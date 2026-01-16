@@ -50,7 +50,7 @@ void hadron_bkg() {
     // Using HIST PLC PFC:
     // PLC picks Line Color from Palette
     // PFC picks Fill Color from Palette (transparency applied via gStyle)
-    h_PiAsPi->SetTitle("Energy [GeV];Events;Reconstructed #pi contributions");
+    h_PiAsPi->SetTitle("Reco #pi contributions;Energy [GeV];Events");
     h_PiAsPi->GetYaxis()->SetRangeUser(0, h_ElAsPi->GetMaximum() * 1.1);
 
     h_PiAsPi->Draw("HIST PLC PFC"); 
@@ -84,8 +84,7 @@ void hadron_bkg() {
     h_Rest->Add(h_RhoAsRho.GetPtr(), -1);
     h_Rest->Add(h_A1AsRho.GetPtr(), -1);
 
-    h_RhoAsRho->GetXaxis()->SetTitle("Energy [GeV]");
-    h_RhoAsRho->GetYaxis()->SetTitle("Events / 0.5 GeV");
+    h_RhoAsRho->SetTitle("Reco #rho contributions;Energy [GeV];Events");
     h_RhoAsRho->GetYaxis()->SetRangeUser(0, h_RhoAsRho->GetMaximum() * 1.3);
 
     h_RhoAsRho->Draw("HIST PLC PFC");
