@@ -18,7 +18,7 @@ void hadron_bkg() {
     gStyle->SetOptTitle(kFALSE);      // Clean look: no title
     gStyle->SetOptStat(0);           // Clean look: no stats
     //gStyle->SetFillAlpha(0.35);      // Set transparency for Palette Fill Color (PFC)
-    gStyle->SetPalette(kPastel);       
+    gStyle->SetPalette(kViridis);       
 
     // 3. Load Data
     ROOT::EnableImplicitMT();
@@ -51,7 +51,7 @@ void hadron_bkg() {
     // PLC picks Line Color from Palette
     // PFC picks Fill Color from Palette (transparency applied via gStyle)
     h_PiAsPi->GetXaxis()->SetTitle("Energy [GeV]");
-    h_PiAsPi->GetYaxis()->SetTitle("Events")
+    h_PiAsPi->GetYaxis()->SetTitle("Events");
     h_PiAsPi->GetYaxis()->SetRangeUser(0, h_ElAsPi->GetMaximum() * 1.1);
 
     h_PiAsPi->Draw("HIST PLC PFC"); 
@@ -78,7 +78,7 @@ void hadron_bkg() {
     // =======================================================
     // 6. Drawing - Rho Channel
     // =======================================================
-    gStyle->SetPalette(kLightTemperature); 
+    gStyle->SetPalette(kBird); 
     TCanvas *cRho = new TCanvas("cRho", "Rho Channel", 1000, 800);
 
     // Calculate "Rest" background
@@ -89,7 +89,7 @@ void hadron_bkg() {
     h_Rest->Add(h_A1AsRho.GetPtr(), -1);
 
     h_RhoAsRho->GetXaxis()->SetTitle("Energy [GeV]");
-    h_RhoAsRho->GetYaxis()->SetTitle("Events / 0.5 GeV");
+    h_RhoAsRho->GetYaxis()->SetTitle("Events");
     h_RhoAsRho->GetYaxis()->SetRangeUser(0, h_RhoAsRho->GetMaximum() * 1.3);
 
     h_RhoAsRho->Draw("HIST PLC PFC");
@@ -100,10 +100,10 @@ void hadron_bkg() {
     cRho->Update();
 
     h_RhoAsRho->SetFillColorAlpha(h_RhoAsRho->GetFillColor(), 0.5);
-    h_PiAsRho->SetFillColorAlpha(h_PiAsRho->GetFillColor(), 0.5);
     h_A1AsRho->SetFillColorAlpha(h_A1AsRho->GetFillColor(), 0.5);
+    h_PiAsRho->SetFillColorAlpha(h_PiAsRho->GetFillColor(), 0.5);
     h_Rest->SetFillColorAlpha(h_Rest->GetFillColor(), 0.5);
-
+    
     cRho->Modified();
     cRho->Update();
 
