@@ -59,13 +59,13 @@ void hadron_bkg() {
     h_RhoAsPi->Draw("HIST SAME PLC PFC");
     h_A1AsPi->Draw("HIST SAME PLC PFC");
 
+    cPi->Update();
+
     h_PiAsPi->SetFillColorAlpha(h_PiAsPi->GetFillColor(), 0.5);
     h_ElAsPi->SetFillColorAlpha(h_ElAsPi->GetFillColor(), 0.5);
     h_MuAsPi->SetFillColorAlpha(h_MuAsPi->GetFillColor(), 0.5);
     h_RhoAsPi->SetFillColorAlpha(h_RhoAsPi->GetFillColor(), 0.5);
     h_A1AsPi->SetFillColorAlpha(h_A1AsPi->GetFillColor(), 0.5);
-
-    cPi->Update();
 
     gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
     cPi->SaveAs(Form("%sPion_Bkg.pdf", outDir));
@@ -93,12 +93,12 @@ void hadron_bkg() {
     h_A1AsRho->Draw("HIST SAME PLC PFC");
     h_Rest->Draw("HIST SAME PLC PFC");
 
+    cRho->Update();
+
     h_RhoAsRho->SetFillColorAlpha(h_RhoAsRho->GetFillColor(), 0.5);
     h_PiAsRho->SetFillColorAlpha(h_PiAsRho->GetFillColor(), 0.5);
     h_A1AsRho->SetFillColorAlpha(h_A1AsRho->GetFillColor(), 0.5);
     h_Rest->SetFillColorAlpha(h_Rest->GetFillColor(), 0.5);
-
-    cRho->Update();
 
     gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
     cRho->SaveAs(Form("%sRho_Bkg.pdf", outDir));
