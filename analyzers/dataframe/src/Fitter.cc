@@ -195,14 +195,14 @@ namespace Fitter {
         h_data->SetLineColor(kBlack);
         h_data->SetMarkerColor(kBlack);
         h_data->SetMarkerStyle(20);
-        h_data->SetMarkerSize(0.7);
+        h_data->SetMarkerSize(0.8);
         h_data->SetMinimum(0.);
 
         TH1D *h_result_total = (TH1D*)h_plus_plot->Clone("h_res_total");
         h_result_total->Add(h_minus_plot); 
         
-        h_result_total->SetLineColor(kGray+3);
-        h_result_total->SetLineWidth(1);
+        h_result_total->SetLineColor(kGray+2);
+        h_result_total->SetLineWidth(2);
         h_result_total->SetLineStyle(1);
         h_result_total->SetFillStyle(0);
         
@@ -214,7 +214,7 @@ namespace Fitter {
         h_plus_plot->Draw("HIST SAME");
         h_minus_plot->Draw("HIST SAME");
 
-        TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
+        TLegend *leg = new TLegend(0.6, 0.6, 0.88, 0.9);
         leg->AddEntry(h_data, "Data", "lp");
         //leg->AddEntry(f_fit, "Global Fit", "l");
         leg->AddEntry(h_plus_plot, "#it{H} = +1", "l");
@@ -297,7 +297,7 @@ namespace Fitter {
         h_p->Draw("SAME");
         h_m->Draw("SAME");
 
-        TLegend *leg = new TLegend(0.2, 0.2, 0.45, 0.4);
+        TLegend *leg = new TLegend(0.2, 0.2, 0.55, 0.4);
         leg->AddEntry(h_data, "Data", "lp");
         leg->AddEntry(f_fit, "Fit", "l");
         leg->AddEntry(h_p, "#it{H} = +1", "l");
