@@ -200,9 +200,12 @@ namespace Fitter {
         h_result_total->Add(h_minus_plot); 
         
         h_result_total->SetLineColor(kGray+3);
-        h_result_total->SetLineWidth(2);
-        //h_result_total->SetLineStyle(9); 
-        //h_result_total->SetFillStyle(0);
+        h_result_total->SetLineWidth(1);
+        h_result_total->SetLineStyle(1);
+        h_result_total->SetFillStyle(0);
+        
+        // Remove fit function from histogram to avoid drawing it
+        h_data->GetListOfFunctions()->Clear();
         
         h_data->Draw("E1 X0 P"); 
         h_result_total->Draw("HIST SAME");
@@ -212,9 +215,9 @@ namespace Fitter {
         TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
         leg->AddEntry(h_data, "Data", "lp");
         //leg->AddEntry(f_fit, "Global Fit", "l");
-        leg->AddEntry(h_plus_plot, "#mathcal{H} = +1", "l");
-        leg->AddEntry(h_minus_plot, "#mathcal{H} = -1", "l");
-        leg->AddEntry((TObject*)0, Form("#bf{#mathcal{P} = %.4f #pm %.4f}", result.P_tau, result.P_err), "");
+        leg->AddEntry(h_plus_plot, "#it{H} = +1", "l");
+        leg->AddEntry(h_minus_plot, "#it{H} = -1", "l");
+        leg->AddEntry((TObject*)0, Form("#bf{#it{P} = %.4f #pm %.4f}", result.P_tau, result.P_err), "");
         leg->Draw();
 
         c->SaveAs((outdir + output_filename).c_str());
@@ -246,7 +249,7 @@ namespace Fitter {
              std::cerr << "[Fitter] Data column missing: " << dataColName << std::endl; return result;
         }
 
-        auto h_ptr = df.Histo1D({"h_data", (plot_title + ";" + x_axis_title + ";Events").c_str(), 20, 0.0, 1.0}, dataColName);
+        auto h_ptr = df.Histo1D({"h_data", (plot_title + ";" + x_axis_title + ";Events").c_str(), 40, 0.0, 1.0}, dataColName);
         TH1D *h_data = (TH1D*)h_ptr->Clone("h_analytic");
         h_data->SetDirectory(0);
         h_data->Sumw2();
@@ -285,6 +288,8 @@ namespace Fitter {
         h_m->SetLineColor(kRed); h_m->SetLineStyle(2); h_m->SetFillColorAlpha(kRed, 0.1);
 
         h_data->SetMarkerStyle(20);
+        f_fit->SetLineColor(kMagenta);
+
         h_data->Draw("EP");
         f_fit->Draw("SAME");
         h_p->Draw("SAME");
@@ -293,9 +298,9 @@ namespace Fitter {
         TLegend *leg = new TLegend(0.2, 0.2, 0.45, 0.4);
         leg->AddEntry(h_data, "Data", "lp");
         leg->AddEntry(f_fit, "Fit", "l");
-        leg->AddEntry(h_p, "#mathcal{H} = +1", "l");
-        leg->AddEntry(h_m, "#mathcal{H} = -1", "l");
-        leg->AddEntry((TObject*)0, Form("#bf{#mathcal{P} = %.4f #pm %.4f}", result.P_tau, result.P_err), "");
+        leg->AddEntry(h_p, "#it{H} = +1", "l");
+        leg->AddEntry(h_m, "#it{H} = -1", "l");
+        leg->AddEntry((TObject*)0, Form("#bf{#it{P} = %.4f #pm %.4f}", result.P_tau, result.P_err), "");
         leg->Draw();
 
         c->SaveAs((outdir + output_filename).c_str());
