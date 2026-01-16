@@ -18,7 +18,7 @@ void hadron_bkg() {
     gStyle->SetOptTitle(kFALSE);      // Clean look: no title
     gStyle->SetOptStat(0);           // Clean look: no stats
     //gStyle->SetFillAlpha(0.35);      // Set transparency for Palette Fill Color (PFC)
-    gStyle->SetPalette(kPastel);       
+    //gStyle->SetPalette(kRedBlue);       
     TGaxis::SetMaxDigits(3);
     gStyle->SetPadRightMargin(0.05);
 
@@ -29,6 +29,12 @@ void hadron_bkg() {
     // Range 0 to 47 GeV with bin width 0.5 -> 94 bins
     auto hModel = [](const char* name, const char* title) {
         return ROOT::RDF::TH1DModel(name, title, 94, 0, 47);
+    };
+    // Helper lambda for styling
+    auto styleHisto = [](TH1D* h, int color) {
+        h->SetLineColor(color);
+        h->SetLineWidth(2);
+        h->SetFillColorAlpha(color, 0.4); 
     };
 
     // 4. Create Histograms (Lazy Evaluation)
@@ -54,13 +60,19 @@ void hadron_bkg() {
     h_PiAsPi->GetYaxis()->SetTitle("Events");
     h_PiAsPi->GetYaxis()->SetRangeUser(0, h_ElAsPi->GetMaximum() * 1.1);
 
-    h_PiAsPi->Draw("HIST PLC PFC");
-    h_RhoAsPi->Draw("HIST SAME PLC PFC"); 
-    h_ElAsPi->Draw("HIST SAME PLC PFC");
-    h_MuAsPi->Draw("HIST SAME PLC PFC");
-    h_A1AsPi->Draw("HIST SAME PLC PFC");
+    styleHisto(h_PiAsPi.GetPtr(),  kGreen); 
+    styleHisto(h_ElAsPi.GetPtr(),  kRed);
+    styleHisto(h_MuAsPi.GetPtr(),  kMagenta);
+    styleHisto(h_RhoAsPi.GetPtr(), kBlue);
+    styleHisto(h_A1AsPi.GetPtr(),  kAzure);
 
-    gPad->BuildLegend(0.65, 0.65, 0.9, 0.9);
+    h_PiAsPi->Draw("HIST"); 
+    h_ElAsPi->Draw("HIST SAME");
+    h_MuAsPi->Draw("HIST SAME");
+    h_RhoAsPi->Draw("HIST SAME");
+    h_A1AsPi->Draw("HIST SAME");
+    
+    gPad->BuildLegend();
     gPad->RedrawAxis();
 
     cPi->SaveAs(Form("%sPion_Bkg.pdf", outDir));
@@ -89,13 +101,13 @@ void hadron_bkg() {
     styleHisto(h_A1AsRho.GetPtr(),  kAzure);
     styleHisto(h_Rest,     kGray+2);
 
-    h_RhoAsRho->Draw("HIST PLC PFC");
-    h_A1AsRho->Draw("HIST SAME PLC PFC");
-    h_Rest->Draw("HIST SAME PLC PFC");
-    h_PiAsRho->Draw("HIST SAME PLC PFC");
-
-    gPad->BuildLegend(0.05, 0.65, 0.35, 0.95);
-
+    h_RhoAsRho->Draw("HIST");
+    
+    h_A1AsRho->Draw("HIST SAME");
+    h_Rest->Draw("HIST SAME");
+    h_PiAsRho->Draw("HIST SAME");
+    
+    gPad->BuildLegend();
     gPad->RedrawAxis();
     
     cRho->SaveAs(Form("%sRho_Bkg.pdf", outDir));
