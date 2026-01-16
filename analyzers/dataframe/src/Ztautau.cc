@@ -926,34 +926,35 @@ RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
-RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
-                         const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck,
-                          const bool asymmetric) {
+RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type, const bool bool_mc,
+                          const int reco_type, const bool masscheck) {
 
   RVec<double> out;
-  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if(asymmetric){
-    // skip any 'other' non-classified event
-    if(evs[0].mc_type == 0 || evs[1].mc_type ==0) return out;
-    // check 1 hadronic + 1 leptonic
-    if( ( (evs[0].mc_type <=2) && (evs[1].mc_type <=2) ) ||
-        ( (evs[0].mc_type >=3) && (evs[1].mc_type >=3) ) ) return out;
-  }
+
   for (const auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
+  
     // impose invariant mass check
     if (masscheck && e.m_debug_mass == 1)
       continue;
-    // pion energies
-    if (e.n_pi > 0) {
-      for (const auto &p4 : e.m_piP4) {
-        out.push_back(p4.E());
+
+    // if bool_mc is false skip mc type check
+    if (!bool_mc){
+      if (e.m_type == reco_type) {
+        out.push_back(e.m_RecoEnergy);
+      }
+      continue;
+    }
+    
+    // if reco && mc type are >0 collect energy where reco == mc
+    if ( (mc_type >= 0) && (reco_type >= 0) ) {
+      if (e.mc_type == mc_type && e.m_type == reco_type) {
+        out.push_back(e.m_RecoEnergy);
+      }
+    } 
+    // if reco && mc type are <0 collect any energy where reco != mc given a said reco decay
+    else if ( (mc_type <= 0) && (reco_type <= 0) ) {
+      if ( (e.m_type == reco_type) && (e.mc_type != e.m_type) ) {
+        out.push_back(e.m_RecoEnergy);
       }
     }
   }

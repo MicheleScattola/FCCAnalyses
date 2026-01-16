@@ -176,10 +176,8 @@ RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
                          const bool bool_reco, const bool masscheck,
                           const bool asymmetric);
 
-RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
-                         const bool bool_mc, const int reco_type,
-                         const bool bool_reco, const bool masscheck,
-                          const bool asymmetric);
+RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type, const bool bool_mc,
+                          const int reco_type, const bool masscheck);
 
 // ==========================================
 RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
