@@ -64,8 +64,8 @@ void matrix(){
 
     // Plot
     gStyle->SetOptStat(0);
-    gStyle->SetPalette(kPastel);
-
+    gStyle->SetPalette(kStarryNight);
+   
     TCanvas *c = new TCanvas("cConf", "Identification matrix", 1200, 700);
     c->SetRightMargin(0.15);
     c->SetGrid();
@@ -96,7 +96,7 @@ void matrix(){
 	hConf->SetMarkerSize(1.5);       
 
     // show cell values in scientific notation with 3 digits
-    gStyle->SetPaintTextFormat("1.3e");
+    gStyle->SetPaintTextFormat("1.1e");
     hConf->Draw("COLZ TEXT");
 
     TString name_pdf = Form("%smatrix_id.pdf", outdir);
