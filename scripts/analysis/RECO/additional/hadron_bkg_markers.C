@@ -6,7 +6,7 @@
 #include <TSystem.h>
 #include <vector>
 
-void plot_backgrounds_markers() {
+void hadron_bkg_markers() {
     // 1. Setup Paths
     std::string inputPath = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/p8_ee_Ztautau_ecm91.root";
     const char* outDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/additional/";
