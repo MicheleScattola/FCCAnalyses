@@ -294,10 +294,12 @@ int classify_MC(const RVec<int> &pdgs) {
     return 1; // mu
   else if (n_el == 1)
     return 2; // el
-  else if (n_pi == 1 && n_pi0 == 0)
+  else if (n_pi == 1 && n_pi0 == 0 && n_ph == 0)
     return 3; // pi
   else if (n_pi == 1 && n_pi0 == 1)
     return 4; // rho
+  else if (n_pi == 1 && n_pi0 == 1 && n_ph == 2)
+    return 5; // rho (not a pi0 in the decay but directly gammas)
   else if (n_pi == 1 && n_pi0 == 2)
     return 5; // a1 (1prong)
   else if (n_pi == 3)

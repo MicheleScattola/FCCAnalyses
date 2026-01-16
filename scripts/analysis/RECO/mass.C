@@ -1,17 +1,4 @@
 
-// invariant mass BreitWigner distribution
-double RelativisticBW(double *x, double *par) {
-    double xx = x[0];       // invariant mass
-    double M = par[1];     // peak mass
-    double G = par[2];     // decay width
-    double A = par[0];     // normalization
-    
-    double num = M * M * G * G; 
-    double den = (xx * xx - M * M) * (xx * xx - M * M) + M * M * G * G;
-    
-    return A * num / den;
-}
-
 void mass() {
     
     ROOT::EnableImplicitMT(); 
@@ -19,7 +6,7 @@ void mass() {
     gROOT->Reset();
 
     const char* infile = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91.root";
-    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO";
+    const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/additional";
 
     gSystem->Exec(Form("mkdir -p %s", outdir));
 
