@@ -17,7 +17,7 @@ void hadron_bkg() {
     // 2. Global Style Settings
     //gStyle->SetOptTitle(kFALSE);      // Clean look: no title
     gStyle->SetOptStat(0);           // Clean look: no stats
-    gStyle->SetFillAlpha(0.35);      // Set transparency for Palette Fill Color (PFC)
+    //gStyle->SetFillAlpha(0.35);      // Set transparency for Palette Fill Color (PFC)
     gStyle->SetPalette(kPastel);       
 
     // 3. Load Data
@@ -61,7 +61,7 @@ void hadron_bkg() {
     h_A1AsPi->Draw("HIST SAME PLC PFC");
 
     gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
-    cPi->SaveAs(Form("%sPion_Bkg_Histo.pdf", outDir));
+    cPi->SaveAs(Form("%sPion_Bkg.pdf", outDir));
 
 
     // =======================================================
@@ -87,7 +87,7 @@ void hadron_bkg() {
     h_Rest->Draw("HIST SAME PLC PFC");
 
     gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
-    cRho->SaveAs(Form("%sRho_Bkg_Histo.pdf", outDir));
+    cRho->SaveAs(Form("%sRho_Bkg.pdf", outDir));
 
     // 7. Cleanup
     delete cPi; delete cRho; delete h_Rest;
