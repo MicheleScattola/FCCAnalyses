@@ -18,7 +18,7 @@ void hadron_bkg() {
     gStyle->SetOptTitle(kFALSE);      // Clean look: no title
     gStyle->SetOptStat(0);           // Clean look: no stats
     //gStyle->SetFillAlpha(0.35);      // Set transparency for Palette Fill Color (PFC)
-    gStyle->SetPalette(kPastel);       
+    gStyle->SetPalette(kRainbow);       
     TGaxis::SetMaxDigits(3);
     gStyle->SetPadRightMargin(0.05);
 
@@ -84,17 +84,12 @@ void hadron_bkg() {
     h_RhoAsRho->GetYaxis()->SetTitle("Events");
     h_RhoAsRho->GetYaxis()->SetRangeUser(0, h_RhoAsRho->GetMaximum() * 1.3);
 
-    styleHisto(h_RhoAsRho.GetPtr(), kBlue);   
-    styleHisto(h_PiAsRho.GetPtr(),  kGreen);     
-    styleHisto(h_A1AsRho.GetPtr(),  kAzure);
-    styleHisto(h_Rest,     kGray+2);
-
     h_RhoAsRho->Draw("HIST PLC PFC");
     h_A1AsRho->Draw("HIST SAME PLC PFC");
     h_Rest->Draw("HIST SAME PLC PFC");
     h_PiAsRho->Draw("HIST SAME PLC PFC");
 
-    gPad->BuildLegend(0.05, 0.65, 0.35, 0.95);
+    gPad->BuildLegend();
 
     gPad->RedrawAxis();
     
