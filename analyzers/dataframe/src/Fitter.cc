@@ -94,6 +94,8 @@ namespace Fitter {
     {
         FitResult result = {0,0,0,0,false, "Template"};
 
+        std::cout << "[Fitter] Starting Template Fit for " << plot_title << std::endl;
+
         // 1. Recover Templates
         TFile *fTemp = TFile::Open(infile_templates.c_str(), "READ");
         if (!fTemp || fTemp->IsZombie()) {
