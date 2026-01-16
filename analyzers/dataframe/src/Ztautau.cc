@@ -1450,4 +1450,30 @@ RVec<double> get_debug_phi(const RVec<myEvent> &evs,
   return out;
 }
 
+
+// ==========================================
+RVec<debugInfo> get_debug_info(const RVec<myEvent> &evs, const int deb) {
+  RVec<debugInfo> out;
+  for (const auto &e : evs) {
+    // filter by m_debug value
+    if (e.m_debug == deb) {
+      debugInfo info;
+      info.m_debug = e.m_debug;
+      info.m_type = e.m_type;
+      info.mc_type = e.mc_type;
+      out.push_back(info);
+    }
+  }
+  return out;
+}
+
+// ==========================================
+RVec<int> get_debug_info_mc_type(const RVec<debugInfo> &infos) {
+  RVec<int> out;
+  for (const auto &info : infos) {
+    out.push_back(info.mc_type);
+  }
+  return out;
+}
+
 } // namespace Ztautau

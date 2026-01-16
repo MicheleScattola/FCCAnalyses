@@ -101,6 +101,15 @@ struct myEvent {
   double thrust_phi = -999;
 };
 
+//===================================
+// DEBUG INFO STRUCT
+//===================================
+struct debugInfo {
+  int m_debug = 0;
+  int m_type = 0;
+  int mc_type = 0;
+};
+
 // return event struct
 RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<int> &pi_ids, const RVec<int> &ph_ids,
@@ -246,6 +255,13 @@ RVec<double> get_debug_costheta(const RVec<myEvent> &evs,
 RVec<double> get_debug_phi(const RVec<myEvent> &evs,
                                const int mc_type, const bool bool_mc,
                                const int reco_type, const bool bool_reco);
+
+// ==========================================
+// DEBUG INFO: filter events by m_debug value
+// ==========================================
+RVec<debugInfo> get_debug_info(const RVec<myEvent> &evs, const int deb);
+
+RVec<int> get_debug_info_mc_type(const RVec<debugInfo> &infos);
 
 } // namespace Ztautau
 

@@ -8,9 +8,7 @@
 
 void thrust() {
    
-    std::string inputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/";
-    std::string fileName = "p8_ee_Ztautau_ecm91"; 
-    std::string inputFile = inputDir + fileName + ".root";
+    std::string inputFile = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91.root";
     
     std::string outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/additional/";
     std::string outputFile = outputDir + "thrust.pdf";

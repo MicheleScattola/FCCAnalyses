@@ -127,6 +127,9 @@ class RDFanalysis():
                 # confront invariant mass in reco and MC - diagonal elements of confusion matrix
 				.Define("rho_pull","Ztautau::get_mass_pull(myEvent,4,true,4,true)")
 				.Define("a1_pull","Ztautau::get_mass_pull(myEvent,5,true,5,true)")
+
+				.Define("debug_rho","Ztautau::get_debug_info(myEvent,99)")
+                .Define("debug_mctype","Ztautau::get_debug_info_mc_type(debug_rho)")
 				  
                 )
 		
@@ -153,7 +156,8 @@ class RDFanalysis():
 			"MC_rho_m",
 			"MC_a1_m",
 			"rho_pull",
-			"a1_pull"
+			"a1_pull",
+            "debug_mctype"
 		
         	
         	]
