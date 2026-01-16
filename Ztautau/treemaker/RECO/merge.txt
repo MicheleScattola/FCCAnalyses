@@ -1,1 +1,0 @@
-hadd -f /afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91.root /afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91/chunk_*.root
