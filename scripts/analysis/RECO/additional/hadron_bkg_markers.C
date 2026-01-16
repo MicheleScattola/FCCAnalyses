@@ -63,10 +63,8 @@ void hadron_bkg_markers() {
     setStyle(h_A1AsPi.GetPtr(),  kOpenCircle);
 
     // Drawing with "PLC PMC" (Palette Line Color, Palette Marker Color)
-    // We draw Signal first to set axes, assuming it has the most events
-    h_PiAsPi->GetYaxis()->SetRangeUser(0, h_PiAsPi->GetMaximum() * 1.3); // Add space for legend
-    h_PiAsPi->Draw("P PLC PMC"); 
-    h_ElAsPi->Draw("SAME P PLC PMC");
+    h_ElAsPi->Draw("P PLC PMC"); 
+    h_PiAsPi->Draw("SAME P PLC PMC");
     h_MuAsPi->Draw("SAME P PLC PMC");
     h_RhoAsPi->Draw("SAME P PLC PMC");
     h_A1AsPi->Draw("SAME P PLC PMC");
