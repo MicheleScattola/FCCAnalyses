@@ -64,7 +64,7 @@ void hadron_bkg() {
     styleHisto(h_ElAsPi.GetPtr(),  kRed);
     styleHisto(h_MuAsPi.GetPtr(),  kMagenta);
     styleHisto(h_RhoAsPi.GetPtr(), kBlue);
-    styleHisto(h_A1AsPi.GetPtr(),  KAzure);
+    styleHisto(h_A1AsPi.GetPtr(),  kAzure);
 
     h_PiAsPi->Draw("HIST"); 
     h_ElAsPi->Draw("HIST SAME");
@@ -99,7 +99,7 @@ void hadron_bkg() {
     styleHisto(h_RhoAsRho.GetPtr(), kBlue);   
     styleHisto(h_PiAsRho.GetPtr(),  kGreen);     
     styleHisto(h_A1AsRho.GetPtr(),  kAzure);
-    styleHisto(h_Rest.GetPtr(),     kGray+2);
+    styleHisto(h_Rest,     kGray+2);
 
     h_RhoAsRho->Draw("HIST");
     
