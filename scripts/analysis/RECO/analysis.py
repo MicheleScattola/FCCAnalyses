@@ -7,18 +7,18 @@ processList = {
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
-prodTag     = "FCCee/winter2023/IDEA/"
+#prodTag     = "FCCee/winter2023/IDEA/"
 # Link to the dictonary that contains all the cross section informations etc... (mandatory)
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 
 #Optional
-nCPUS       = 4
+nCPUS       = 1
 runBatch    = True
 batchQueue = "longlunch"
 compGroup = "group_u_FCC.local_gen"

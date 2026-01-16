@@ -193,20 +193,20 @@ namespace Fitter {
         h_data->SetLineColor(kBlack);
         h_data->SetMarkerColor(kBlack);
         h_data->SetMarkerStyle(20);
-        h_data->SetMarkerSize(0.6);
-        h_data->SetFillColor(kGray+1);
-        h_data->SetFillStyle(3144);
+        h_data->SetMarkerSize(0.7);
+        //h_data->SetFillColor(kGray+1);
+        //h_data->SetFillStyle(3144);
         h_data->SetMinimum(0.);
 
         TH1D *h_result_total = (TH1D*)h_plus_plot->Clone("h_res_total");
         h_result_total->Add(h_minus_plot); 
         
         h_result_total->SetLineColor(kGray+3);
-        h_result_total->SetLineWidth(1);
-        h_result_total->SetLineStyle(9); 
-        h_result_total->SetFillStyle(0);
+        h_result_total->SetLineWidth(2);
+        //h_result_total->SetLineStyle(9); 
+        //h_result_total->SetFillStyle(0);
         
-        h_data->Draw("E2 P HIST"); 
+        h_data->Draw("E1 X0 P"); 
         h_result_total->Draw("HIST SAME");
         h_plus_plot->Draw("HIST SAME");
         h_minus_plot->Draw("HIST SAME");
