@@ -194,8 +194,6 @@ namespace Fitter {
         h_data->SetMarkerColor(kBlack);
         h_data->SetMarkerStyle(20);
         h_data->SetMarkerSize(0.7);
-        //h_data->SetFillColor(kGray+1);
-        //h_data->SetFillStyle(3144);
         h_data->SetMinimum(0.);
 
         TH1D *h_result_total = (TH1D*)h_plus_plot->Clone("h_res_total");
@@ -214,9 +212,9 @@ namespace Fitter {
         TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
         leg->AddEntry(h_data, "Data", "lp");
         //leg->AddEntry(f_fit, "Global Fit", "l");
-        leg->AddEntry(h_plus_plot, "H=+1", "l");
-        leg->AddEntry(h_minus_plot, "H=-1", "l");
-        leg->AddEntry((TObject*)0, Form("P = %.3f #pm %.3f", result.P_tau, result.P_err), "");
+        leg->AddEntry(h_plus_plot, "#mathcal{H} = +1", "l");
+        leg->AddEntry(h_minus_plot, "#mathcal{H} = -1", "l");
+        leg->AddEntry((TObject*)0, Form("#bf{#mathcal{P} = %.4f #pm %.4f}", result.P_tau, result.P_err), "");
         leg->Draw();
 
         c->SaveAs((outdir + output_filename).c_str());
@@ -295,9 +293,9 @@ namespace Fitter {
         TLegend *leg = new TLegend(0.2, 0.2, 0.45, 0.4);
         leg->AddEntry(h_data, "Data", "lp");
         leg->AddEntry(f_fit, "Fit", "l");
-        leg->AddEntry(h_p, "H=+1", "l");
-        leg->AddEntry(h_m, "H=-1", "l");
-        leg->AddEntry((TObject*)0, Form("P = %.3f #pm %.3f", result.P_tau, result.P_err), "");
+        leg->AddEntry(h_p, "#mathcal{H} = +1", "l");
+        leg->AddEntry(h_m, "#mathcal{H} = -1", "l");
+        leg->AddEntry((TObject*)0, Form("#bf{#mathcal{P} = %.4f #pm %.4f}", result.P_tau, result.P_err), "");
         leg->Draw();
 
         c->SaveAs((outdir + output_filename).c_str());
