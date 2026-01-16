@@ -31,7 +31,7 @@ void hadron_bkg() {
 
     // 4. Create Histograms (Lazy Evaluation)
     // The titles here will be used by gPad->BuildLegend()
-    auto h_PiAsPi  = df.Histo1D(hModel("h_PiAsPi",  "True #pi (Signal)"), "PiAsPi_e");
+    auto h_PiAsPi  = df.Histo1D(hModel("h_PiAsPi",  "True #pi)"), "PiAsPi_e");
     auto h_ElAsPi  = df.Histo1D(hModel("h_ElAsPi",  "e #rightarrow #pi"), "ElAsPi_e");
     auto h_MuAsPi  = df.Histo1D(hModel("h_MuAsPi",  "#mu #rightarrow #pi"), "MuAsPi_e");
     auto h_RhoAsPi = df.Histo1D(hModel("h_RhoAsPi", "#rho #rightarrow #pi"), "RhoAsPi_e");
@@ -50,8 +50,7 @@ void hadron_bkg() {
     // Using HIST PLC PFC:
     // PLC picks Line Color from Palette
     // PFC picks Fill Color from Palette (transparency applied via gStyle)
-    h_PiAsPi->GetXaxis()->SetTitle("Energy [GeV]");
-    h_PiAsPi->GetYaxis()->SetTitle("Events / 0.5 GeV");
+    h_PiAsPi->SetTitle("Energy [GeV];Events;Reconstructed #pi contributions");
     h_PiAsPi->GetYaxis()->SetRangeUser(0, h_ElAsPi->GetMaximum() * 1.1);
 
     h_PiAsPi->Draw("HIST PLC PFC"); 
