@@ -18,8 +18,9 @@ void hadron_bkg() {
     gStyle->SetOptTitle(kFALSE);      // Clean look: no title
     gStyle->SetOptStat(0);           // Clean look: no stats
     //gStyle->SetFillAlpha(0.35);      // Set transparency for Palette Fill Color (PFC)
-    gStyle->SetPalette(kViridis);       
-
+    //gStyle->SetPalette(kRedBlue);       
+    TGaxis::SetMaxDigits(3);
+    gStyle->SetPadRightMargin(0.05);
     // 3. Load Data
     ROOT::EnableImplicitMT();
     ROOT::RDataFrame df("events", inputPath);
@@ -46,7 +47,7 @@ void hadron_bkg() {
     // 5. Drawing - Pion Channel
     // =======================================================
     TCanvas *cPi = new TCanvas("cPi", "Pion Channel", 1000, 800);
-    
+     
     // Using HIST PLC PFC:
     // PLC picks Line Color from Palette
     // PFC picks Fill Color from Palette (transparency applied via gStyle)
@@ -60,8 +61,9 @@ void hadron_bkg() {
     h_RhoAsPi->Draw("HIST SAME PLC PFC");
     h_A1AsPi->Draw("HIST SAME PLC PFC");
 
+    cPi->Modified();
     cPi->Update();
-
+    
     h_PiAsPi->SetFillColorAlpha(h_PiAsPi->GetFillColor(), 0.5);
     h_ElAsPi->SetFillColorAlpha(h_ElAsPi->GetFillColor(), 0.5);
     h_MuAsPi->SetFillColorAlpha(h_MuAsPi->GetFillColor(), 0.5);
@@ -70,7 +72,7 @@ void hadron_bkg() {
 
     cPi->Modified();
     cPi->Update();
-
+    gPad->RedrawAxis();
     gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
     cPi->SaveAs(Form("%sPion_Bkg.pdf", outDir));
 
@@ -78,9 +80,9 @@ void hadron_bkg() {
     // =======================================================
     // 6. Drawing - Rho Channel
     // =======================================================
-    gStyle->SetPalette(kBird); 
+    //gStyle->SetPalette(kCool); 
     TCanvas *cRho = new TCanvas("cRho", "Rho Channel", 1000, 800);
-
+   
     // Calculate "Rest" background
     TH1D *h_Rest = (TH1D*)h_AllRho->Clone("h_Rest");
     h_Rest->SetTitle("Other bkg");
@@ -106,8 +108,10 @@ void hadron_bkg() {
     
     cRho->Modified();
     cRho->Update();
-
+    
     gPad->BuildLegend(0.6, 0.65, 0.9, 0.9);
+    gPad->RedrawAxis();
+    
     cRho->SaveAs(Form("%sRho_Bkg.pdf", outDir));
 
     // 7. Cleanup
