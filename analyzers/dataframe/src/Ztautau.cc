@@ -344,7 +344,7 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
   } else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
 
       // flag: 0,2 GeV < mass < 1.4 GeV
-      if(e.m_RecoMass>1.4 || e.m_RecoMass<0.2) {
+      if(ev.m_RecoMass>1.4 || ev.m_RecoMass<0.2) {
         ev.m_debug = 11;
       }
       return 4; // Type 4: Rho (pi + 1-2 gamma)

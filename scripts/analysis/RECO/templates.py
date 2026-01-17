@@ -20,7 +20,7 @@ inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 #Optional
 nCPUS       = 1
 runBatch    = True
-batchQueue = "longlunch"
+batchQueue = "espresso"
 compGroup = "group_u_FCC.local_gen"
 
 #Optional test file , run with --test
@@ -100,7 +100,7 @@ class RDFanalysis():
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
 				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,false)/45.5")
+				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,false,3,true,true,false)")
 				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,false,3,true,true,false)")
 				# rho signal

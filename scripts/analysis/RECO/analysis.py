@@ -20,7 +20,7 @@ inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 #Optional
 nCPUS       = 1
 runBatch    = True
-batchQueue = "longlunch"
+batchQueue = "espresso"
 compGroup = "group_u_FCC.local_gen"
 
 #Optional test file , run with --test
