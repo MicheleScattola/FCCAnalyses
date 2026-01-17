@@ -155,7 +155,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     ev.m_RecoMass = p4_tot.M(); 
     if (ev.m_RecoMass > 2){
       ev.m_debug_mass = 1; // high mass
-    
+    }
     // mass limits on hadronic decays are done in classification
 
    // invariant mass check
@@ -182,14 +182,6 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     else if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi != 0 ) {
       ev.m_debug = 11;
     }
-    // if 1 prong add RP2MC energy
-    auto &p2mc = mc[ev.mc_RP2MC_id];
-    TLorentzVector rp2mcp4;
-    rp2mcp4.SetXYZM(p2mc.momentum.x, p2mc.momentum.y, p2mc.momentum.z,
-                           p2mc.mass);
-    ev.mc_RP2MC_e = rp2mcp4.E();
-
-
 
     // MC EVENT CLASSIFICATION & WEIGHTING
 
@@ -244,7 +236,6 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       // now exit the loop
       break;
     }
-    if(ev.mc_daughterP4.M()>1.8) ev.mc_debug_mass = 1;
 
     // push back and change hemisphere
     out.push_back(ev);
