@@ -155,9 +155,20 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     ev.m_RecoMass = p4_tot.M(); 
     if (ev.m_RecoMass > 2){
       ev.m_debug_mass = 1; // high mass
-
+    
     // mass limits on hadronic decays are done in classification
 
+   // invariant mass check
+    TLorentzVector p4_tot;
+    for(auto &p : ev.m_muP4) p4_tot += p;
+    for(auto &p : ev.m_elP4) p4_tot += p;
+    for(auto &p : ev.m_piP4) p4_tot += p;
+    for(auto &p : ev.m_phP4) p4_tot += p;
+    
+    ev.m_RecoMass = p4_tot.M(); 
+    if (ev.m_RecoMass > 2){
+      ev.m_debug_mass = 1; // high mass
+    }  
     // RECO EVT CLASSIFICATION
     // Leptonic
     if ( (ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0 ) {
@@ -178,8 +189,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                            p2mc.mass);
     ev.mc_RP2MC_e = rp2mcp4.E();
 
-    
-    }
+
 
     // MC EVENT CLASSIFICATION & WEIGHTING
 
