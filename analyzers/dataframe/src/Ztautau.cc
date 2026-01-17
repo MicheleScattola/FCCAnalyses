@@ -294,12 +294,12 @@ int classify_MC(const RVec<int> &pdgs) {
     return 1; // mu
   else if (n_el == 1)
     return 2; // el
-  else if (n_pi == 1 && n_pi0 == 0 && n_ph == 0)
+  else if (n_pi == 1 && n_pi0 == 0 )
     return 3; // pi
   else if (n_pi == 1 && n_pi0 == 1)
     return 4; // rho
-  else if (n_pi == 1 && n_pi0 == 1 && n_ph == 2)
-    return 5; // rho (not a pi0 in the decay but directly gammas)
+  //else if (n_pi == 1 && n_pi0 == 0 && n_ph == 2)
+    //return 4; // rho (not a pi0 in the decay but directly gammas)
   else if (n_pi == 1 && n_pi0 == 2)
     return 5; // a1 (1prong)
   else if (n_pi == 3)
@@ -342,14 +342,29 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
       ev.mc_RP2MC_id = rp2mc_idx[id];
       return 3; // Type 3: Single Pion
   } else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
+
+      // flag: 0,2 GeV < mass < 1.4 GeV
+      if(e.m_RecoMass>1.4 || e.m_RecoMass<0.2) {
+        ev.m_debug = 11;
+      }
       return 4; // Type 4: Rho (pi + 1-2 gamma)
   } else if (ev.n_ph >= 3) {
+
+      // flag: 0,6 < mass < 1.8 GeV
+      if(ev.m_RecoMass>1.8 || ev.m_RecoMass<0.6) {
+        ev.m_debug = 11;
+      }
       ev.m_debug = 2;
       return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
   }
   }
   if (ev.n_pi == 3) {
   	ev.m_debug = 3;
+
+    // flag: 0,6 < mass < 1.8 GeV
+      if(ev.m_RecoMass>1.8 || ev.m_RecoMass<0.6) {
+        ev.m_debug = 11;
+      }
     return 5; // Type 5: a1 (3-prong mode)
   }
   
@@ -358,11 +373,12 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
   
   
 
-RVec<int> get_type_safe(const RVec<myEvent> &evs) {
+RVec<int> get_type_safe(const RVec<myEvent> &evs, const bool masscheck) {
   RVec<int> out;
   out.reserve(evs.size());
   for (const auto &e : evs) {
-    if(e.m_debug_mass != 1) out.push_back(e.m_type);
+    if(masscheck && e.m_debug_mass != 1 && e.m_debug_mass != 11) out.push_back(e.m_type);
+    else if (!masscheck && e.m_debug != 1) out.push_back(e.m_type);
     else out.push_back(0);
   }
   return out;
@@ -631,7 +647,10 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
   // double E_tau = p4_tau.E();
   double P_rho = p4_rho.P();
 
-  // should I check m_rho ??
+  // SAFETY CHECK
+  if (m_rho < 2.0 * SM_PI + 0.001) {
+     return -999.0; // Return a dummy value or handle gracefully
+  }
 
   // 2. Calculate cos(psi_tau) [Angle of rho in tau rest frame]
   // cos_psi_tau = (2x - 1 - m_rho^2/m_tau^2) / (1 - m_rho^2/m_tau^2)
@@ -934,7 +953,7 @@ RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type, const boo
   for (const auto &e : evs) {
   
     // impose invariant mass check
-    if (masscheck && e.m_debug_mass == 1)
+    if ( masscheck && (e.m_debug_mass == 1 || e.m_debug_mass == 11) ) 
       continue;
 
     // if bool_mc is false skip mc type check
@@ -944,6 +963,7 @@ RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type, const boo
       }
       continue;
     }
+    // from now we assume bool_mc is true
     
     // if reco && mc type are >0 collect energy where reco == mc
     if ( (mc_type >= 0) && (reco_type >= 0) ) {
@@ -984,8 +1004,8 @@ RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
-    // impose invarian mass check
-    if (masscheck && e.m_debug_mass == 1)
+    // impose invariant mass check
+    if ((masscheck && e.m_debug_mass == 1) || (masscheck && e.m_debug_mass == 11))
       continue;
     // omega_rho
     TLorentzVector p4_tau, p4_rho, p4_pip, p4_pi0;
@@ -1010,6 +1030,7 @@ RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
       p4_pip = e.mc_piP4;
       p4_pi0 = e.mc_pi0P4;
       p4_tau = e.mc_tauP4;
+      p4_rho = e.mc_daughterP4;
       double omega = geometric_omega_rho(e,p4_tau, p4_rho, p4_pip, p4_pi0);
       out.push_back(omega);
     }
@@ -1149,7 +1170,7 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // impose invariant mass check
-    if (masscheck && e.m_debug_mass == 1)
+    if ((masscheck && e.m_debug_mass == 1) || (masscheck && e.m_debug_mass == 11))
       continue;
     // get weight based on sign passed
     if (sign > 0)

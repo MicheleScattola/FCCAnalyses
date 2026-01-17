@@ -97,7 +97,8 @@ class RDFanalysis():
 				#####
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
-				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
+				.Define("event_type_reco","Ztautau::get_type_safe(myEvent,true)")
+                .Define("event_type_reco_noMassCheck","Ztautau::get_type_safe(myEvent,false)")
 				
 				#####
 				# MC IDENTIFICATION
@@ -110,7 +111,7 @@ class RDFanalysis():
                 
 				#APPLYING INV MASS CHECK:
 				# pi signal
-				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true,true,false)/45.5")
+				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
 				# lepton signals
                 .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,false)/45.5")
                 .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.5")
@@ -128,8 +129,6 @@ class RDFanalysis():
 				.Define("rho_pull","Ztautau::get_mass_pull(myEvent,4,true,4,true)")
 				.Define("a1_pull","Ztautau::get_mass_pull(myEvent,5,true,5,true)")
 
-				.Define("debug_rho","Ztautau::get_debug_info(myEvent,99)")
-                .Define("debug_mctype","Ztautau::get_debug_info_mc_type(debug_rho)")
 				  
                 )
 		
@@ -144,6 +143,7 @@ class RDFanalysis():
         branchList = [
         	"MC_event",
         	"event_type_reco",
+            "event_type_reco_noMassCheck",
         	"pi_sgn",
 			"mu_sgn",
 			"el_sgn",
@@ -156,8 +156,7 @@ class RDFanalysis():
 			"MC_rho_m",
 			"MC_a1_m",
 			"rho_pull",
-			"a1_pull",
-            "debug_mctype"
+			"a1_pull"
 		
         	
         	]

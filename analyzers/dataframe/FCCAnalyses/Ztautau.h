@@ -132,7 +132,7 @@ int classify_lep(myEvent &ev, const RVec<int> &mu_idx, const RVec<int> &el_idx, 
 int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_idx);
 int classify_MC(const RVec<int> &pdgs);
 // ==========================================
-RVec<int> get_type_safe(const RVec<myEvent> &evs);
+RVec<int> get_type_safe(const RVec<myEvent> &evs, const bool masscheck);
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
 // ==========================================
@@ -244,6 +244,11 @@ RVec<int> get_debug(const RVec<myEvent> &evs,
                                const int reco_type, const bool bool_reco,
                                const int debug_mass, const bool bool_debug_mass);
 
+
+RVec<int> get_type_debugmass(const RVec<myEvent> &evs,
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco);
+                               
 RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
                                const int mc_type, const bool bool_mc,
                                const int reco_type, const bool bool_reco);
