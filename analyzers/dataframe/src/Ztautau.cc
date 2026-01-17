@@ -345,14 +345,14 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
 
       // flag: 0,2 GeV < mass < 1.4 GeV
       if(ev.m_RecoMass>1.4 || ev.m_RecoMass<0.2) {
-        ev.m_debug = 11;
+        ev.m_debug_mass = 11;
       }
       return 4; // Type 4: Rho (pi + 1-2 gamma)
   } else if (ev.n_ph >= 3) {
 
       // flag: 0,6 < mass < 1.8 GeV
       if(ev.m_RecoMass>1.8 || ev.m_RecoMass<0.6) {
-        ev.m_debug = 11;
+        ev.m_debug_mass = 11;
       }
       ev.m_debug = 2;
       return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
@@ -363,7 +363,7 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
 
     // flag: 0,6 < mass < 1.8 GeV
       if(ev.m_RecoMass>1.8 || ev.m_RecoMass<0.6) {
-        ev.m_debug = 11;
+        ev.m_debug_mass = 11;
       }
     return 5; // Type 5: a1 (3-prong mode)
   }
@@ -378,7 +378,7 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs, const bool masscheck) {
   out.reserve(evs.size());
   for (const auto &e : evs) {
     if(masscheck && e.m_debug_mass != 1 && e.m_debug_mass != 11) out.push_back(e.m_type);
-    else if (!masscheck && e.m_debug != 1) out.push_back(e.m_type);
+    else if (!masscheck && e.m_debug_mass != 1) out.push_back(e.m_type);
     else out.push_back(0);
   }
   return out;
@@ -1295,7 +1295,7 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 // ==========================================
-// MASKS AND FILTERS
+// DEBUG
 // ==========================================
 
 // ==========================================
@@ -1377,23 +1377,16 @@ RVec<int> get_weight_mask(const RVec<myEvent> &evs) {
   return mask;
 }
 
-RVec<int> get_debug(const RVec<myEvent> &evs,
-                               const int mc_type, const bool bool_mc,
-                               const int reco_type, const bool bool_reco,
-                               const int debug_mass, const bool bool_debug_mass) {
+RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type) {
   RVec<int> out;
   for (const auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
     // check reco event
-    if (bool_reco && e.m_type != reco_type)
+    if (e.m_type != reco_type)
       continue;
-    // check for invariant mass overflow
-    if (bool_debug_mass && e.m_debug_mass != debug_mass)
+    //check debug_mass
+    if(e.m_debug_mass != 11)
       continue;
-    // push back debug value
-    out.push_back(e.m_debug);
+    out.push_back(e.mc_type);
   }
   return out;
 }

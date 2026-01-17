@@ -235,15 +235,11 @@ RVec<double> get_Ptau(const RVec<myEvent> &evs,
                         const bool asymmetric);
                         
 // ==========================================
-// MASKS AND FILTERS
+// DEBUG
 // ==========================================
 RVec<int> get_pi_mask(const RVec<myEvent> &evs);
 RVec<int> get_weight_mask(const RVec<myEvent> &evs);
-RVec<int> get_debug(const RVec<myEvent> &evs,
-                               const int mc_type, const bool bool_mc,
-                               const int reco_type, const bool bool_reco,
-                               const int debug_mass, const bool bool_debug_mass);
-
+RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type);
 
 RVec<int> get_type_debugmass(const RVec<myEvent> &evs,
                                const int mc_type, const bool bool_mc,
