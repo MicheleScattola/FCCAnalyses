@@ -736,8 +736,8 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
   double h1 = 1.0 - cos_psi_rho * cos_psi_rho;
 
   // Calculate W+ and W- 
-  double W_plus  = w1_plus * h1 + w0_plus * h0 + w1_plus * h1;
-  double W_minus = w1_minus * h1 + w0_minus * h0 + w1_minus * h1;
+  double W_plus  = w1_plus * h1 + w0_plus * h0 ;
+  double W_minus = w1_minus * h1 + w0_minus * h0 ;
 
 
   double omega =  (W_plus - W_minus) / (W_plus + W_minus);
@@ -815,8 +815,8 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
   double h1 = 1.0 - cos_psi_rho * cos_psi_rho;
 
   // Calculate W+ and W- 
-  double W_plus  = w1_plus * h1 + w0_plus * h0 + w1_plus * h1;
-  double W_minus = w1_minus * h1 + w0_minus * h0 + w1_minus * h1;
+  double W_plus  = w1_plus * h1 + w0_plus * h0 ;
+  double W_minus = w1_minus * h1 + w0_minus * h0 ;
 
 
   double omega =  (W_plus - W_minus) / (W_plus + W_minus);
