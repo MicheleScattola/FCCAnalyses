@@ -674,7 +674,12 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
 
   // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
   // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
-  
+  // check sqrt argument
+  if(m_rho*m_rho - 4.0*SM_PI*SM_PI <= 0){
+    ev.m_debug = 99;
+    // should check if these are events with missing photons or just wrong ids
+    return -999;
+  }
   double cos_psi_rho = (m_rho / sqrt(m_rho*m_rho - 4.0*SM_PI*SM_PI)) * (p4_pip.E() - p4_pi0.E()) / P_rho;
 
   if (cos_psi_rho > 1.0) {
@@ -751,23 +756,20 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
                      const TLorentzVector &p4_pi0) {
 
   
-  // 1. Get Mass and Energies from the 4-vectors
+  // get MC variables
   double m_rho = p4_rho.M();
   double E_rho = p4_rho.E();
   double E_tau = p4_tau.E();
   double P_rho = p4_rho.P();
 
-  // 2. Calculate cos(psi_tau) [Angle of rho in tau rest frame]
-  // cos_psi_tau = (2x - 1 - m_rho^2/m_tau^2) / (1 - m_rho^2/m_tau^2)
-  // where x = E_rho / E_tau
+  // calculate cos(psi_tau) [Angle of rho in tau rest frame]
   
   double cos_psi_tau = GetCosThetaStar(p4_tau, p4_rho);
 
   if (cos_psi_tau > 1.0)  cos_psi_tau = 1.0;
   if (cos_psi_tau < -1.0) cos_psi_tau = -1.0;
 
-  // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
-  // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
+  // calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
   
   double cos_psi_rho = GetCosThetaStar(p4_rho, p4_pip);
 
@@ -781,11 +783,7 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
     cerr << "[WARNING]: cos(psi_tau) out of bounds: " << cos_psi_tau << " , reco evt = " << ev.m_type << endl;
   } 
 
-  // 4. Compute Omega
   double psi_tau = acos(cos_psi_tau);
-
-  // Wigner Rotation Angle eta 
-  // tan(eta/2) = (m_rho/m_tau) * tan(psi_tau/2)
   double tan_theta_2 = tan(psi_tau / 2.0);
   double eta = 2.0 * atan( (m_rho / SM_TAU) * tan_theta_2 );
 
@@ -1007,6 +1005,9 @@ RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
       continue;
     // impose invariant mass check
     if ((masscheck && e.m_debug_mass == 1) || (masscheck && e.m_debug_mass == 11))
+      continue;
+    // impose cos limits with m_debug
+    if (masscheck && e.m_debug == 99)
       continue;
     // omega_rho
     TLorentzVector p4_tau, p4_rho, p4_pip, p4_pi0;
