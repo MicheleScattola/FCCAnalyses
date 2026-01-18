@@ -15,7 +15,7 @@
 namespace Fitter {
 
     // =========================================================
-    // INTERNAL HELPERS (Hidden from header)
+    // INTERNAL HELPERS 
     // =========================================================
     
     // Helper for Analytic Integral
@@ -31,7 +31,7 @@ namespace Fitter {
         double operator()(double *x, double *par) {
             double xx = x[0];
             double P = par[0];  // Polarization
-            double N = par[1];  // N of events, ideally fixed by histo integral
+            double N = par[1];  // N of events, fixed by histo integral
             double bw = par[2]; // bin_width
             
             double W = 1./3.*( (5 - 9*xx*xx + 4*xx*xx*xx) + P * (1 - 9*xx*xx + 8*xx*xx*xx) );
@@ -42,8 +42,8 @@ namespace Fitter {
         }
     };
 
-    // Functor for Template Fit (Linear Combination)
-    // Models Data = Norm * [ ((1+P)/2)*H_plus + ((1-P)/2)*H_minus ]
+    // Functor for Template Fit 
+    // Data = Norm * [ ((1+P)/2)*H_plus + ((1-P)/2)*H_minus ]
     struct TemplateFunctor {
         TH1D *h_p, *h_m; 
         
@@ -53,32 +53,29 @@ namespace Fitter {
         double operator()(double *x, double *par) {
             double xx = x[0];
             
-            // 1. Find the bin corresponding to x
+            
             // We assume templates and data have identical binning
             int bin = h_p->FindBin(xx);
             
-            // 2. Get bin contents (Probability)
             double y_p = h_p->GetBinContent(bin);
             double y_m = h_m->GetBinContent(bin);
 
-            // 3. Define Parameters
-            // par[0] = Normalization (Total Data Events)
-            // par[1] = Polarization P (Range: -1 to +1)
+            // par[0] = Normalization
+            // par[1] = Polarization P 
             double N = par[0];
             double P = par[1];
 
-            // 4. Calculate Linear Combination
             // P = (N+ - N-) / (N+ + N-)
             // Coeffs: c+ = (1+P)/2, c- = (1-P)/2
-            double weight_p = (1.0 + P) / 2.0;
-            double weight_m = (1.0 - P) / 2.0;
+            double c_plus = (1.0 + P) / 2.0;
+            double c_minus = (1.0 - P) / 2.0;
 
-            return N * (weight_p * y_p + weight_m * y_m);
+            return N * (c_plus * y_p + c_minus * y_m);
         }
     };
 
-// =========================================================
-    // IMPLEMENTATION 1: TEMPLATE FIT (Using TF1 Linear Combo)
+    // =========================================================
+    //TEMPLATE FIT (Using TF1 Linear Combo)
     // =========================================================
     FitResult fit(const std::string& infile_data,
                   const std::string& infile_templates,
@@ -96,7 +93,7 @@ namespace Fitter {
 
         std::cout << "[Fitter] Starting Template Fit for " << plot_title << std::endl;
 
-        // 1. Recover Templates
+        //Recover Templates
         TFile *fTemp = TFile::Open(infile_templates.c_str(), "READ");
         if (!fTemp || fTemp->IsZombie()) {
             std::cerr << "[Fitter] Error: Cannot open templates: " << infile_templates << std::endl;
@@ -114,12 +111,11 @@ namespace Fitter {
         h_plus->SetDirectory(0); h_minus->SetDirectory(0);
         fTemp->Close();
 
-        // --- CRITICAL STEP: Normalize Templates to Unity ---
-        // This ensures par[0] represents the total number of events in Data
+        // normalizing to 1 for safety (templates should already be PDFs)
         if (h_plus->Integral() > 0)  h_plus->Scale(1.0 / h_plus->Integral());
         if (h_minus->Integral() > 0) h_minus->Scale(1.0 / h_minus->Integral());
 
-        // 2. Get Data
+        // retrieve data
         ROOT::EnableImplicitMT();
         ROOT::RDataFrame df(treeName, infile_data);
         if (!df.HasColumn(dataColName)) {
@@ -133,24 +129,20 @@ namespace Fitter {
         auto h_data_ptr = df.Histo1D({"h_data", (plot_title + ";" + x_axis_title + ";Events").c_str(), nBins, xMin, xMax}, dataColName);
         TH1D *h_data = (TH1D*)h_data_ptr->Clone("data");
         h_data->SetDirectory(0);
-        h_data->Sumw2(); // Handle weights correctly
+        h_data->Sumw2();
 
-        // 3. TF1 Linear Fit (Replaces TFractionFitter)
+        // linear fit with functor
         TemplateFunctor functor(h_plus, h_minus);
-        // "2" is the number of parameters (Norm, P)
         TF1 *f_fit = new TF1("f_template", functor, xMin, xMax, 2);
         
         // Setup Parameters
         f_fit->SetParName(0, "Norm");
         f_fit->SetParName(1, "P_tau");
-        
-        // Initialize: Norm = Data Integral, P = 0
         f_fit->FixParameter(0, h_data->Integral());
-        f_fit->SetParameter(1, -0.15); // Start guess
+        f_fit->SetParameter(1, -0.15); 
         
-        // Fit! 
-        // L = Log Likelihood (Better for low stats bins)
-        // S = Save result
+    
+        // L = Log Likelihood
         // Q = Quiet
         TFitResultPtr fitStatus = h_data->Fit(f_fit, "L Q");
 
@@ -160,26 +152,25 @@ namespace Fitter {
              return result;
         }
 
-        // 4. Results
+        // results
         double P_val = f_fit->GetParameter(1);
         double P_err = f_fit->GetParError(1);
         double Norm  = f_fit->GetParameter(0);
 
         result.P_tau = P_val;
         result.P_err = P_err;
-        // Calculated fractions based on P
+        // event fractions
         result.f_plus  = (1.0 + P_val) / 2.0; 
         result.f_minus = (1.0 - P_val) / 2.0;
         result.success = true;
 
         std::cout << "[Fitter] " << plot_title << " (Template TF1) | P_tau: " << result.P_tau << " +/- " << result.P_err << std::endl;
 
-        // 5. Plotting
+        // plotting
         gStyle->SetOptStat(0);
         TCanvas *c = new TCanvas("c", "Fit", 800, 600);
         
-        // Scale templates for visualization to match the fit Norm
-        // (Remember we normalized them to 1.0 earlier)
+        // scale templates to data
         TH1D* h_plus_plot = (TH1D*)h_plus->Clone("h_plus_plot");
         TH1D* h_minus_plot = (TH1D*)h_minus->Clone("h_minus_plot");
         
@@ -206,7 +197,7 @@ namespace Fitter {
         h_result_total->SetLineStyle(1);
         h_result_total->SetFillStyle(0);
         
-        // Remove fit function from histogram to avoid drawing it
+        // remove fit function from histogram to avoid drawing it
         h_data->GetListOfFunctions()->Clear();
         
         h_data->Draw("E1 X0 P"); 
@@ -229,7 +220,7 @@ namespace Fitter {
     }
 
     // =========================================================
-    // IMPLEMENTATION 2: ANALYTIC FIT
+    // ANALYTIC FIT
     // =========================================================
     FitResult fit(const std::string& infile_data,
                   const std::string& outdir,
@@ -259,7 +250,7 @@ namespace Fitter {
         int N = h_data->Integral();
         if (N==0) return result;
 
-        // 2. Analytic Function
+        // analytic functor for denominator normalization (fitting range)
         AnalyticFunctor functor(xmin, xmax);
         TF1 *f_fit = new TF1("f_ana", functor, xmin, xmax, 3);
         f_fit->SetParName(0, "P_tau");
@@ -267,7 +258,7 @@ namespace Fitter {
         f_fit->FixParameter(1, N);
         f_fit->FixParameter(2, h_data->GetBinWidth(1));
 
-        // 3. Fit
+        // fit
         gStyle->SetOptStat(0);
         h_data->Fit(f_fit, "R Q M E");
 
@@ -277,7 +268,7 @@ namespace Fitter {
 
         std::cout << "[Fitter] " << plot_title << " (Analytic) | P_tau: " << result.P_tau << " +/- " << result.P_err << std::endl;
 
-        // 4. Plotting
+        // plotting
         TCanvas *c = new TCanvas("c_ana", "Analytic Fit", 800, 600);
         
         // Draw H+ / H- reference curves

@@ -350,7 +350,7 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx, const RVec<int> &rp2mc_i
       }
       ev.m_debug = 2;
       return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
-  }
+    }
   }
   if (ev.n_pi == 3) {
   	ev.m_debug = 3;
@@ -562,6 +562,15 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
       p4_rho_lab += p4_pi0_lab;
       ev.mc_pi0P4 = p4_pi0_lab;
     } 
+    //adding possible photons
+    else if (abs(dau.PDG) == 22) {
+      TLorentzVector p4_gamma_lab;
+      p4_gamma_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                         dau.mass);
+      p4_rho_lab += p4_gamma_lab;
+      cout << "[INFO]: FSR photon found in rho MC decay!" << endl;
+      ev.mc_piP4 = += p4_gamma_lab;
+    }
   }
   ev.mc_daughterP4 = p4_rho_lab;
   double mRho = p4_rho_lab.M();
@@ -854,9 +863,7 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     TLorentzVector p4_dau;
     p4_dau.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z, dau.mass);
 
-    // Check PDG
-    // Charged Pion (211) or Kaon (321) treated as pion for rho approx
-    if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321) { 
+    if (abs(dau.PDG) == 211 ) { 
       p4_pip_lab = p4_dau;
       ev.mc_piP4 = p4_dau;
       found_pip = true;
@@ -1188,6 +1195,10 @@ RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
     if (bool_reco && e.m_type != reco_type)
       continue;
     // invariant mass
+    // check debug
+    if()(e.m_debug_mass == 1 || e.m_debug_mass == 11){
+      continue;
+    }
     out.push_back(e.m_RecoMass);
   }
   return out;
@@ -1205,6 +1216,10 @@ RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
+    // check mass debug
+    if(e.m_debug_mass == 1 || e.m_debug_mass == 11){
+      continue;
+    }
     // meson mass
     out.push_back(e.mc_daughterMass - e.m_RecoMass);
   }

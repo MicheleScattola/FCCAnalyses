@@ -7,7 +7,7 @@
 
 namespace Fitter {
 
-    // Common Result Structure
+    // Result struct
     struct FitResult {
         double P_tau;       // Polarization
         double P_err;       // Error
@@ -18,8 +18,7 @@ namespace Fitter {
     };
 
     // =========================================================
-    // OVERLOAD 1: TEMPLATE FIT (TFractionFitter)
-    // Used for: Rho, Pi, (and Leptons if desired)
+    // TEMPLATE FIT (generic)
     // =========================================================
     FitResult fit(const std::string& infile_data,
                   const std::string& infile_templates,
@@ -34,8 +33,7 @@ namespace Fitter {
                   );
 
     // =========================================================
-    // OVERLOAD 2: ANALYTIC FIT
-    // Used for: Leptons only (Muon, Electron)
+    // ANALYTIC FIT (leptons)
     // =========================================================
     FitResult fit(const std::string& infile_data,
                   const std::string& outdir,
