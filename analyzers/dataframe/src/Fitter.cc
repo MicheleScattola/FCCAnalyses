@@ -165,7 +165,7 @@ namespace Fitter {
         f_fit->SetParameter(1, total_events / 2.0);
         
         // 4. Perform Fit
-        TFitResultPtr fitStatus = h_data->Fit(f_fit, "L S Q M E"); // S needed for Covariance Matrix access
+        TFitResultPtr fitStatus = h_data->Fit(f_fit, "L S Q"); // S needed for Covariance Matrix access
 
         if ((Int_t)fitStatus != 0) {
             std::cerr << "[Fitter] Fraction Fit failed." << std::endl;
@@ -325,7 +325,7 @@ namespace Fitter {
         // Q = Quiet
         // M = Improved Errors (alg from TMinuit)
         // E = Better errors estimation (Minos technique)
-        TFitResultPtr fitStatus = h_data->Fit(f_fit, "L Q M E ");
+        TFitResultPtr fitStatus = h_data->Fit(f_fit, "L Q");
 
         if ((Int_t)fitStatus != 0) {
             std::cerr << "[Fitter] Template Fit failed." << std::endl;
