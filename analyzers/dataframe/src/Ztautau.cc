@@ -569,7 +569,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                          dau.mass);
       p4_rho_lab += p4_gamma_lab;
       cout << "[INFO]: FSR photon found in rho MC decay!" << endl;
-      ev.mc_piP4 = += p4_gamma_lab;
+      ev.mc_piP4 += p4_gamma_lab;
     }
   }
   ev.mc_daughterP4 = p4_rho_lab;
@@ -1196,7 +1196,7 @@ RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
       continue;
     // invariant mass
     // check debug
-    if()(e.m_debug_mass == 1 || e.m_debug_mass == 11){
+    if(e.m_debug_mass == 1 || e.m_debug_mass == 11){
       continue;
     }
     out.push_back(e.m_RecoMass);
