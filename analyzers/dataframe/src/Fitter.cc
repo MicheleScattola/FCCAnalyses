@@ -11,6 +11,9 @@
 #include "TFractionFitter.h"
 #include "TObjArray.h"
 #include "ROOT/RDataFrame.hxx"
+#include "TMatrixDSym.h"
+#include "TFitResult.h"
+#include "Fit/FitResult.h"
 
 namespace Fitter {
 
@@ -96,7 +99,7 @@ namespace Fitter {
     // =========================================================
     // OLD METHOD: FRACTION FIT (Fit N+, N- then Error Prop)
     // =========================================================
-    FitResult fit_fraction(const std::string& infile_data,
+    myFit fit_fraction(const std::string& infile_data,
                            const std::string& infile_templates,
                            const std::string& outdir,
                            const std::string& output_filename, 
@@ -108,7 +111,7 @@ namespace Fitter {
                            const std::string& x_axis_title      
                            ) 
     {
-        FitResult result = {0,0,0,0,false, "Fraction"};
+        myFit result = {0,0,0,0,false, "Fraction"};
 
         std::cout << "[Fitter] Starting Fraction Fit (N+, N-) for " << plot_title << std::endl;
 
@@ -253,7 +256,7 @@ namespace Fitter {
     // =========================================================
     //TEMPLATE FIT (Using TF1 Linear Combo)
     // =========================================================
-    FitResult fit(const std::string& infile_data,
+    myFit fit(const std::string& infile_data,
                   const std::string& infile_templates,
                   const std::string& outdir,
                   const std::string& output_filename, 
@@ -265,7 +268,7 @@ namespace Fitter {
                   const std::string& x_axis_title     
                   ) 
     {
-        FitResult result = {0,0,0,0,false, "Template"};
+        myFit result = {0,0,0,0,false, "Template"};
 
         std::cout << "[Fitter] Starting Template Fit for " << plot_title << std::endl;
 
@@ -400,7 +403,7 @@ namespace Fitter {
     // =========================================================
     // ANALYTIC FIT
     // =========================================================
-    FitResult fit(const std::string& infile_data,
+    myFit fit(const std::string& infile_data,
                   const std::string& outdir,
                   const std::string& output_filename, 
                   const std::string& treeName,
@@ -411,7 +414,7 @@ namespace Fitter {
                   double xmax
                   )
     {
-        FitResult result = {0,0,0,0,false, "Analytic"};
+        myFit result = {0,0,0,0,false, "Analytic"};
 
         // 1. Get Data
         ROOT::EnableImplicitMT();

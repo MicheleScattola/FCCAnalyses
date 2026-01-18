@@ -8,7 +8,7 @@
 namespace Fitter {
 
     // Result struct
-    struct FitResult {
+    struct myFit {
         double P_tau;       // Polarization
         double P_err;       // Error
         double f_plus;      // Fraction H+ (Template only)
@@ -20,7 +20,7 @@ namespace Fitter {
     // =========================================================
     // OLD METHOD: FRACTION FIT (Fit N+, N- then Error Prop)
     // =========================================================
-    FitResult fit_fraction(const std::string& infile_data,
+    myFit fit_fraction(const std::string& infile_data,
                            const std::string& infile_templates,
                            const std::string& outdir,
                            const std::string& output_filename, 
@@ -35,7 +35,7 @@ namespace Fitter {
     // =========================================================
     // TEMPLATE FIT (generic)
     // =========================================================
-    FitResult fit(const std::string& infile_data,
+    myFit fit(const std::string& infile_data,
                   const std::string& infile_templates,
                   const std::string& outdir,
                   const std::string& output_filename, 
@@ -50,7 +50,7 @@ namespace Fitter {
     // =========================================================
     // ANALYTIC FIT (leptons)
     // =========================================================
-    FitResult fit(const std::string& infile_data,
+    myFit fit(const std::string& infile_data,
                   const std::string& outdir,
                   const std::string& output_filename, 
                   const std::string& treeName,
