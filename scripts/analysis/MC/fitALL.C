@@ -18,7 +18,7 @@ void fitALL() {
     std::cout << ">>> Starting Polarization Fits..." << std::endl;
 
     // =========================================================================
-    // 2. TEMPLATE FITS (TFractionFitter)
+    // 2. TEMPLATE FITS (1 parameter P)
     // =========================================================================
     
     // --- Rho Channel ---
@@ -81,6 +81,50 @@ void fitALL() {
                 "Electron Channel (Analytic)", 
                 "x_{e}",
                 0.05, 1.0  // xmin, xmax
+    );
+
+    // =========================================================================
+    // 4. TEMPLATE FITS (2 parameters N+ N-)
+    // =========================================================================
+    
+    // --- Rho Channel ---
+    Fitter::fit_fraction(infile_data, infile_templates, outdir, 
+                "OLD_rho.pdf",           // Output filename
+                treeName, "rho_sgn",        // Data Column
+                "h_template_rho_plus",      // Template +
+                "h_template_rho_minus",     // Template -
+                "Rho Channel (old 2 parameters)",   // Title
+                "#omega_{#rho}"             // X-axis label
+    );
+
+    // --- Pion Channel ---
+    Fitter::fit_fraction(infile_data, infile_templates, outdir, 
+                "OLD_pi.pdf", 
+                treeName, "pi_sgn", 
+                "h_template_pi_plus", 
+                "h_template_pi_minus", 
+                "Pion Channel (old 2 parameters)", 
+                "x_{#pi}"
+    );
+
+    // --- Muon Channel (old 2 parameters) ---
+    Fitter::fit_fraction(infile_data, infile_templates, outdir, 
+                "OLD_mu.pdf", 
+                treeName, "mu_sgn", 
+                "h_template_mu_plus", 
+                "h_template_mu_minus", 
+                "Muon Channel (old 2 parameters)", 
+                "x_{#mu}"
+    );
+
+    // --- Electron Channel (old 2 parameters) ---
+    Fitter::fit_fraction(infile_data, infile_templates, outdir, 
+                "OLD_el.pdf", 
+                treeName, "el_sgn", 
+                "h_template_el_plus", 
+                "h_template_el_minus", 
+                "Electron Channel (old 2 parameters)", 
+                "x_{e}"
     );
 
     std::cout << ">>> All fits completed." << std::endl;

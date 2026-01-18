@@ -72,16 +72,19 @@ void create_and_save(ROOT::RDF::RNode df,
     h_plus->SetMaximum(max_y * 1.25);
     h_plus->SetMinimum(0.);
     
-    h_plus->SetTitle(("Polarization Templates " + label + " (Split Sample);x (re-weighted);Probability Density").c_str());
-
+    h_plus->SetTitle(("Polarization template: " + label + " (Split Sample);x (re-weighted);Probability Density").c_str());
+    if(suffix == "rho") {
+        h_plus->SetTitle(("Polarization template: " + label + " (Split Sample);#omega (re-weighted);Probability Density").c_str());
+    }
+    
     h_plus->Draw("HIST");
     h_minus->Draw("HIST SAME");
 
     // Legend
     TLegend *leg = new TLegend(0.65, 0.75, 0.88, 0.88);
     leg->SetBorderSize(0);
-    leg->AddEntry(h_plus,  "Helicity +1 (Even Events)", "f");
-    leg->AddEntry(h_minus, "Helicity -1 (Odd Events)", "f");
+    leg->AddEntry(h_plus,  "Helicity +1", "f");
+    leg->AddEntry(h_minus, "Helicity -1", "f");
     leg->Draw();
 
     // save pdf
