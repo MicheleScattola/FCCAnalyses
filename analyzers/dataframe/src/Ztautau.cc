@@ -371,7 +371,16 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs, const bool masscheck) {
   RVec<int> out;
   out.reserve(evs.size());
   for (const auto &e : evs) {
-    if(masscheck && e.m_debug_mass != 1 && e.m_debug_mass != 11) out.push_back(e.m_type);
+    if(masscheck && e.m_debug_mass != 1 && e.m_debug_mass != 11){
+      
+      // impose 2 gev energy cut for pion decays
+      if(e.m_type == 3 && e.m_RecoEnergy < 2.0){
+        out.push_back(0);
+        continue;
+      }
+      out.push_back(e.m_type);
+
+    }
     else if (!masscheck && e.m_debug_mass != 1) out.push_back(e.m_type);
     else out.push_back(0);
   }
@@ -716,20 +725,20 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
 
   // Calculate w_0 and w_1 components 
   // w0+
-  double term0p = SM_TAU * cos_eta * cos_theta_2 + SM_TAU * sin_eta * sin_theta_2;
+  double term0p = SM_TAU * cos_eta * cos_theta_2 + m_rho * sin_eta * sin_theta_2;
   double w0_plus = term0p * term0p;
 
   // w0-
-  double term0m = SM_TAU * cos_eta * sin_theta_2 - SM_TAU * sin_eta * cos_theta_2;
+  double term0m = SM_TAU * cos_eta * sin_theta_2 - m_rho * sin_eta * cos_theta_2;
   double w0_minus = term0m * term0m;
 
-  // w1+
-  double term1p = SM_TAU * sin_eta * cos_theta_2 - SM_TAU * cos_eta * sin_theta_2;
-  double w1_plus = (term1p * term1p) + (SM_TAU * SM_TAU * sin_theta_2 * sin_theta_2);
+  // w1 +
+  double term1 = SM_TAU * sin_eta * cos_theta_2 - m_rho* cos_eta * sin_theta_2;
+  double w1_plus = (term1p * term1p) + (m_rho * m_rho * sin_theta_2 * sin_theta_2);
 
-  // w1-
-  double term1m = SM_TAU * sin_eta * sin_theta_2 + SM_TAU * cos_eta * cos_theta_2;
-  double w1_minus = (term1m * term1m) + (SM_TAU * SM_TAU * cos_theta_2 * cos_theta_2);
+  // w1 -
+  double term1m = SM_TAU * sin_eta * sin_theta_2 + m_rho * cos_eta * cos_theta_2;
+  double w1_minus = (term1m * term1m) + (m_rho * m_rho * cos_theta_2 * cos_theta_2);
 
   // Calculate h functions 
   double h0 = 2.0 * cos_psi_rho * cos_psi_rho;
@@ -795,20 +804,20 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
 
   // Calculate w_0 and w_1 components 
   // w0+
-  double term0p = SM_TAU * cos_eta * cos_theta_2 + SM_TAU * sin_eta * sin_theta_2;
+  double term0p = SM_TAU * cos_eta * cos_theta_2 + m_rho * sin_eta * sin_theta_2;
   double w0_plus = term0p * term0p;
 
   // w0-
-  double term0m = SM_TAU * cos_eta * sin_theta_2 - SM_TAU * sin_eta * cos_theta_2;
+  double term0m = SM_TAU * cos_eta * sin_theta_2 - m_rho * sin_eta * cos_theta_2;
   double w0_minus = term0m * term0m;
 
-  // w1+
-  double term1p = SM_TAU * sin_eta * cos_theta_2 - SM_TAU * cos_eta * sin_theta_2;
-  double w1_plus = (term1p * term1p) + (SM_TAU * SM_TAU * sin_theta_2 * sin_theta_2);
+  // w1 +
+  double term1 = SM_TAU * sin_eta * cos_theta_2 - m_rho* cos_eta * sin_theta_2;
+  double w1_plus = (term1p * term1p) + (m_rho * m_rho * sin_theta_2 * sin_theta_2);
 
-  // w1-
-  double term1m = SM_TAU * sin_eta * sin_theta_2 + SM_TAU * cos_eta * cos_theta_2;
-  double w1_minus = (term1m * term1m) + (SM_TAU * SM_TAU * cos_theta_2 * cos_theta_2);
+  // w1 -
+  double term1m = SM_TAU * sin_eta * sin_theta_2 + m_rho * cos_eta * cos_theta_2;
+  double w1_minus = (term1m * term1m) + (m_rho * m_rho * cos_theta_2 * cos_theta_2);
 
   // Calculate h functions 
   double h0 = 2.0 * cos_psi_rho * cos_psi_rho;
