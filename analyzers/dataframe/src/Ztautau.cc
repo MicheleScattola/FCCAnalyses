@@ -733,7 +733,7 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
   double w0_minus = term0m * term0m;
 
   // w1 +
-  double term1 = SM_TAU * sin_eta * cos_theta_2 - m_rho* cos_eta * sin_theta_2;
+  double term1p = SM_TAU * sin_eta * cos_theta_2 - m_rho* cos_eta * sin_theta_2;
   double w1_plus = (term1p * term1p) + (m_rho * m_rho * sin_theta_2 * sin_theta_2);
 
   // w1 -
@@ -812,7 +812,7 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
   double w0_minus = term0m * term0m;
 
   // w1 +
-  double term1 = SM_TAU * sin_eta * cos_theta_2 - m_rho* cos_eta * sin_theta_2;
+  double term1p = SM_TAU * sin_eta * cos_theta_2 - m_rho* cos_eta * sin_theta_2;
   double w1_plus = (term1p * term1p) + (m_rho * m_rho * sin_theta_2 * sin_theta_2);
 
   // w1 -
