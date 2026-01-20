@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include <glob.h>
 #include <cmath>
 
@@ -133,40 +134,86 @@ void fitALL() {
     std::cout << "RESULTS SUMMARY" << std::endl;
     std::cout << "========================================\n" << std::endl;
 
-    double mean, stddev;
+    double mean_el, stddev_el, mean_mu, stddev_mu, mean_pi, stddev_pi, mean_rho, stddev_rho;
 
     // Electron Channel
-    calculateStats(P_el, mean, stddev);
+    calculateStats(P_el, mean_el, stddev_el);
     std::cout << "Electron Channel:" << std::endl;
     std::cout << "  Number of successful fits: " << P_el.size() << std::endl;
-    std::cout << "  Mean P_tau: " << mean << std::endl;
-    std::cout << "  Std Dev:    " << stddev << std::endl;
+    std::cout << "  Mean P_tau: " << mean_el << std::endl;
+    std::cout << "  Std Dev:    " << stddev_el << std::endl;
     std::cout << std::endl;
 
     // Muon Channel
-    calculateStats(P_mu, mean, stddev);
+    calculateStats(P_mu, mean_mu, stddev_mu);
     std::cout << "Muon Channel:" << std::endl;
     std::cout << "  Number of successful fits: " << P_mu.size() << std::endl;
-    std::cout << "  Mean P_tau: " << mean << std::endl;
-    std::cout << "  Std Dev:    " << stddev << std::endl;
+    std::cout << "  Mean P_tau: " << mean_mu << std::endl;
+    std::cout << "  Std Dev:    " << stddev_mu << std::endl;
     std::cout << std::endl;
 
     // Pion Channel
-    calculateStats(P_pi, mean, stddev);
+    calculateStats(P_pi, mean_pi, stddev_pi);
     std::cout << "Pion Channel:" << std::endl;
     std::cout << "  Number of successful fits: " << P_pi.size() << std::endl;
-    std::cout << "  Mean P_tau: " << mean << std::endl;
-    std::cout << "  Std Dev:    " << stddev << std::endl;
+    std::cout << "  Mean P_tau: " << mean_pi << std::endl;
+    std::cout << "  Std Dev:    " << stddev_pi << std::endl;
     std::cout << std::endl;
 
     // Rho Channel
-    calculateStats(P_rho, mean, stddev);
+    calculateStats(P_rho, mean_rho, stddev_rho);
     std::cout << "Rho Channel:" << std::endl;
     std::cout << "  Number of successful fits: " << P_rho.size() << std::endl;
-    std::cout << "  Mean P_tau: " << mean << std::endl;
-    std::cout << "  Std Dev:    " << stddev << std::endl;
+    std::cout << "  Mean P_tau: " << mean_rho << std::endl;
+    std::cout << "  Std Dev:    " << stddev_rho << std::endl;
     std::cout << std::endl;
 
     std::cout << "========================================" << std::endl;
+    
+    // =========================================================================
+    // 5. SAVE RESULTS TO FILE
+    // =========================================================================
+    
+    std::string output_file = data_dir + "fit_results_summary.txt";
+    std::ofstream outfile(output_file);
+    
+    if (outfile.is_open()) {
+        outfile << "========================================" << std::endl;
+        outfile << "POLARIZATION FIT RESULTS SUMMARY" << std::endl;
+        outfile << "========================================" << std::endl;
+        outfile << std::endl;
+        
+        outfile << "Electron Channel:" << std::endl;
+        outfile << "  Number of successful fits: " << P_el.size() << std::endl;
+        outfile << "  Mean P_tau: " << mean_el << std::endl;
+        outfile << "  RMS:        " << stddev_el << std::endl;
+        outfile << std::endl;
+        
+        outfile << "Muon Channel:" << std::endl;
+        outfile << "  Number of successful fits: " << P_mu.size() << std::endl;
+        outfile << "  Mean P_tau: " << mean_mu << std::endl;
+        outfile << "  RMS:        " << stddev_mu << std::endl;
+        outfile << std::endl;
+        
+        outfile << "Pion Channel:" << std::endl;
+        outfile << "  Number of successful fits: " << P_pi.size() << std::endl;
+        outfile << "  Mean P_tau: " << mean_pi << std::endl;
+        outfile << "  RMS:        " << stddev_pi << std::endl;
+        outfile << std::endl;
+        
+        outfile << "Rho Channel:" << std::endl;
+        outfile << "  Number of successful fits: " << P_rho.size() << std::endl;
+        outfile << "  Mean P_tau: " << mean_rho << std::endl;
+        outfile << "  RMS:        " << stddev_rho << std::endl;
+        outfile << std::endl;
+        
+        outfile << "========================================" << std::endl;
+        outfile.close();
+        
+        std::cout << "Results saved to: " << output_file << std::endl;
+    } else {
+        std::cerr << "Error: Could not open output file: " << output_file << std::endl;
+    }
+    
     std::cout << ">>> All fits completed." << std::endl;
 }

@@ -38,11 +38,11 @@ for i in range(n_template_jobs):
     abs_list_path = os.path.abspath(list_name)
     job_manifest.append(f"{abs_list_path} {output_root} templates.py")
 
-# 2. Create 30 Lists for Fits (Next 1M events each - 10 files per job)
+# 2. Create 80 Lists for Fits (Next 1M events each - 10 files per job)
 # Start after the template files
 start_idx = n_template_files
 n_fit_files = 10 # 1M events
-n_jobs = 30
+n_jobs = 80
 
 for i in range(n_jobs):
     end_idx = start_idx + n_fit_files
