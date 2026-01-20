@@ -9,8 +9,12 @@ output_file = os.path.join(base_path, "templates_merged.root")
 # Find all templates_*.root files
 template_files = sorted(glob.glob(os.path.join(base_path, "templates_*.root")))
 
+# Exclude templates_histograms.root and templates_merged.root
+exclude_files = {"templates_histograms.root", "templates_merged.root"}
+template_files = [f for f in template_files if os.path.basename(f) not in exclude_files]
+
 if not template_files:
-    print(f"No templates_*.root files found in {base_path}")
+    print(f"No template files found in {base_path}")
     exit(1)
 
 print(f"Found {len(template_files)} template files:")
