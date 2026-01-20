@@ -69,6 +69,8 @@ class RDFanalysis():
 				.Define("RP_thrustcostheta","return EVT_thrust[5]/ sqrt(EVT_thrust[1]*EVT_thrust[1]   + EVT_thrust[3]*EVT_thrust[3]   + EVT_thrust[5]*EVT_thrust[5])")
 				.Define("RP_thrustphi", "return atan2(EVT_thrust[3],EVT_thrust[1])")
 				
+				.Filter("abs(RP_thrustcostheta)<0.95")
+                
 				#####
 				# RECONSTRUCTED PARTICLES
 				#####

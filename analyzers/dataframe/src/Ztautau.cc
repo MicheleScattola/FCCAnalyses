@@ -651,8 +651,7 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
                      const TLorentzVector &p4_pi0) {
 
   
-  // 1. Get Mass and Energies from the 4-vectors
-  // NOTE: For Reco, these are the RECONSTRUCTED quantities
+  // get mass and energies from p4
   double m_rho = p4_rho.M();
   double E_rho = p4_rho.E();
   double E_tau = 45.5;
@@ -661,10 +660,10 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
 
   // SAFETY CHECK
   if (m_rho < 2.0 * SM_PI + 0.001) {
-     return -999.0; // Return a dummy value or handle gracefully
+     return -999.0; 
   }
 
-  // 2. Calculate cos(psi_tau) [Angle of rho in tau rest frame]
+  // angle of rho in tau rest frame
   // cos_psi_tau = (2x - 1 - m_rho^2/m_tau^2) / (1 - m_rho^2/m_tau^2)
   // where x = E_rho / E_tau
   
@@ -681,7 +680,7 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
     ev.m_debug = 99;
   }
 
-  // 3. Calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
+  // angle of charged pion in rho rest frame
   // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged - E_pi_neutral) / P_rho
   // check sqrt argument
   if(m_rho*m_rho - 4.0*SM_PI*SM_PI <= 0){
@@ -709,7 +708,7 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
     cerr << "[WARNING]: cos(psi_tau) out of bounds: " << cos_psi_tau << " , reco evt = " << ev.m_type << endl;
   } 
 
-  // 4. Compute Omega
+  // compute Omega
   double psi_tau = acos(cos_psi_tau);
 
   // Wigner Rotation Angle eta 
@@ -771,14 +770,14 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
   double E_tau = p4_tau.E();
   double P_rho = p4_rho.P();
 
-  // calculate cos(psi_tau) [Angle of rho in tau rest frame]
+  // angle of rho in tau rest frame
   
   double cos_psi_tau = GetCosThetaStar(p4_tau, p4_rho);
 
   if (cos_psi_tau > 1.0)  cos_psi_tau = 1.0;
   if (cos_psi_tau < -1.0) cos_psi_tau = -1.0;
 
-  // calculate cos(psi_rho) [Angle of charged pion in rho rest frame]
+  // aAngle of charged pion in rho rest frame
   
   double cos_psi_rho = GetCosThetaStar(p4_rho, p4_pip);
 

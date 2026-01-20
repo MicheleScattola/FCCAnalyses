@@ -33,10 +33,10 @@ namespace rv = ROOT::VecOps;
 
 const double SM_TAU = 1.77686; // tau mass in GeV
 const double SM_PI = 0.13957039;
-const double SM_sin2thetaW = 0.23148;
+const double SM_sin2thetaW = 0.2315;
 const double gv_ga = 1 - 4 * SM_sin2thetaW;
 const double SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
-const double SQRTS = 91.2; // Z pole energy
+const double SQRTS = 91.188; // Z pole energy
 const double E_TAU = SQRTS / 2; // tau energy at Z pole
 //===================================
 // custom getThrustPointing using charge instead of energy

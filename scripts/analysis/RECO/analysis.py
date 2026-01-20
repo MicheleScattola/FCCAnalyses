@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.1 , 'chunks':20},
+    'p8_ee_Ztautau_ecm91':{},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -19,8 +19,8 @@ inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 
 #Optional
 nCPUS       = 1
-runBatch    = True
-batchQueue = "espresso"
+#runBatch    = True
+#batchQueue = "espresso"
 compGroup = "group_u_FCC.local_gen"
 
 #Optional test file , run with --test
