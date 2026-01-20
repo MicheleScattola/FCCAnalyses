@@ -1,0 +1,25 @@
+========================================
+POLARIZATION FIT RESULTS SUMMARY
+========================================
+
+Electron Channel:
+  Number of successful fits: 80
+  Mean P_tau: -0.158791
+  RMS:        0.00795732
+
+Muon Channel:
+  Number of successful fits: 80
+  Mean P_tau: -0.160341
+  RMS:        0.0081781
+
+Pion Channel:
+  Number of successful fits: 80
+  Mean P_tau: -0.137575
+  RMS:        0.00385099
+
+Rho Channel:
+  Number of successful fits: 80
+  Mean P_tau: -0.135808
+  RMS:        0.0120494
+
+========================================
