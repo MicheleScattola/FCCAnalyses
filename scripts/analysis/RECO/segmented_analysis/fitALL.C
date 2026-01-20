@@ -174,7 +174,7 @@ void fitALL() {
     // 5. SAVE RESULTS TO FILE
     // =========================================================================
     
-    std::string output_file = data_dir + "fit_results_summary.txt";
+    std::string output_file = data_dir + "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/results_summary.txt";
     std::ofstream outfile(output_file);
     
     if (outfile.is_open()) {
