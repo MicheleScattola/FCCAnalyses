@@ -176,19 +176,18 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
     // find tau, loop on daughters for event type, then weight based on evt type
     for (int i = 0; i < mc.size(); i++) {
+
       const auto &p = mc[i];
       // skip if not matching decayed tau
       if (abs(p.PDG) != 15 || p.charge * ev.m_RecoCharge < 0 ||
           p.generatorStatus != 2)
         continue;
-      // found tau with matching charge and decayed status
-      ev.mc_tau_index = i;
-      TLorentzVector p4_tau_lab;
-      p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
-      ev.mc_tauP4 = p4_tau_lab;
+
+  
       // cycle daugthers and find event type
       int pb = p.daughters_begin;
       int pe = p.daughters_end;
+      bool tau_not_final = false;
 
       // sanity check
       if (pe == pb) {
@@ -201,7 +200,24 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         int dau_idx = daughters[i];
         const auto &dau = mc[dau_idx];
         dau_pdgs.push_back(abs(dau.PDG));
+
+        if(abs(dau.PDG) == 15) {
+          tau_not_final = true;
+          // exit
+          break;
+        }
       }
+      // if tau has tau daughter skip this particle, it's not final tau
+      if(tau_not_final) {
+        continue;
+      }
+
+      // found tau with matching charge and decayed status
+      ev.mc_tau_index = i;
+      TLorentzVector p4_tau_lab;
+      p4_tau_lab.SetXYZM(p.momentum.x, p.momentum.y, p.momentum.z, p.mass);
+      ev.mc_tauP4 = p4_tau_lab;
+
       ev.mc_daughters = dau_pdgs;
       // classify
       ev.mc_type = classify_MC(dau_pdgs);
