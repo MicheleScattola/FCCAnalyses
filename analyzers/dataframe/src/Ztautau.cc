@@ -179,7 +179,13 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
       const auto &p = mc[i];
       // skip if not matching decayed tau
-      if (abs(p.PDG) != 15 || p.charge * ev.m_RecoCharge < 0 ||
+      // choose tau charge based on charge of hemisphere, in order they should be : POS , NEG
+      // DO NOT RELY ON RECO CHARGES, BIASED!!!
+      double temp_charge = 0.0;
+      if(hemisphere) temp_charge = 1.0;
+      else if (!hemisphere) temp_charge = -1.0;
+
+      if (abs(p.PDG) != 15 || p.charge * temp_charge < 0 ||
           p.generatorStatus != 2)
         continue;
 
