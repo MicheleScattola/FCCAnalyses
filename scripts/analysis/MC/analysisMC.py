@@ -96,14 +96,14 @@ class RDFanalysis():
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
 				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_optimal(myEvent,3,true,3,false,false,false)")
+				.Define("pi_sgn","Ztautau::get_optimal(myEvent,3,true,3,false,false)")
                 
 				# pi signal and weights
-				.Define("rho_sgn","Ztautau::get_optimal(myEvent,4,true,4,false,false,false)")
+				.Define("rho_sgn","Ztautau::get_optimal(myEvent,4,true,4,false,false)")
                 
 				# lep signal and weights
-                .Define("el_sgn","Ztautau::get_optimal(myEvent,2,true,2,false,false,false)")
-                .Define("mu_sgn","Ztautau::get_optimal(myEvent,1,true,1,false,false,false)")
+                .Define("el_sgn","Ztautau::get_optimal(myEvent,2,true,2,false,false)")
+                .Define("mu_sgn","Ztautau::get_optimal(myEvent,1,true,1,false,false)")
 				
 				  
                 )
