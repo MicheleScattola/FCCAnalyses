@@ -83,6 +83,7 @@ struct myEvent {
   double mc_Ptau = 0.;        // tau polarization from MC
   double mc_weight_plus = 1.0;  // reweighting for h = +1
   double mc_weight_minus = 1.0; // reweighting for h = -1
+  double mc_omega = 0.;        // optimal variable for each channel
   bool m_found = false;
   TLorentzVector mc_tauP4;    // P4 of mc tau
   TLorentzVector mc_daughterP4;   // P4 of the mc daughter (whole resonance in case)
@@ -178,6 +179,10 @@ RVec<double> get_lepton_e(const RVec<myEvent> &evs, const int mc_type,
 
 RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type, const bool bool_mc,
                           const int reco_type, const bool masscheck);
+
+RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco, const bool masscheck);
 
 // ==========================================
 RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,

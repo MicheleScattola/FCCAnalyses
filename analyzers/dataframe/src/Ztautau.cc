@@ -484,6 +484,7 @@ void lepton_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 
   ev.mc_weight_plus = w_plus;
   ev.mc_weight_minus = w_minus;
+  ev.mc_omega = x;
 }
 
 void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
@@ -526,14 +527,6 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                         dau.mass);
       p4_pi_lab += p_temp;
     }
-    // adding possible photons
-    else if (abs(dau.PDG) == 22) {
-      TLorentzVector p_temp;
-      p_temp.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
-                        dau.mass);
-      p4_pi_lab += p_temp; 
-      cout << "[INFO]: photon found in pion MC decay!" << endl;
-    }
     
   }
   ev.mc_daughterP4 = p4_pi_lab;
@@ -545,6 +538,7 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 
   ev.mc_weight_plus = w_plus;
   ev.mc_weight_minus = w_minus;
+  ev.mc_omega = p4_pi_lab.E()/ev.mc_tauP4.E();
 }
 
 void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
@@ -571,7 +565,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 
   Ptau = calc_Ptau(p4_tau_lab);
   ev.mc_Ptau = Ptau;
-  TLorentzVector p4_rho_lab;
+  TLorentzVector p4_rho_lab, p4_pi_lab, p4_pi0_lab;
 
   for (int i = pb; i < pe; i++) {
     // loop on daughters, find resonance, store p4
@@ -580,29 +574,17 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     // save pion
     if (abs(dau.PDG) == 211) {
       ev.m_found = true;
-      TLorentzVector p4_pi_lab;
       p4_pi_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                         dau.mass);
-      p4_rho_lab += p4_pi_lab;
       ev.mc_piP4 = p4_pi_lab;
     } else if (abs(dau.PDG) == 111) {
       // save pi0
-      TLorentzVector p4_pi0_lab;
       p4_pi0_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
                          dau.mass);
-      p4_rho_lab += p4_pi0_lab;
       ev.mc_pi0P4 = p4_pi0_lab;
     } 
-    //adding possible photons
-    else if (abs(dau.PDG) == 22) {
-      TLorentzVector p4_gamma_lab;
-      p4_gamma_lab.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
-                         dau.mass);
-      p4_rho_lab += p4_gamma_lab;
-      cout << "[INFO]: FSR photon found in rho MC decay!" << endl;
-      ev.mc_piP4 += p4_gamma_lab;
-    }
   }
+  p4_rho_lab = p4_pi_lab + p4_pi0_lab;
   ev.mc_daughterP4 = p4_rho_lab;
   double mRho = p4_rho_lab.M();
   ev.mc_daughterMass = mRho;
@@ -611,6 +593,7 @@ void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   // weights
   ev.mc_weight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
   ev.mc_weight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
+  ev.mc_omega = geometric_omega_rho(ev,p4_tau_lab,p4_rho_lab,p4_pi_lab,p4_pi0_lab);
 }
 
 void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
@@ -1010,6 +993,31 @@ RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type, const boo
 
   return out;
 };
+
+// =========================================
+RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco, const bool masscheck){
+
+  RVec<double> out; 
+
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if ((masscheck && e.m_debug_mass == 1) || (masscheck && e.m_debug_mass == 11))
+      continue;
+    // optimal variable
+    out.push_back(e.mc_omega);
+    
+  }
+
+  return out;
+}
 
 // ==========================================
 RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
