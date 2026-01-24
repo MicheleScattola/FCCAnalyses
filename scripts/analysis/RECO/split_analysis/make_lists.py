@@ -68,5 +68,5 @@ with open("job_manifest.txt", "w") as f:
     for line in job_manifest:
         f.write(line + "\n")
 
-print(f"Created {n_template_jobs} template lists and {n_jobs} fit lists.")
+print(f"Created {n_template_jobs} template lists and {n_data_jobs} fit lists.")
 print("Generated 'job_manifest.txt' for Condor.")
