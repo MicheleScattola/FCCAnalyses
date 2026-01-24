@@ -7,9 +7,9 @@ void fitALL() {
     // =========================================================================
     // 1. CONFIGURATION
     // =========================================================================
-    const std::string infile_data = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91.root";
-    const std::string infile_templates = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/templates/templates.root";
-    const std::string outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/fits/";
+    const std::string infile_data = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/split_analysis/output_merged.root";
+    const std::string infile_templates = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/split_analysis/templates_histograms.root";
+    const std::string outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/split_analysis/";
     const std::string treeName = "events";
 
     // Ensure output directory exists (optional system call)
@@ -18,7 +18,7 @@ void fitALL() {
     std::cout << ">>> Starting Polarization Fits..." << std::endl;
 
     // =========================================================================
-    // 2. TEMPLATE FITS
+    // 2. TEMPLATE FITS 
     // =========================================================================
     
     // --- Rho Channel ---
@@ -27,7 +27,7 @@ void fitALL() {
                 treeName, "rho_sgn",        // Data Column
                 "h_template_rho_plus",      // Template +
                 "h_template_rho_minus",     // Template -
-                "Rho Channel (Template)",   // Title
+                "Rho Channel (RECO)",   // Title
                 "#omega_{#rho}"             // X-axis label
     );
 
@@ -37,7 +37,7 @@ void fitALL() {
                 treeName, "pi_sgn", 
                 "h_template_pi_plus", 
                 "h_template_pi_minus", 
-                "Pion Channel (Template)", 
+                "Pion Channel (RECO)", 
                 "x_{#pi}"
     );
 
@@ -47,7 +47,7 @@ void fitALL() {
                 treeName, "mu_sgn", 
                 "h_template_mu_plus", 
                 "h_template_mu_minus", 
-                "Muon Channel (Template)", 
+                "Muon Channel (RECO)", 
                 "x_{#mu}"
     );
 
@@ -57,7 +57,7 @@ void fitALL() {
                 treeName, "el_sgn", 
                 "h_template_el_plus", 
                 "h_template_el_minus", 
-                "Electron Channel (Template)", 
+                "Electron Channel (RECO)", 
                 "x_{e}"
     );
 
@@ -69,7 +69,7 @@ void fitALL() {
     Fitter::fit(infile_data, outdir, 
                 "reco_mu_analytical.pdf", 
                 treeName, "mu_sgn", 
-                "Muon Channel (Analytic)", 
+                "Muon Channel (RECO)", 
                 "x_{#mu}",
                 0.05, 1.0  // xmin, xmax
     );
@@ -78,7 +78,7 @@ void fitALL() {
     Fitter::fit(infile_data, outdir, 
                 "reco_el_analytical.pdf", 
                 treeName, "el_sgn", 
-                "Electron Channel (Analytic)", 
+                "Electron Channel (RECO)", 
                 "x_{e}",
                 0.05, 1.0  // xmin, xmax
     );

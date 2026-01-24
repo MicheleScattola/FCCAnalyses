@@ -184,6 +184,12 @@ RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco, const bool masscheck);
 
+
+// =========================================
+RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco, const bool masscheck);
+
 // ==========================================
 RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,

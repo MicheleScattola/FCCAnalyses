@@ -214,9 +214,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         }
       }
       // if tau has tau daughter skip this particle, it's not final tau
-      if(tau_not_final) {
-        continue;
-      }
+      if(tau_not_final) continue;
 
       // found tau with matching charge and decayed status
       ev.mc_tau_index = i;
@@ -306,17 +304,17 @@ int classify_MC(const RVec<int> &pdgs) {
       n_ph++;
   }
   // classification
-  if (n_mu == 1)
+  if (n_mu == 1 && n_ph == 0)
     return 1; // mu
-  else if (n_el == 1)
+  else if (n_el == 1 && n_ph == 0)
     return 2; // el
-  else if (n_pi == 1 && n_pi0 == 0 )
+  else if (n_pi == 1 && n_pi0 == 0 && n_ph == 0)
     return 3; // pi
-  else if (n_pi == 1 && n_pi0 == 1)
+  else if (n_pi == 1 && n_pi0 == 1 && n_ph == 0)
     return 4; // rho
   //else if (n_pi == 1 && n_pi0 == 0 && n_ph == 2)
     //return 4; // rho (not a pi0 in the decay but directly gammas)
-  else if (n_pi == 1 && n_pi0 == 2)
+  else if (n_pi == 1 && n_pi0 == 2 && n_ph == 0)
     return 5; // a1 (1prong)
   else if (n_pi == 3)
     return 5; // a1 (3prong)
@@ -474,7 +472,7 @@ void lepton_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_daughterP4 = p4_lep_lab;
   ev.mc_daughterMass = p4_lep_lab.M();
 
-  double x = ev.mc_daughterP4.E()/ev.mc_tauP4.E();
+  double x = ev.mc_daughterP4.E()/E_TAU;
 
   double a = (5.0-9.0*x*x+4.0*x*x*x);
   double b = (1.0-9.0*x*x+8.0*x*x*x);
@@ -516,7 +514,6 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   for (int i = pb; i < pe; i++) {
     int dau_idx = daughters[i];
     const auto &dau = mc[dau_idx];
-    //if (abs(dau.PDG) == 211 || abs(dau.PDG) == 321 || abs(dau.PDG) == 323) {
     
     if (abs(dau.PDG) == 211) {
       // found pion daughter
@@ -538,7 +535,7 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 
   ev.mc_weight_plus = w_plus;
   ev.mc_weight_minus = w_minus;
-  ev.mc_omega = p4_pi_lab.E()/ev.mc_tauP4.E();
+  ev.mc_omega = p4_pi_lab.E()/E_TAU;
 }
 
 void rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
@@ -659,7 +656,7 @@ double calculate_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
   // get mass and energies from p4
   double m_rho = p4_rho.M();
   double E_rho = p4_rho.E();
-  double E_tau = 45.5;
+  double E_tau = E_TAU;
   // double E_tau = p4_tau.E();
   double P_rho = p4_rho.P();
 
@@ -1013,6 +1010,32 @@ RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
       continue;
     // optimal variable
     out.push_back(e.mc_omega);
+    
+  }
+
+  return out;
+}
+
+
+// =========================================
+RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco, const bool masscheck){
+
+  RVec<double> out; 
+
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if ((masscheck && e.m_debug_mass == 1) || (masscheck && e.m_debug_mass == 11))
+      continue;
+    // optimal variable
+    out.push_back(e.m_RecoEnergy/E_TAU);
     
   }
 
