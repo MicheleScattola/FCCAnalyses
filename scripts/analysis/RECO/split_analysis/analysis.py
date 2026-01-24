@@ -109,7 +109,7 @@ class RDFanalysis():
 				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true,true)")
 				# lepton signals
                 .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true,true)")
-                .Define("mu_sgn","Ztautau::get_reco_x(myEvent,1,false,1,true,true)")
+                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.594")
 				# rho signal
                 .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
 

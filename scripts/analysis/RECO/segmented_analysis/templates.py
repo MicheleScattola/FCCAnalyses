@@ -101,7 +101,7 @@ class RDFanalysis():
 				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
 				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
+				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true,true)")
 				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,false,3,true,true,false)")
 				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,false,3,true,true,false)")
 				# rho signal
@@ -110,8 +110,8 @@ class RDFanalysis():
 				.Define("w_minus_rho","Ztautau::get_weights(-1,myEvent,4,false,4,true,true,false)")
                 
 				# lep signal and weights
-                .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,false)/45.5")
-                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.5")
+                .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true,true)")
+                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.594")
                 .Define("w_plus_el","Ztautau::get_weights(1,myEvent,2,false,2,true,true,false)")
 				.Define("w_minus_el","Ztautau::get_weights(-1,myEvent,2,false,2,true,true,false)")
                 .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,false,1,true,true,false)")
