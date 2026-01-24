@@ -41,11 +41,11 @@ for i in range(n_template_jobs):
 # 2. Create Lists for Fits (Next 20M events each - 10 files per job)
 # Start after the template files
 start_idx = n_template_files
-n_fit_files = 200 # 1M events
-n_jobs = 20
+data_files_per_job = 10 # 1M events
+n_data_jobs = 20
 
-for i in range(n_jobs):
-    end_idx = start_idx + n_fit_files
+for i in range(n_data_jobs):
+    end_idx = start_idx + data_files_per_job
     chunk_files = all_files[start_idx:end_idx]
     
     list_name = f"{output_dir}/data_{i}.txt"
