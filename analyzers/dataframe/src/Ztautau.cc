@@ -304,9 +304,9 @@ int classify_MC(const RVec<int> &pdgs) {
       n_ph++;
   }
   // classification
-  if (n_mu == 1 && n_ph == 0)
+  if (n_mu == 1 )
     return 1; // mu
-  else if (n_el == 1 && n_ph == 0)
+  else if (n_el == 1 )
     return 2; // el
   else if (n_pi == 1 && n_pi0 == 0 && n_ph == 0)
     return 3; // pi
@@ -469,10 +469,28 @@ void lepton_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                         dau.mass);
     }
   }
+
   ev.mc_daughterP4 = p4_lep_lab;
   ev.mc_daughterMass = p4_lep_lab.M();
 
-  double x = ev.mc_daughterP4.E()/E_TAU;
+  double lep_energy = p4_lep_lab.E();
+  // add photons if event is electron decay
+  if(ev.mc_type == 2){
+    for (int i = pb; i < pe; i++) {
+      int dau_idx = daughters[i];
+      const auto &dau = mc[dau_idx];
+      if (abs(dau.PDG) == 22 ) {
+        // found photon daughter
+        TLorentzVector p4_photon;
+        p4_photon.SetXYZM(dau.momentum.x, dau.momentum.y, dau.momentum.z,
+                          dau.mass);
+        lep_energy += p4_photon.E();
+      }
+    }
+  }
+  
+
+  double x = lep_energy/E_TAU;
 
   double a = (5.0-9.0*x*x+4.0*x*x*x);
   double b = (1.0-9.0*x*x+8.0*x*x*x);
