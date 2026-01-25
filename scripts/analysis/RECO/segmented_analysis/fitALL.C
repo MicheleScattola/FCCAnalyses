@@ -49,8 +49,8 @@ void calculateStats(const std::vector<double>& values, double& mean, double& std
 // Build a ROOT histogram for a channel
 TH1D* makeHist(const std::vector<double>& values, const std::string& name, const std::string& title) {
     // Define a reasonable range for polarization; adjust if input widens.
-    const double xmin = -1.2;
-    const double xmax = 1.2;
+    const double xmin = -0.170;
+    const double xmax = -0.120;
     const int nbins = 30;
 
     TH1D* h = new TH1D(name.c_str(), title.c_str(), nbins, xmin, xmax);
