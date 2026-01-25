@@ -230,7 +230,7 @@ void fitALL() {
         line->Draw();
 
         // Add text label next to the line
-        TLatex* txt = new TLatex(P_tau_value, h->GetMaximum() * 0.75, "P_{#tau}^{SM}");
+        TLatex* txt = new TLatex(P_tau_value + 0.5*stddev, h->GetMaximum() * 0.5, "P_{#tau}^{SM}");
         txt->SetTextColor(kBlue);
         txt->SetTextSize(0.05);
         txt->Draw();
