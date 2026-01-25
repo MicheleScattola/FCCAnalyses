@@ -185,7 +185,10 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       if(hemisphere) temp_charge = 1.0;
       else if (!hemisphere) temp_charge = -1.0;
 
-      if (abs(p.PDG) != 15 || p.charge * temp_charge < 0 ||
+      /*if (abs(p.PDG) != 15 || p.charge * temp_charge < 0 ||
+          p.generatorStatus != 2)
+        continue;*/
+      if(abs(p.PDG) != 15 || p.charge * ev.m_RecoCharge < 0 ||
           p.generatorStatus != 2)
         continue;
 

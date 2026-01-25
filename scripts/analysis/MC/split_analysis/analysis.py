@@ -112,7 +112,7 @@ class RDFanalysis():
                 
 				# lep signal and weights
                 .Define("el_sgn","Ztautau::get_optimal(myEvent,2,true,2,false,false)")
-                .Define("mu_sgn","Ztautau::get_MCdaughter_x(myEvent,1,true,1,false,false,false)")
+                .Define("mu_sgn","Ztautau::get_optimal(myEvent,1,true,1,false,false)")
 
 				  
                 )
