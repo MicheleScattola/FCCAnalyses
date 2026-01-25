@@ -23,7 +23,7 @@ void fitALL() {
     
     // --- Rho Channel ---
     Fitter::fit(infile_data, infile_templates, outdir, 
-                "reco_rho.pdf",           // Output filename
+                "cm_rho.pdf",           // Output filename
                 treeName, "rho_sgn",        // Data Column
                 "h_template_rho_plus",      // Template +
                 "h_template_rho_minus",     // Template -
@@ -33,7 +33,7 @@ void fitALL() {
 
     // --- Pion Channel ---
     Fitter::fit(infile_data, infile_templates, outdir, 
-                "reco_pi.pdf", 
+                "mc_pi.pdf", 
                 treeName, "pi_sgn", 
                 "h_template_pi_plus", 
                 "h_template_pi_minus", 
@@ -43,7 +43,7 @@ void fitALL() {
 
     // --- Muon Channel (Template) ---
     Fitter::fit(infile_data, infile_templates, outdir, 
-                "reco_mu.pdf", 
+                "mc_mu.pdf", 
                 treeName, "mu_sgn", 
                 "h_template_mu_plus", 
                 "h_template_mu_minus", 
@@ -53,7 +53,7 @@ void fitALL() {
 
     // --- Electron Channel (Template) ---
     Fitter::fit(infile_data, infile_templates, outdir, 
-                "reco_el.pdf", 
+                "mc_el.pdf", 
                 treeName, "el_sgn", 
                 "h_template_el_plus", 
                 "h_template_el_minus", 
@@ -67,7 +67,7 @@ void fitALL() {
     
     // --- Muon Channel (Analytic) ---
     Fitter::fit(infile_data, outdir, 
-                "reco_mu_analytical.pdf", 
+                "mc_mu_analytical.pdf", 
                 treeName, "mu_sgn", 
                 "Muon Channel (MC)", 
                 "x_{#mu}",
@@ -76,7 +76,7 @@ void fitALL() {
 
     // --- Electron Channel (Analytic) ---
     Fitter::fit(infile_data, outdir, 
-                "reco_el_analytical.pdf", 
+                "mc_el_analytical.pdf", 
                 treeName, "el_sgn", 
                 "Electron Channel (MC)", 
                 "x_{e}",
