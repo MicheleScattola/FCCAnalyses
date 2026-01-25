@@ -71,7 +71,7 @@ void fitALL() {
     // 1. CONFIGURATION
     // =========================================================================
     const std::string data_dir = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/segmented_analysis/";
-    const std::string output_dir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO"
+    const std::string output_dir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO";
     const std::string infile_templates = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/segmented_analysis/templates_histograms.root";
     const std::string treeName = "events";
 
@@ -235,7 +235,7 @@ void fitALL() {
         txt->Draw();
     }
 
-    const std::string output_plot = data_dir + "/segmented_summary.pdf";
+    const std::string output_plot = output_dir + "/segmented_summary.pdf";
     c->SaveAs(output_plot.c_str());
     std::cout << "Plot saved to: " << output_plot << std::endl;
 
