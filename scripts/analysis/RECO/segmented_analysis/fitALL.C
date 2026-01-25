@@ -51,8 +51,8 @@ void calculateStats(const std::vector<double>& values, double& mean, double& std
 // Build a ROOT histogram for a channel
 TH1D* makeHist(const std::vector<double>& values, const std::string& name, const std::string& title, double mean, double stddev) {
     // Define range centered on mean with width of 2 sigma per side (4 sigma total)
-    const double xmin = mean - 2.0 * stddev;
-    const double xmax = mean + 2.0 * stddev;
+    const double xmin = mean - 3.0 * stddev;
+    const double xmax = mean + 3.0 * stddev;
     const int nbins = 30;
 
     TH1D* h = new TH1D(name.c_str(), title.c_str(), nbins, xmin, xmax);
@@ -229,7 +229,7 @@ void fitALL() {
         line->Draw();
 
         // Add text label next to the line
-        TText* txt = new TText(P_tau_value, h->GetMaximum() * 0.95, "P_{#tau}^{SM}");
+        TLatex* txt = new TLatex(P_tau_value, h->GetMaximum() * 0.75, "P_{#tau}^{SM}");
         txt->SetTextColor(kBlue);
         txt->SetTextSize(0.05);
         txt->Draw();
