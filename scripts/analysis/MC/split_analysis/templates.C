@@ -7,6 +7,7 @@
 #include "TFile.h"
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 void create_and_save(ROOT::RDF::RNode df, 
                      TFile* fOut,
@@ -104,6 +105,10 @@ void templates() {
     const char* infile = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/split_analysis/templates_merged.root";
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/MC/split_analysis/";
     const char* outdir2 = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/MC/split_analysis/";
+    
+    // Ensure output directories exist
+    system(("mkdir -p " + std::string(outdir)).c_str());
+    system(("mkdir -p " + std::string(outdir2)).c_str());
     
     std::string treeName = "events"; 
     

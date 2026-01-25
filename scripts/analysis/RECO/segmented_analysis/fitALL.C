@@ -10,6 +10,7 @@
 #include <TStyle.h>
 #include <TLine.h>
 #include <TText.h>
+#include <sys/stat.h>
 
 // Helper function to get all data_*.root files
 std::vector<std::string> getDataFiles(const std::string& directory) {
@@ -234,6 +235,9 @@ void fitALL() {
         txt->SetTextSize(0.05);
         txt->Draw();
     }
+
+    // Ensure output directory exists
+    mkdir(output_dir.c_str(), 0755);
 
     const std::string output_plot = output_dir + "/segmented_summary.pdf";
     c->SaveAs(output_plot.c_str());
