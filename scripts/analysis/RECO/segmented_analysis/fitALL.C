@@ -2,9 +2,12 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <fstream>
 #include <glob.h>
 #include <cmath>
+#include <TCanvas.h>
+#include <TH1D.h>
+#include <TColor.h>
+#include <TStyle.h>
 
 // Helper function to get all data_*.root files
 std::vector<std::string> getDataFiles(const std::string& directory) {
@@ -41,6 +44,23 @@ void calculateStats(const std::vector<double>& values, double& mean, double& std
         variance += (val - mean) * (val - mean);
     }
     stddev = sqrt(variance / values.size());
+}
+
+// Build a ROOT histogram for a channel
+TH1D* makeHist(const std::vector<double>& values, const std::string& name, const std::string& title) {
+    // Define a reasonable range for polarization; adjust if input widens.
+    const double xmin = -1.2;
+    const double xmax = 1.2;
+    const int nbins = 30;
+
+    TH1D* h = new TH1D(name.c_str(), title.c_str(), nbins, xmin, xmax);
+    h->SetLineWidth(2);
+    h->SetLineColor(kRed + 1);
+    for (double v : values) {
+        h->Fill(v);
+    }
+    h->SetStats(true);
+    return h;
 }
 
 void fitALL() {
@@ -169,51 +189,34 @@ void fitALL() {
     std::cout << std::endl;
 
     std::cout << "========================================" << std::endl;
-    
+
     // =========================================================================
-    // 5. SAVE RESULTS TO FILE
+    // 5. DRAW DISTRIBUTIONS (2x2 CANVAS) AND SAVE
     // =========================================================================
-    
-    std::string output_file = data_dir + "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/results_summary.txt";
-    std::ofstream outfile(output_file);
-    
-    if (outfile.is_open()) {
-        outfile << "========================================" << std::endl;
-        outfile << "POLARIZATION FIT RESULTS SUMMARY" << std::endl;
-        outfile << "========================================" << std::endl;
-        outfile << std::endl;
-        
-        outfile << "Electron Channel:" << std::endl;
-        outfile << "  Number of successful fits: " << P_el.size() << std::endl;
-        outfile << "  Mean P_tau: " << mean_el << std::endl;
-        outfile << "  RMS:        " << stddev_el << std::endl;
-        outfile << std::endl;
-        
-        outfile << "Muon Channel:" << std::endl;
-        outfile << "  Number of successful fits: " << P_mu.size() << std::endl;
-        outfile << "  Mean P_tau: " << mean_mu << std::endl;
-        outfile << "  RMS:        " << stddev_mu << std::endl;
-        outfile << std::endl;
-        
-        outfile << "Pion Channel:" << std::endl;
-        outfile << "  Number of successful fits: " << P_pi.size() << std::endl;
-        outfile << "  Mean P_tau: " << mean_pi << std::endl;
-        outfile << "  RMS:        " << stddev_pi << std::endl;
-        outfile << std::endl;
-        
-        outfile << "Rho Channel:" << std::endl;
-        outfile << "  Number of successful fits: " << P_rho.size() << std::endl;
-        outfile << "  Mean P_tau: " << mean_rho << std::endl;
-        outfile << "  RMS:        " << stddev_rho << std::endl;
-        outfile << std::endl;
-        
-        outfile << "========================================" << std::endl;
-        outfile.close();
-        
-        std::cout << "Results saved to: " << output_file << std::endl;
-    } else {
-        std::cerr << "Error: Could not open output file: " << output_file << std::endl;
+
+    gStyle->SetOptStat(1111); // Show entries, mean, and RMS on stat box
+
+    TCanvas* c = new TCanvas("c", "Polarization distributions", 1200, 900);
+    c->Divide(2, 2);
+
+    std::vector<std::pair<std::vector<double>*, std::string>> channels = {
+        {&P_el, "Electron"},
+        {&P_mu, "Muon"},
+        {&P_pi, "Pion"},
+        {&P_rho, "Rho"}
+    };
+
+    for (size_t idx = 0; idx < channels.size(); ++idx) {
+        c->cd(idx + 1);
+        const auto& data = *channels[idx].first;
+        const std::string& label = channels[idx].second;
+        TH1D* h = makeHist(data, "h_" + label, label + " Channel;P_{#tau};Entries");
+        h->Draw();
     }
-    
+
+    const std::string output_plot = data_dir + "/segmented_summary.pdf";
+    c->SaveAs(output_plot.c_str());
+    std::cout << "Plot saved to: " << output_plot << std::endl;
+
     std::cout << ">>> All fits completed." << std::endl;
 }

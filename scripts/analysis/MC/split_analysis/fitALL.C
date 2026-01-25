@@ -23,7 +23,7 @@ void fitALL() {
     
     // --- Rho Channel ---
     Fitter::fit(infile_data, infile_templates, outdir, 
-                "cm_rho.pdf",           // Output filename
+                "mc_rho.pdf",           // Output filename
                 treeName, "rho_sgn",        // Data Column
                 "h_template_rho_plus",      // Template +
                 "h_template_rho_minus",     // Template -
