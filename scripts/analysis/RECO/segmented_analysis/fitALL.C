@@ -8,6 +8,8 @@
 #include <TH1D.h>
 #include <TColor.h>
 #include <TStyle.h>
+#include <TLine.h>
+#include <TText.h>
 
 // Helper function to get all data_*.root files
 std::vector<std::string> getDataFiles(const std::string& directory) {
@@ -47,10 +49,10 @@ void calculateStats(const std::vector<double>& values, double& mean, double& std
 }
 
 // Build a ROOT histogram for a channel
-TH1D* makeHist(const std::vector<double>& values, const std::string& name, const std::string& title) {
-    // Define a reasonable range for polarization; adjust if input widens.
-    const double xmin = -0.170;
-    const double xmax = -0.120;
+TH1D* makeHist(const std::vector<double>& values, const std::string& name, const std::string& title, double mean, double stddev) {
+    // Define range centered on mean with width of 2 sigma per side (4 sigma total)
+    const double xmin = mean - 2.0 * stddev;
+    const double xmax = mean + 2.0 * stddev;
     const int nbins = 30;
 
     TH1D* h = new TH1D(name.c_str(), title.c_str(), nbins, xmin, xmax);
@@ -69,6 +71,7 @@ void fitALL() {
     // 1. CONFIGURATION
     // =========================================================================
     const std::string data_dir = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/segmented_analysis/";
+    const std::string output_dir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO"
     const std::string infile_templates = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/segmented_analysis/templates_histograms.root";
     const std::string treeName = "events";
 
@@ -199,19 +202,37 @@ void fitALL() {
     TCanvas* c = new TCanvas("c", "Polarization distributions", 1200, 900);
     c->Divide(2, 2);
 
-    std::vector<std::pair<std::vector<double>*, std::string>> channels = {
-        {&P_el, "Electron"},
-        {&P_mu, "Muon"},
-        {&P_pi, "Pion"},
-        {&P_rho, "Rho"}
+    std::vector<std::pair<std::vector<double>*, std::pair<double, double>>> channels = {
+        {&P_el, {mean_el, stddev_el}},
+        {&P_mu, {mean_mu, stddev_mu}},
+        {&P_pi, {mean_pi, stddev_pi}},
+        {&P_rho, {mean_rho, stddev_rho}}
     };
+
+    std::vector<std::string> labels = {"Electron", "Muon", "Pion", "Rho"};
+    const double P_tau_value = -0.14719; // Reference polarization value
 
     for (size_t idx = 0; idx < channels.size(); ++idx) {
         c->cd(idx + 1);
         const auto& data = *channels[idx].first;
-        const std::string& label = channels[idx].second;
-        TH1D* h = makeHist(data, "h_" + label, label + " Channel;P_{#tau};Entries");
+        double mean = channels[idx].second.first;
+        double stddev = channels[idx].second.second;
+        const std::string& label = labels[idx];
+        TH1D* h = makeHist(data, "h_" + label, label + " Channel;P_{#tau};Entries", mean, stddev);
         h->Draw();
+
+        // Add blue dashed vertical line at P_tau value with label
+        TLine* line = new TLine(P_tau_value, 0, P_tau_value, h->GetMaximum());
+        line->SetLineColor(kBlue);
+        line->SetLineStyle(2); // Dashed line
+        line->SetLineWidth(2);
+        line->Draw();
+
+        // Add text label next to the line
+        TText* txt = new TText(P_tau_value, h->GetMaximum() * 0.95, "P_{#tau}^{SM}");
+        txt->SetTextColor(kBlue);
+        txt->SetTextSize(0.05);
+        txt->Draw();
     }
 
     const std::string output_plot = data_dir + "/segmented_summary.pdf";

@@ -3,7 +3,8 @@
 void matrix(){
 	gROOT->Reset();
 	
-    const char* filename = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91.root";
+    //const char* filename = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91.root";
+    const char* filename = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/split_analysis/output_merged.root";
     const char* treename = "events";
     const int   nCat     = 6;      // categories 0,1,2,3,4,5
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/additional/";
