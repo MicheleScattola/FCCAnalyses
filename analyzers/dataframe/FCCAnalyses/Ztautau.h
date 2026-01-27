@@ -250,11 +250,9 @@ RVec<double> get_Ptau(const RVec<myEvent> &evs,
 // ==========================================
 RVec<int> get_pi_mask(const RVec<myEvent> &evs);
 RVec<int> get_weight_mask(const RVec<myEvent> &evs);
-RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type);
+RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type, const int n_photons, const bool bool_ph);
 
-RVec<int> get_type_debugmass(const RVec<myEvent> &evs,
-                               const int mc_type, const bool bool_mc,
-                               const int reco_type, const bool bool_reco);
+RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type, const int n_photons);
                                
 RVec<RVec<int>> get_debug_daughters(const RVec<myEvent> &evs,
                                const int mc_type, const bool bool_mc,

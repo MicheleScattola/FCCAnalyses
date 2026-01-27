@@ -112,6 +112,14 @@ class RDFanalysis():
                 .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.594")
 				# rho signal
                 .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
+                
+				#debug stats on rho
+                .Define("rho_mass_reject_1","Ztautau::get_debug_mass(myEvent,4,1,true)")
+                .Define("rho_mass_reject_2","Ztautau::get_debug_mass(myEvent,4,2,true)")
+                .Define("a1_mass_reject","Ztautau::get_debug_mass(myEvent,5,1,false)")
+                .Define("rho_angle_reject_1","Ztautau::get_debug(myEvent,4,1)")
+                .Define("rho_angle_reject_2","Ztautau::get_debug(myEvent,4,2)")
+                
 
 				  
                 )
@@ -130,7 +138,12 @@ class RDFanalysis():
         	"pi_sgn",
 			"mu_sgn",
 			"el_sgn",
-            "rho_sgn"
+            "rho_sgn",
+            "rho_mass_reject_1",
+            "rho_mass_reject_2",
+            "a1_mass_reject",
+            "rho_angle_reject_1",
+            "rho_angle_reject_2"
 		
         	
         	]

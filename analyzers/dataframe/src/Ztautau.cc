@@ -1469,11 +1469,13 @@ RVec<int> get_weight_mask(const RVec<myEvent> &evs) {
   return mask;
 }
 
-RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type) {
+RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type, const int n_photons, const bool bool_ph) {
   RVec<int> out;
   for (const auto &e : evs) {
     // check reco event
     if (e.m_type != reco_type)
+      continue;
+    if(bool_ph && (e.n_ph != n_photons))
       continue;
     //check debug_mass
     if(e.m_debug_mass != 11)
@@ -1483,24 +1485,19 @@ RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type) {
   return out;
 }
 
-RVec<int> get_type_debugmass(const RVec<myEvent> &evs,
-                               const int mc_type, const bool bool_mc,
-                               const int reco_type, const bool bool_reco) {
+RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type, const int n_photons) {
   RVec<int> out;
   for (const auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
     // check reco event
-    if (bool_reco && e.m_type != reco_type)
+    if (e.m_type != reco_type)
       continue;
-    // check for invariant mass 
-    if (e.m_debug_mass == 0)
+    //check debug_mass
+    if(e.m_debug != 99)
       continue;
-    // push back event type
-    // note this can only work if we remove the reset of type in case of high mass
-    // otherwise all types become 0
-    out.push_back(e.m_type);
+    if(e.n_ph != n_photons)
+      continue;
+    if(e.m_debug == 99 && e.m_debug_mass != 1 && e.m_debug_mass != 11)
+      out.push_back(e.mc_type);
   }
   return out;
 }
