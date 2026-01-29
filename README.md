@@ -1,13 +1,23 @@
 
-## Z -> tau tau analysis
+## $Z \rightarrow \tau \tau$ analysis
+Analysis performed by Michele Scattola, if you have any questions don't hesitate to write at michele.scattola@studenti.unimi.it
+
 The overall code structure is the following:
-- personalized functions are stored in `FCCAnalyses/analyzer/dataframe/src/Ztautau.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Ztautau.h`
-- `FCCAnalyses/scripts/` contains the preliminary script `analysis.py` which collects necessary information for the optimal variables
-- `matrix*.C` files can be exectued to plot the confusion matrix in its simple, purity or efficiency form
-- `thrust.C` can be executed to plot cos(theta) and phi of the reconstructed Thrust axis
-- files in `FCCAnalyses/scripts/1prong/` contain the macros for 1-prong decays analysis. One can also run `templates.py` and `templates.C` to create and store histograms to re-weight templates of pion decays
-- files in `FCCAnalyses/scripts/sel1/` provide a first selection for E>2 GeV in pion decays and the associated macros to re-plot the confusion matrices
-- `/FCCAnalyses/Ztautau/plots` contains all the created plots
+- personalized functions are stored in `FCCAnalyses/analyzer/dataframe/src/Ztautau.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Ztautau.h` . Further specifications are explained in the file FUNCTIONS.md
+- fitting functions are stored in `FCCAnalyses/analyzer/dataframe/src/Fitter.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Fitter.h` .
+The methods applied are explained in the file FITTING.md
+- analysis scripts are stored in 'FCCAnalyses/scripts/analysis' in folders 'MC' and 'RECO' for Monte Carlo or Reconstructed analysis
+- both analysis folder feature a 'split_analysis' section where the templates and data events are collected from indipendent event samples
+- `/FCCAnalyses/Ztautau/plots` contains all the created plots for MC and RECO
+
+## RECO analysis
+# Split analysis:
+This folder produces an analysis over $20 \times 10^6$ events for both templates and data. The events are taken from indipendent samples via python scripts and convenient condor queuing system.
+# Segmented analysis:
+This folder produces a repeated analysis with $20 \times 10^6$ events for templates and $1 \times 10^6$ events for data. The polarization analysis is perfomed over 80 different sets of data, in order to calculate the standard deviation of the fitting results.
+
+## MC analysis
+This section provides the same analysis ad 'RECO/split_analysis/' but on Monte Carlo data.
 # FCCAnalyses
 
 [![DOI](https://zenodo.org/badge/177151745.svg)](https://zenodo.org/doi/10.5281/zenodo.4767810)

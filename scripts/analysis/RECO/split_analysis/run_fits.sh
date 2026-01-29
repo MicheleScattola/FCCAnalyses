@@ -15,4 +15,11 @@ echo ">>> 3. Fitting all data files..."
 
 root -l -b -q fitALL.C
 
+echo ">>> 4. Generating confusion matrices..."
+
+root -l -b -q ../confusion/matrix.C
+root -l -b -q ../confusion/matrix_eff.C
+root -l -b -q ../confusione/matrix_pur.C
+
+
 echo ">>> DONE."

@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'templates':{},
+    'p8_ee_Ztautau_ecm91':{},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -12,7 +12,8 @@ processList = {
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/split_analysis/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/"
+outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 
@@ -25,7 +26,7 @@ nCPUS       = 1
 #Optional test file , run with --test
 testFile = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/p8_ee_Ztautau_ecm91/events_080694422.root"
 
-#operations on the TTree
+#operations on the TTreout.push_back(e.m_type);out.push_back(e.m_type);e
 class RDFanalysis():
     #__________________________________________________________
     #analysers function to define the analysers to process
@@ -40,11 +41,7 @@ class RDFanalysis():
 				.Alias("MCRecoAssociations0", "MCRecoAssociations#0.index")
 				.Alias("MCRecoAssociations1", "MCRecoAssociations#1.index")
 				.Alias("rps", "ReconstructedParticles")
-				.Define("rp2mc_idx",
-  "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, rps)")
-			
-				#PDG ids of reconstructed particles
-                .Define("AssociatedMCpdg","RVec<int> pdgs; for(auto idx : MCRecoAssociations1) pdgs.push_back(Particle[idx].PDG); return pdgs;")
+                .Define("rp2mc_idx","ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, rps)")
                 
                 #initial basic cuts
                 .Filter("rps.size()>=2")
@@ -69,7 +66,7 @@ class RDFanalysis():
 				.Define("RP_thrustphi", "return atan2(EVT_thrust[3],EVT_thrust[1])")
 				
 				.Filter("abs(RP_thrustcostheta)<0.95")
-                
+				
 				#####
 				# RECONSTRUCTED PARTICLES
 				#####
@@ -98,29 +95,45 @@ class RDFanalysis():
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,Particle0,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
                 
-				# pi signal and weights
-				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true)")
-				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,false,3,true)")
-				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
-				# rho signal
-                .Define("rho_sgn","Ztautau::get_reco_x(myEvent,4,false,4,true)")
-                .Define("w_plus_rho","Ztautau::get_weights(1,myEvent,4,false,4,true)")
-				.Define("w_minus_rho","Ztautau::get_weights(-1,myEvent,4,false,4,true)")
-                
-				# lep signal and weights
-                .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true)")
-                .Define("mu_sgn","Ztautau::get_reco_x(myEvent,1,false,1,true)")
-                .Define("w_plus_el","Ztautau::get_weights(1,myEvent,2,false,2,true)")
-				.Define("w_minus_el","Ztautau::get_weights(-1,myEvent,2,false,2,true)")
-                .Define("w_plus_mu","Ztautau::get_weights(1,myEvent,1,false,1,true)")
-				.Define("w_minus_mu","Ztautau::get_weights(-1,myEvent,1,false,1,true)")
+				.Define("event_type_reco","Ztautau::get_type_safe(myEvent,true)")
 				
+				#####
+				# MC IDENTIFICATION
+				#####
+                .Define("MC_event","RVec<int> {myEvent[0].mc_type,myEvent[1].mc_type}")
+                
+                
+				#APPLYING INV MASS CHECK:
+				# pi signal
+				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true,true)")
+				# lepton signals
+                .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true,true)")
+                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.594")
+				# rho signal
+                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
+                
+				#debug stats on rho
+                .Define("rho_mass_reject_1","Ztautau::get_debug_mass(myEvent,4,1,true)")
+                .Define("rho_mass_reject_2","Ztautau::get_debug_mass(myEvent,4,2,true)")
+                .Define("a1_mass_reject","Ztautau::get_debug_mass(myEvent,5,1,false)")
+                .Define("rho_angle_reject_1","Ztautau::get_debug(myEvent,4,1)")
+                .Define("rho_angle_reject_2","Ztautau::get_debug(myEvent,4,2)")
+                
+				# dressed photons P
+                .Define("dressed_n","Ztautau::get_dressed_n(myEvent,2)")
+                .Define("P_dressed_true","Ztautau::get_dressed_photon_p(myEvent,true)")
+                .Define("P_dressed_false","Ztautau::get_dressed_photon_p(myEvent,false)")
+                .Define("angle_dressed_true","Ztautau::get_dressed_lepton_photon_angle(myEvent,true)")
+                .Define("angle_dressed_false","Ztautau::get_dressed_lepton_photon_angle(myEvent,false)")
+                .Define("parents_dressed_true","Ztautau::get_dressed_parents(myEvent,true)")
+                .Define("parents_dressed_false","Ztautau::get_dressed_parents(myEvent,false)")
+
 				  
                 )
 		
-        #df2.Display(["MC_event","MC_event_type","weights_plus","weights_minus","found"],20).Print()
+        df2.Display(["dressed_n","parents_dressed_true","parents_dressed_false"],20).Print()
         #df2.Display(["ElAsPi_e","MuAsPi_e","RhoAsPi_e","A1AsPi_e","PiAsPi_e"],20).Print()
         return df2
        
@@ -129,18 +142,25 @@ class RDFanalysis():
     #Mandatory: output function, please make sure you return the branchlist as a python list
     def output():
         branchList = [
+        	"MC_event",
+        	"event_type_reco",
         	"pi_sgn",
-			"w_plus_pi",
-			"w_minus_pi",
-            "el_sgn",
-            "w_plus_el",
-            "w_minus_el",
-            "mu_sgn",
-            "w_plus_mu",
-            "w_minus_mu",
+			"mu_sgn",
+			"el_sgn",
             "rho_sgn",
-			"w_plus_rho",
-            "w_minus_rho",
+            "rho_mass_reject_1",
+            "rho_mass_reject_2",
+            "a1_mass_reject",
+            "rho_angle_reject_1",
+            "rho_angle_reject_2",
+            "dressed_n",
+            "P_dressed_true",
+            "P_dressed_false",
+			"angle_dressed_true",
+            "angle_dressed_false",
+            "parents_dressed_true",
+            "parents_dressed_false"
+		
         	
         	]
         return branchList
