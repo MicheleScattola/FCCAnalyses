@@ -47,9 +47,12 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
   bool hemisphere = true;
 
   for (int i = 0; i < 2; i++) {
+
     myEvent ev;
+
     ev.thrust_costheta = thrust_costheta;
     ev.thrust_phi = thrust_phi;
+
     // select particles in hemisphere
     // bool hemisphere starts as true for positive hemi, changing after first
     // loop to false for negative hemi
@@ -195,13 +198,13 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     ev.m_RecoMass = p4_tot.M();
     if (ev.m_RecoMass > 2) {
       ev.m_debug_mass = 1; // high mass
-      ev.m_type = 0;
+      ev.m_type = 0; // reset type
     }
     // store type before optimal variable constraints (to check efficiency)
     ev.m_type_before = ev.m_type;
 
     // calculate optimal variables for reco
-    reco_omega(ev);
+    if(ev.m_type != 0) reco_omega(ev);
 
     // push back and change hemisphere
     out.push_back(ev);
@@ -381,31 +384,37 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx,
 
   // invariant mass check is done in main function
   // classification
+
+  // 1prong
   if (ev.n_pi == 1) {
+
     if (ev.n_ph == 0) {
       // check RP2MC and get corresponding 1prong true MC energy
       int id = pi_idx[0];
       ev.mc_RP2MC_id = rp2mc_idx[id];
       return 3; // Type 3: Single Pion
+
     } else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
 
       // flag: 0,2 GeV < mass < 1.4 GeV
       if (ev.m_RecoMass > 1.4 || ev.m_RecoMass < 0.2) {
         ev.m_debug_mass = 11;
       }
+
       return 4; // Type 4: Rho (pi + 1-2 gamma)
+
     } else if (ev.n_ph >= 3) {
 
       // flag: 0,6 < mass < 1.8 GeV
       if (ev.m_RecoMass > 1.8 || ev.m_RecoMass < 0.6) {
         ev.m_debug_mass = 11;
       }
-      ev.m_debug = 2;
+
       return 5; // Type 5: a1 -> pi + 2pi0 -> pi + 4gamma
     }
   }
+  // 3prong
   if (ev.n_pi == 3) {
-    ev.m_debug = 3;
 
     // flag: 0,6 < mass < 1.8 GeV
     if (ev.m_RecoMass > 1.8 || ev.m_RecoMass < 0.6) {
@@ -442,8 +451,10 @@ void reco_omega(myEvent &ev){
     // leptonic
     if(ev.m_type == 1){
       ev.m_omega = ev.m_muP4[0].E()/E_TAU;
+
     }else if(ev.m_type == 2){
       ev.m_omega  = ev.m_elP4[0].E()/E_TAU;
+
     }
     // pion
     else if(ev.m_type == 3) {
@@ -452,20 +463,21 @@ void reco_omega(myEvent &ev){
     // rho
     else if(ev.m_type == 4){
       
-      TLorentzVector p4_tau, p4_pi, p4_pi0, p4_rho;
+      TLorentzVector p4_tau, p4_pip, p4_pi0, p4_rho;
 
       p4_tau = ev.mc_tauP4;
-      p4_pi = ev.m_piP4[0];
+      p4_pip = ev.m_piP4[0];
 
       //build pi0 from photons
       for(const auto &p: ev.m_phP4){
         p4_pi0 += p;
       }
 
-      p4_rho = p4_pi + p4_pi0;
+      p4_rho = p4_pip + p4_pi0;
 
-      ev.m_omega = calculate_omega_rho(ev,p4_tau,p4_rho,p4_pi,p4_pi0);
+      ev.m_omega = calculate_omega_rho(ev,p4_tau,p4_rho,p4_pip,p4_pi0);
     }
+    // a1
 
 }
 
@@ -525,7 +537,7 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
   // bad event reconstruction flags to "other" event type, even if they are true RHO
   // bad cos(theta) => bad omega value
   if(ev.m_debug == 99) {
-    ev.m_type = 0;
+    //ev.m_type = 0;
     return -999;
   }
   // bad mass window is checked only for 1 reco photons, where the reject rate is good
@@ -1110,6 +1122,32 @@ RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
       continue;
     // check reco event
     if (bool_reco && e.m_type != reco_type)
+      continue;
+    // optimal variable
+    out.push_back(e.m_omega);
+  }
+
+  return out;
+}
+
+// ==========================================
+// get reco optimal in specifiec costheta min and max
+RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
+                                 const bool bool_mc, const int reco_type,
+                                 const bool bool_reco, const double costheta_min,
+                                 const double costheta_max) {
+
+  RVec<double> out;
+
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // check costheta cuts
+    if (e.thrust_costheta < costheta_min || e.thrust_costheta > costheta_max)
       continue;
     // optimal variable
     out.push_back(e.m_omega);

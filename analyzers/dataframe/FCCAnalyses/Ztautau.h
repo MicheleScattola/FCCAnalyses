@@ -54,7 +54,7 @@ struct myEvent {
       m_phP4;     // particle TLorentzVectors
   int m_type = 0; // event reco type
   int m_type_before = 0; // event reco type before optimal variable constraints
-  int m_omega = 0; // optimal variable binned
+  double m_omega = 0; // optimal variable binned
 
   // MC
   int mc_tau_index = -1;        // tau MC index
@@ -195,10 +195,6 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
 // ==========================================
 // EXTRACT VARIABLES
 // ==========================================
-RVec<double> get_lepton_x(const RVec<myEvent> &evs, const int mc_type,
-                          const bool bool_mc, const int reco_type,
-                          const bool bool_reco, const bool masscheck,
-                          const bool asymmetric);
 
 RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
@@ -208,6 +204,13 @@ RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
                         const bool bool_mc, const int reco_type,
                         const bool bool_reco);
+// ==========================================
+// get reco optimal in specifiec costheta min and max
+RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
+                                 const bool bool_mc, const int reco_type,
+                                 const bool bool_reco, const double costheta_min,
+                                 const double costheta_max);
+
 
 // ==========================================
 RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
@@ -248,7 +251,12 @@ RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
 
 // =========================================
 // NOT IN USE
-// =========================================                           
+// =========================================      
+RVec<double> get_lepton_x(const RVec<myEvent> &evs, const int mc_type,
+                          const bool bool_mc, const int reco_type,
+                          const bool bool_reco, const bool masscheck,
+                          const bool asymmetric);
+                                               
 RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                           const bool bool_mc, const int reco_type,
                           const bool masscheck);
