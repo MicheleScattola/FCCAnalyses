@@ -158,6 +158,30 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs);
 
 void reco_omega(myEvent &ev);
 
+double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
+                           const TLorentzVector &p4_rho,
+                           const TLorentzVector &p4_pip,
+                           const TLorentzVector &p4_pi0);
+
+// ==========================================
+// EXTRACT VARIABLES
+// ==========================================
+
+RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco);
+                         
+// =========================================
+RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
+                        const bool bool_mc, const int reco_type,
+                        const bool bool_reco);
+
+// ==========================================
+RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
+                         const int mc_type, const bool bool_mc,
+                         const int reco_type, const bool bool_reco);
+
+
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
 // ==========================================
@@ -181,47 +205,15 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                     const RVec<int> &daughters);
 
-double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
-                           const TLorentzVector &p4_rho,
-                           const TLorentzVector &p4_pip,
-                           const TLorentzVector &p4_pi0);
-
 // omega_rho with p4 angles instead of kinematic variables, possible only for MC
 double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
                            const TLorentzVector &p4_rho,
                            const TLorentzVector &p4_pip,
                            const TLorentzVector &p4_pi0);
-
+                           
 // ==========================================
-// EXTRACT VARIABLES
+// additional
 // ==========================================
-
-RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
-                         const bool bool_mc, const int reco_type,
-                         const bool bool_reco);
-
-// =========================================
-RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
-                        const bool bool_mc, const int reco_type,
-                        const bool bool_reco);
-// ==========================================
-// get reco optimal in specifiec costheta min and max
-RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
-                                 const bool bool_mc, const int reco_type,
-                                 const bool bool_reco, const double costheta_min,
-                                 const double costheta_max);
-
-
-// ==========================================
-RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
-                           const bool bool_mc, const int reco_type,
-                           const bool bool_reco, const bool masscheck,
-                           const bool asymmetric);
-                          
-// ==========================================
-RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
-                         const int mc_type, const bool bool_mc,
-                         const int reco_type, const bool bool_reco);
 
 // ==========================================
 RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
@@ -292,8 +284,20 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
                                  const bool bool_mc, const int reco_type,
                                  const bool bool_reco);
 
+// ==========================================
+// get reco optimal in specifiec costheta min and max
+RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
+                                 const bool bool_mc, const int reco_type,
+                                 const bool bool_reco, const double costheta_min,
+                                 const double costheta_max);
 
 
+// ==========================================
+RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
+                           const bool bool_mc, const int reco_type,
+                           const bool bool_reco, const bool masscheck,
+                           const bool asymmetric);
+                        
 
 
 } // namespace Ztautau

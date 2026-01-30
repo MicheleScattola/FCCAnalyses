@@ -181,6 +181,14 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
     // RECO EVENT CLASSIFICATION
 
+    // generic mass limit less than 2 GeV
+    ev.m_RecoMass = p4_tot.M();
+    if (ev.m_RecoMass > 2) {
+      ev.m_debug_mass = 1; // high mass
+
+      // do not store type = 0 to check which events are rejected by rho case
+    }
+
     // Leptonic
     if ((ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
       ev.m_type =
@@ -194,14 +202,6 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     else if ((ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi != 0) {
       ev.m_debug = 33;
     }
-    // generic mass limit less than 2 GeV
-    ev.m_RecoMass = p4_tot.M();
-    if (ev.m_RecoMass > 2) {
-      ev.m_debug_mass = 1; // high mass
-      ev.m_type = 0; // reset type
-    }
-    // store type before optimal variable constraints (to check efficiency)
-    ev.m_type_before = ev.m_type;
 
     // calculate optimal variables for reco
     if(ev.m_type != 0) reco_omega(ev);
@@ -437,6 +437,7 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
       out.push_back(0);
       continue;
     }
+
     out.push_back(e.m_type);
   }
   return out;
@@ -534,18 +535,6 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
     ev.m_debug = 99;
   }
 
-  // bad event reconstruction flags to "other" event type, even if they are true RHO
-  // bad cos(theta) => bad omega value
-  if(ev.m_debug == 99) {
-    //ev.m_type = 0;
-    return -999;
-  }
-  // bad mass window is checked only for 1 reco photons, where the reject rate is good
-  if(ev.m_debug_mass == 11 && ev.n_ph == 1){
-    ev.m_type = 0;
-    return -999;
-  }
-
 
   if (cos_psi_rho > 1.0 || cos_psi_rho < -1.0) {
     cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho
@@ -610,8 +599,91 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
 
   return omega;
 }
-  
 
+
+
+// ==========================================
+// EXTRACT VARIABLES
+// ==========================================
+
+// =========================================
+RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
+                         const bool bool_mc, const int reco_type,
+                         const bool bool_reco) {
+
+  RVec<double> out;
+
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // optimal variable
+    out.push_back(e.mc_omega);
+  }
+
+  return out;
+}
+
+// =========================================
+RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
+                        const bool bool_mc, const int reco_type,
+                        const bool bool_reco) {
+
+  RVec<double> out;
+
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+
+    // masscheck
+    if(e.m_debug_mass == 1) continue;
+
+    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
+
+
+    // optimal variable
+    out.push_back(e.m_omega);
+  }
+
+  return out;
+}
+
+
+
+// ==========================================
+RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
+                         const int mc_type, const bool bool_mc,
+                         const int reco_type, const bool bool_reco) {
+
+  RVec<double> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+
+    // masscheck
+    if(e.m_debug_mass == 1) continue;
+
+    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
+
+    // get weight based on sign passed
+    if (sign > 0)
+      out.push_back(e.mc_weight_plus);
+    else if (sign < 0)
+      out.push_back(e.mc_weight_minus);
+  }
+  return out;
+};
 
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
@@ -1050,195 +1122,9 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 }
 
 // ==========================================
-// EXTRACT VARIABLES
+// additional
 // ==========================================
-RVec<double> get_lepton_x(const RVec<myEvent> &evs, const int mc_type,
-                          const bool bool_mc, const int reco_type,
-                          const bool bool_reco, const bool masscheck,
-                          const bool asymmetric) {
 
-  RVec<double> out;
-  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if (asymmetric) {
-    // skip any 'other' non-classified event
-    if (evs[0].mc_type == 0 || evs[1].mc_type == 0)
-      return out;
-    // check 1 hadronic + 1 leptonic
-    if (((evs[0].mc_type <= 2) && (evs[1].mc_type <= 2)) ||
-        ((evs[0].mc_type >= 3) && (evs[1].mc_type >= 3)))
-      return out;
-  }
-  for (const auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // impose invariant mass check
-    if (masscheck && e.m_debug_mass == 1)
-      continue;
-    // lepton energy
-    if (e.n_mu > 0)
-      out.push_back(e.m_muP4[0].E()/E_TAU);
-    else if (e.n_el > 0)
-      out.push_back(e.m_elP4[0].E()/E_TAU);
-  }
-  return out;
-};
-
-
-// =========================================
-RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
-                         const bool bool_mc, const int reco_type,
-                         const bool bool_reco) {
-
-  RVec<double> out;
-
-  for (auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // optimal variable
-    out.push_back(e.mc_omega);
-  }
-
-  return out;
-}
-
-// =========================================
-RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
-                        const bool bool_mc, const int reco_type,
-                        const bool bool_reco) {
-
-  RVec<double> out;
-
-  for (auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // optimal variable
-    out.push_back(e.m_omega);
-  }
-
-  return out;
-}
-
-// ==========================================
-// get reco optimal in specifiec costheta min and max
-RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
-                                 const bool bool_mc, const int reco_type,
-                                 const bool bool_reco, const double costheta_min,
-                                 const double costheta_max) {
-
-  RVec<double> out;
-
-  for (auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // check costheta cuts
-    if (e.thrust_costheta < costheta_min || e.thrust_costheta > costheta_max)
-      continue;
-    // optimal variable
-    out.push_back(e.m_omega);
-  }
-
-  return out;
-}
-
-// ==========================================
-RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
-                           const bool bool_mc, const int reco_type,
-                           const bool bool_reco, const bool masscheck,
-                           const bool asymmetric) {
-
-  RVec<double> out;
-  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
-  if (asymmetric) {
-    // skip any 'other' non-classified event
-    if (evs[0].mc_type == 0 || evs[1].mc_type == 0)
-      return out;
-    // check 1 hadronic + 1 leptonic
-    if (((evs[0].mc_type <= 2) && (evs[1].mc_type <= 2)) ||
-        ((evs[0].mc_type >= 3) && (evs[1].mc_type >= 3)))
-      return out;
-  }
-  for (auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // impose invariant mass check
-    if ((masscheck && e.m_debug_mass == 1) ||
-        (masscheck && e.m_debug_mass == 11))
-      continue;
-    // impose cos limits with m_debug
-    if (masscheck && e.m_debug == 99)
-      continue;
-    // omega_rho
-    TLorentzVector p4_tau, p4_rho, p4_pip, p4_pi0;
-
-    if (bool_reco || (bool_reco && bool_mc)) {
-      // fill with reco p4
-      for (const auto &p : e.m_piP4) {
-        p4_pip += p;
-      }
-      for (const auto &p : e.m_phP4) {
-        p4_pi0 += p;
-      }
-
-      p4_rho = p4_pip + p4_pi0;
-      p4_tau = e.mc_tauP4;
-      double omega = calculate_omega_rho(e, p4_tau, p4_rho, p4_pip, p4_pi0);
-      out.push_back(omega);
-    }
-
-    if (bool_mc && !bool_reco) {
-      // fill with mc p4
-      p4_pip = e.mc_piP4;
-      p4_pi0 = e.mc_pi0P4;
-      p4_tau = e.mc_tauP4;
-      p4_rho = e.mc_daughterP4;
-      double omega = geometric_omega_rho(e, p4_tau, p4_rho, p4_pip, p4_pi0);
-      out.push_back(omega);
-    }
-  }
-  return out;
-};
-
-// ==========================================
-RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
-                         const int mc_type, const bool bool_mc,
-                         const int reco_type, const bool bool_reco) {
-
-  RVec<double> out;
-  for (const auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // get weight based on sign passed
-    if (sign > 0)
-      out.push_back(e.mc_weight_plus);
-    else if (sign < 0)
-      out.push_back(e.mc_weight_minus);
-  }
-  return out;
-};
 // ==========================================
 RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
                                 const bool bool_mc, const int reco_type,
@@ -1319,7 +1205,7 @@ RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type,
   RVec<int> out;
   for (const auto &e : evs) {
     // check reco event
-    if (e.m_type_before != reco_type)
+    if (e.m_type != reco_type)
       continue;
     if (bool_ph && (e.n_ph != n_photons))
       continue;
@@ -1336,7 +1222,7 @@ RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
   RVec<int> out;
   for (const auto &e : evs) {
     // check reco event
-    if (e.m_type_before != reco_type)
+    if (e.m_type != reco_type)
       continue;
     // check debug_mass
     if (e.m_debug != 99)
@@ -1590,5 +1476,129 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
   }
   return out;
 };
+
+// ==========================================
+// get reco optimal in specifiec costheta min and max
+RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
+                                 const bool bool_mc, const int reco_type,
+                                 const bool bool_reco, const double costheta_min,
+                                 const double costheta_max) {
+
+  RVec<double> out;
+
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // check costheta cuts
+    if (e.thrust_costheta < costheta_min || e.thrust_costheta > costheta_max)
+      continue;
+    // optimal variable
+    out.push_back(e.m_omega);
+  }
+
+  return out;
+}
+
+// ==========================================
+RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
+                           const bool bool_mc, const int reco_type,
+                           const bool bool_reco, const bool masscheck,
+                           const bool asymmetric) {
+
+  RVec<double> out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if (asymmetric) {
+    // skip any 'other' non-classified event
+    if (evs[0].mc_type == 0 || evs[1].mc_type == 0)
+      return out;
+    // check 1 hadronic + 1 leptonic
+    if (((evs[0].mc_type <= 2) && (evs[1].mc_type <= 2)) ||
+        ((evs[0].mc_type >= 3) && (evs[1].mc_type >= 3)))
+      return out;
+  }
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if ((masscheck && e.m_debug_mass == 1) ||
+        (masscheck && e.m_debug_mass == 11))
+      continue;
+    // impose cos limits with m_debug
+    if (masscheck && e.m_debug == 99)
+      continue;
+    // omega_rho
+    TLorentzVector p4_tau, p4_rho, p4_pip, p4_pi0;
+
+    if (bool_reco || (bool_reco && bool_mc)) {
+      // fill with reco p4
+      for (const auto &p : e.m_piP4) {
+        p4_pip += p;
+      }
+      for (const auto &p : e.m_phP4) {
+        p4_pi0 += p;
+      }
+
+      p4_rho = p4_pip + p4_pi0;
+      p4_tau = e.mc_tauP4;
+      double omega = calculate_omega_rho(e, p4_tau, p4_rho, p4_pip, p4_pi0);
+      out.push_back(omega);
+    }
+
+    if (bool_mc && !bool_reco) {
+      // fill with mc p4
+      p4_pip = e.mc_piP4;
+      p4_pi0 = e.mc_pi0P4;
+      p4_tau = e.mc_tauP4;
+      p4_rho = e.mc_daughterP4;
+      double omega = geometric_omega_rho(e, p4_tau, p4_rho, p4_pip, p4_pi0);
+      out.push_back(omega);
+    }
+  }
+  return out;
+};
+
+RVec<double> get_lepton_x(const RVec<myEvent> &evs, const int mc_type,
+                          const bool bool_mc, const int reco_type,
+                          const bool bool_reco, const bool masscheck,
+                          const bool asymmetric) {
+
+  RVec<double> out;
+  // choose only events with 1 hadronic tau + 1 leptonic tau if asked
+  if (asymmetric) {
+    // skip any 'other' non-classified event
+    if (evs[0].mc_type == 0 || evs[1].mc_type == 0)
+      return out;
+    // check 1 hadronic + 1 leptonic
+    if (((evs[0].mc_type <= 2) && (evs[1].mc_type <= 2)) ||
+        ((evs[0].mc_type >= 3) && (evs[1].mc_type >= 3)))
+      return out;
+  }
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+    // impose invariant mass check
+    if (masscheck && e.m_debug_mass == 1)
+      continue;
+    // lepton energy
+    if (e.n_mu > 0)
+      out.push_back(e.m_muP4[0].E()/E_TAU);
+    else if (e.n_el > 0)
+      out.push_back(e.m_elP4[0].E()/E_TAU);
+  }
+  return out;
+};
+
 
 } // namespace Ztautau
