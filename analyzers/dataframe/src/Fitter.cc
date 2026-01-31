@@ -371,6 +371,107 @@ myFit fit_no_plot(const std::string &infile_data,
 }
 
 // =========================================================
+// TEMPLATE FIT WITH DATAFRAME FILTERING (for angular binning)
+// =========================================================
+myFit fit_filtered(const std::string &infile_data,
+                   const std::string &infile_templates,
+                   const std::string &treeName, const std::string &dataColName,
+                   const std::string &name_plus, const std::string &name_minus) {
+  myFit result = {0, 0, 0, 0, false, "Template_Filtered"};
+
+  // Recover Templates
+  TFile *fTemp = TFile::Open(infile_templates.c_str(), "READ");
+  if (!fTemp || fTemp->IsZombie()) {
+    std::cerr << "[Fitter] Error: Cannot open templates: " << infile_templates
+              << std::endl;
+    return result;
+  }
+  TH1D *h_plus = (TH1D *)fTemp->Get(name_plus.c_str());
+  TH1D *h_minus = (TH1D *)fTemp->Get(name_minus.c_str());
+
+  if (!h_plus || !h_minus) {
+    std::cerr << "[Fitter] Template not found." << std::endl;
+    return result;
+  }
+
+  h_plus = (TH1D *)h_plus->Clone("mc_plus_filtered");
+  h_minus = (TH1D *)h_minus->Clone("mc_minus_filtered");
+  h_plus->SetDirectory(0);
+  h_minus->SetDirectory(0);
+  fTemp->Close();
+
+  // normalizing to 1 for safety (templates should already be PDFs)
+  if (h_plus->Integral() > 0)
+    h_plus->Scale(1.0 / h_plus->Integral());
+  if (h_minus->Integral() > 0)
+    h_minus->Scale(1.0 / h_minus->Integral());
+
+  // retrieve data and filter by RP_costheta
+  ROOT::EnableImplicitMT();
+  ROOT::RDataFrame df(treeName, infile_data);
+  
+  if (!df.HasColumn(dataColName)) {
+    std::cerr << "[Fitter] Data column missing: " << dataColName << std::endl;
+    return result;
+  }
+  
+  int nBins = h_plus->GetNbinsX();
+  double xMin = h_plus->GetXaxis()->GetXmin();
+  double xMax = h_plus->GetXaxis()->GetXmax();
+
+  auto h_data_ptr = df.Histo1D(
+      {"h_data_filtered", "Data;x;Events", nBins, xMin, xMax}, dataColName);
+  TH1D *h_data = (TH1D *)h_data_ptr->Clone("data_filtered");
+  h_data->SetDirectory(0);
+  h_data->Sumw2();
+
+  // Check if we have enough events
+  if (h_data->Integral() < 10) {
+    std::cerr << "[Fitter] Warning: Very few events (" << h_data->Integral()
+              << ") for column " << dataColName << std::endl;
+  }
+
+  // linear fit with functor
+  TemplateFunctor functor(h_plus, h_minus);
+  TF1 *f_fit = new TF1("f_template_filtered", functor, xMin, xMax, 2);
+
+  // Setup Parameters
+  f_fit->SetParName(0, "Norm");
+  f_fit->SetParName(1, "P_tau");
+  f_fit->FixParameter(0, h_data->Integral());
+  f_fit->SetParameter(1, -0.15);
+
+  // Perform fit (quiet mode)
+  TFitResultPtr fitStatus = h_data->Fit(f_fit, "L Q S");
+
+  if ((Int_t)fitStatus != 0) {
+    std::cerr << "[Fitter] Template Fit failed for column " << dataColName
+              << std::endl;
+    delete f_fit;
+    delete h_data;
+    delete h_plus;
+    delete h_minus;
+    return result;
+  }
+
+  // results
+  double P_val = f_fit->GetParameter(1);
+  double P_err = f_fit->GetParError(1);
+
+  result.P_tau = P_val;
+  result.P_err = P_err;
+  result.f_plus = (1.0 + P_val) / 2.0;
+  result.f_minus = (1.0 - P_val) / 2.0;
+  result.success = true;
+
+  delete f_fit;
+  delete h_data;
+  delete h_plus;
+  delete h_minus;
+  return result;
+}
+
+// =========================================================
 // TEMPLATE FIT (Using TF1 Linear Combo)
 // =========================================================
 myFit fit(const std::string &infile_data, const std::string &infile_templates,

@@ -81,6 +81,7 @@ struct myEvent {
   int m_debug_mass = 0;
   double thrust_costheta = -999;
   double thrust_phi = -999;
+  double thrust_costheta_hemi = -999;
 
   bool is_dressed = false;
 };
@@ -97,8 +98,10 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<edm4hep::MCParticleData> &mc,
                           const RVec<int> &daughters, 
                           const RVec<int> &rp2mc_idx,
-                          const double &thrust_costheta,
-                          const double &thrust_phi);
+                          const RVec<double> &thrust_vector);
+
+// return signed thrust costheta per hemisphere
+RVec<double> get_thrustcostheta_hemi(const RVec<myEvent> &evs);
 
 // ==========================================
 // helper to fill P4 and add energy & charge
@@ -232,6 +235,12 @@ RVec<double> get_Ptau(const RVec<myEvent> &evs, const int mc_type,
                       const bool asymmetric);
 
 // ==========================================
+RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
+                           const bool bool_mc, const int reco_type,
+                           const bool bool_reco, const bool masscheck,
+                           const bool asymmetric);
+
+// ==========================================
 // DEBUG
 // ==========================================
 
@@ -286,17 +295,18 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
 
 // ==========================================
 // get reco optimal in specifiec costheta min and max
-RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
+RVec<double> get_reco_x_theta(RVec<myEvent> &evs, const int mc_type,
                                  const bool bool_mc, const int reco_type,
                                  const bool bool_reco, const double costheta_min,
                                  const double costheta_max);
 
-
 // ==========================================
-RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
-                           const bool bool_mc, const int reco_type,
-                           const bool bool_reco, const bool masscheck,
-                           const bool asymmetric);
+// get weights in specific costheta min and max
+RVec<double> get_weights_theta(const int sign, const RVec<myEvent> &evs,
+                                  const int mc_type, const bool bool_mc,
+                                  const int reco_type, const bool bool_reco,
+                                  const double costheta_min, const double costheta_max);
+
                         
 
 

@@ -94,7 +94,7 @@ class RDFanalysis():
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,EVT_thrust)")
                 
 				.Define("event_type_reco","Ztautau::get_type_safe(myEvent)")
 				
@@ -143,7 +143,8 @@ class RDFanalysis():
             "rho_mass_reject_2",
             "a1_mass_reject",
             "rho_angle_reject_1",
-            "rho_angle_reject_2"
+            "rho_angle_reject_2",
+            
 		
         	
         	]

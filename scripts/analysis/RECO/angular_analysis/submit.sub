@@ -1,0 +1,25 @@
+executable            = run_wrapper.sh
+universe              = vanilla
+getenv                = True
+
+# Transfer the analysis scripts so the node has them
+transfer_input_files  = templates.py, analysis.py
+
+# Logs
+output                = logs/job.$(ClusterId).$(ProcId).out
+error                 = logs/job.$(ClusterId).$(ProcId).err
+log                   = logs/job.$(ClusterId).$(ProcId).log
+
+# Resources
+request_cpus          = 2
+request_memory        = 12GB
++JobFlavour           = "espresso" 
+
+# --- QUEUE LOGIC ---
+# This tells Condor: Read "job_manifest.txt".
+# Assign Column 1 -> $(listFile)
+# Assign Column 2 -> $(rootFile)
+# Assign Column 3 -> $(pyScript)
+arguments             = $(listFile) $(rootFile) $(pyScript)
+
+queue listFile, rootFile, pyScript from job_manifest.txt

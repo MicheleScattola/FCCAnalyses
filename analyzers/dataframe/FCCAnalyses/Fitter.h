@@ -47,6 +47,14 @@ myFit fit_no_plot(const std::string &infile_data,
                   const std::string &name_plus, const std::string &name_minus);
 
 // =========================================================
+// TEMPLATE FIT WITH DATAFRAME FILTERING (for angular binning)
+// =========================================================
+myFit fit_filtered(const std::string &infile_data,
+                   const std::string &infile_templates,
+                   const std::string &treeName, const std::string &dataColName,
+                   const std::string &name_plus, const std::string &name_minus);
+
+// =========================================================
 // ANALYTIC FIT (leptons)
 // =========================================================
 myFit fit(const std::string &infile_data, const std::string &outdir,

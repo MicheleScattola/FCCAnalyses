@@ -213,6 +213,11 @@ void fitALL() {
     std::vector<std::string> labels = {"Electron", "Muon", "Pion", "Rho"};
     const double P_tau_value = -0.14719; // Reference polarization value
 
+    // Save histograms to ROOT file
+    const std::string output_root = data_dir + "average.root";
+    TFile* fout = new TFile(output_root.c_str(), "RECREATE");
+    fout->cd();
+
     for (size_t idx = 0; idx < channels.size(); ++idx) {
         c->cd(idx + 1);
         const auto& data = *channels[idx].first;
@@ -221,6 +226,9 @@ void fitALL() {
         const std::string& label = labels[idx];
         TH1D* h = makeHist(data, "h_" + label, label + " Channel;P_{#tau};Entries", mean, stddev);
         h->Draw();
+        fout->cd();
+        h->Write();
+        c->cd(idx + 1);
 
         // Add blue dashed vertical line at P_tau value with label
         TLine* line = new TLine(P_tau_value, 0, P_tau_value, h->GetMaximum());
@@ -242,6 +250,9 @@ void fitALL() {
     const std::string output_plot = output_dir + "/segmented_summary.pdf";
     c->SaveAs(output_plot.c_str());
     std::cout << "Plot saved to: " << output_plot << std::endl;
+
+    fout->Close();
+    std::cout << "Histograms saved to: " << output_root << std::endl;
 
     std::cout << ">>> All fits completed." << std::endl;
 }

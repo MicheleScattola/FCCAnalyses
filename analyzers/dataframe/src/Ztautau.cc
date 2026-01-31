@@ -24,8 +24,15 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<edm4hep::MCParticleData> &mc,
                           const RVec<int> &daughters, 
                           const RVec<int> &rp2mc_idx,
-                          const double &thrust_costheta,
-                          const double &thrust_phi) {
+                          const RVec<double> &thrust_vector) {
+  
+  // Extract thrust axis components (indices 1, 3, 5 are x, y, z)
+  double thrust_x = thrust_vector[1];
+  double thrust_y = thrust_vector[3];
+  double thrust_z = thrust_vector[5];
+  double thrust_mag = sqrt(thrust_x*thrust_x + thrust_y*thrust_y + thrust_z*thrust_z);
+  double thrust_costheta = thrust_z / thrust_mag;
+  double thrust_phi = atan2(thrust_y, thrust_x);
 
   // collect particles
   RVec<edm4hep::ReconstructedParticleData> mu_tot =
@@ -69,6 +76,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     RVec<int> el_idx = get_idx(hemisphere, el_costheta, el_ids);
     RVec<int> pi_idx = get_idx(hemisphere, pi_costheta, pi_ids);
     RVec<int> ph_idx = get_idx(hemisphere, ph_costheta, ph_ids);
+    
     // fill struct
     ev.n_mu = mu.size();
     ev.n_el = el.size();
@@ -84,18 +92,18 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     fill_collection(ev, pi, ev.m_piP4);
     fill_collection(ev, ph, ev.m_phP4);
 
-    // fill struct
+    // Calculate total momentum of this hemisphere
     TLorentzVector p4_tot;
-    for (auto &p : ev.m_muP4)
-      p4_tot += p;
-    for (auto &p : ev.m_elP4)
-      p4_tot += p;
-    for (auto &p : ev.m_piP4)
-      p4_tot += p;
-    for (auto &p : ev.m_phP4)
-      p4_tot += p;
-
+    for (const auto &p4 : ev.m_muP4) p4_tot += p4;
+    for (const auto &p4 : ev.m_elP4) p4_tot += p4;
+    for (const auto &p4 : ev.m_piP4) p4_tot += p4;
+    for (const auto &p4 : ev.m_phP4) p4_tot += p4;
     
+    // Calculate dot product between hemisphere momentum and thrust axis
+    double dot_product = p4_tot.Px()*thrust_x + p4_tot.Py()*thrust_y + p4_tot.Pz()*thrust_z;
+    
+    // Assign signed costheta: positive if aligned, negative if anti-aligned
+    ev.thrust_costheta_hemi = (dot_product >= 0) ? thrust_costheta : -thrust_costheta;
 
     // MC EVENT CLASSIFICATION & WEIGHTING
 
@@ -211,6 +219,17 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     hemisphere = false;
   }
 
+  return out;
+}
+
+//===================================
+// return signed thrust costheta per hemisphere
+RVec<double> get_thrustcostheta_hemi(const RVec<myEvent> &evs) {
+  RVec<double> out;
+  out.reserve(evs.size());
+  for (const auto &e : evs) {
+    out.push_back(e.thrust_costheta_hemi);
+  }
   return out;
 }
 
@@ -437,6 +456,14 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
       out.push_back(0);
       continue;
     }
+    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11){
+      out.push_back(0);
+      continue;
+    }
+    if(e.m_type == 4 && e.m_debug == 99){
+      out.push_back(0);
+      continue;
+    }
 
     out.push_back(e.m_type);
   }
@@ -646,6 +673,7 @@ RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
     if(e.m_debug_mass == 1) continue;
 
     if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
+    if(e.m_type == 4 && e.m_debug == 99) continue;
 
 
     // optimal variable
@@ -675,6 +703,7 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
     if(e.m_debug_mass == 1) continue;
 
     if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
+    if(e.m_type == 4 && e.m_debug == 99) continue;
 
     // get weight based on sign passed
     if (sign > 0)
@@ -1196,6 +1225,77 @@ RVec<double> get_Ptau(const RVec<myEvent> &evs, const int mc_type,
 };
 
 // ==========================================
+// get reco optimal in specifiec costheta min and max
+RVec<double> get_reco_x_theta(RVec<myEvent> &evs, const int mc_type,
+                                 const bool bool_mc, const int reco_type,
+                                 const bool bool_reco, const double costheta_min,
+                                 const double costheta_max) {
+
+  RVec<double> out;
+
+  for (auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+
+    // masscheck
+    if(e.m_debug_mass == 1) continue;
+
+    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
+    if(e.m_type == 4 && e.m_debug == 99) continue;
+
+    // check costheta cuts
+    if (e.thrust_costheta_hemi < costheta_min || e.thrust_costheta_hemi > costheta_max)
+      continue;
+    // optimal variable
+    out.push_back(e.m_omega);
+  }
+
+  return out;
+}
+
+// ==========================================
+// get weights in specific costheta min and max
+RVec<double> get_weights_theta(const int sign, const RVec<myEvent> &evs,
+                                  const int mc_type, const bool bool_mc,
+                                  const int reco_type, const bool bool_reco,
+                                  const double costheta_min, const double costheta_max) {
+
+  RVec<double> out;
+
+  for (const auto &e : evs) {
+    // check mc event
+    if (bool_mc && e.mc_type != mc_type)
+      continue;
+    // check reco event
+    if (bool_reco && e.m_type != reco_type)
+      continue;
+
+    // masscheck
+    if(e.m_debug_mass == 1) continue;
+
+    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
+    if(e.m_type == 4 && e.m_debug == 99) continue;
+
+    // check costheta cuts
+    if (e.thrust_costheta_hemi < costheta_min || e.thrust_costheta_hemi > costheta_max)
+      continue;
+
+    // return appropriate weight
+    if (sign > 0) {
+      out.push_back(e.mc_weight_plus);
+    } else {
+      out.push_back(e.mc_weight_minus);
+    }
+  }
+
+  return out;
+}
+
+// ==========================================
 // DEBUG
 // ==========================================
 
@@ -1477,31 +1577,6 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 
-// ==========================================
-// get reco optimal in specifiec costheta min and max
-RVec<double> get_reco_omega_cut(RVec<myEvent> &evs, const int mc_type,
-                                 const bool bool_mc, const int reco_type,
-                                 const bool bool_reco, const double costheta_min,
-                                 const double costheta_max) {
-
-  RVec<double> out;
-
-  for (auto &e : evs) {
-    // check mc event
-    if (bool_mc && e.mc_type != mc_type)
-      continue;
-    // check reco event
-    if (bool_reco && e.m_type != reco_type)
-      continue;
-    // check costheta cuts
-    if (e.thrust_costheta < costheta_min || e.thrust_costheta > costheta_max)
-      continue;
-    // optimal variable
-    out.push_back(e.m_omega);
-  }
-
-  return out;
-}
 
 // ==========================================
 RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,

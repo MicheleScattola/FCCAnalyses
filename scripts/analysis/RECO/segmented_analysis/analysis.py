@@ -93,17 +93,16 @@ class RDFanalysis():
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,EVT_thrust)")
     
                 
-				#APPLYING INV MASS CHECK:
 				# pi signal
-				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true,true)")
+				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true)")
 				# lepton signals
-                .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true,true)")
-                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.594")
+                .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true)")
+                .Define("mu_sgn","Ztautau::get_reco_x(myEvent,1,false,1,true)")
 				# rho signal
-                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
+                .Define("rho_sgn","Ztautau::get_reco_x(myEvent,4,false,4,true)")
 
 				  
                 )
