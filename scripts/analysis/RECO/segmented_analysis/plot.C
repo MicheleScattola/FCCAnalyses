@@ -5,6 +5,7 @@
 #include "TStyle.h"
 #include "TLine.h"
 #include "TLatex.h"
+#include "TF1.h"
 #include <sys/stat.h>
 
 void plot() {
@@ -44,8 +45,19 @@ void plot() {
         c->cd(i + 1);
         hists[i]->SetTitle((std::string(labels[i]) + " Channel;P_{#tau};Entries").c_str());
         hists[i]->SetLineWidth(2);
-        hists[i]->SetLineColor(kRed + 1);
+        hists[i]->SetLineColor(kBlack);
         hists[i]->Draw();
+
+        // Fit with Gaussian using histogram mean and stddev as initial parameters
+        double mean = hists[i]->GetMean();
+        double stddev = hists[i]->GetStdDev();
+        
+        TF1* gaus = new TF1(Form("gaus_%d", i), "gaus");
+        gaus->SetParameters(hists[i]->GetMaximum(), mean, stddev);
+        gaus->SetLineColor(kRed);
+        gaus->SetLineWidth(1);
+        hists[i]->Fit(gaus, "");
+        gaus->Draw("same");
 
         //TLine* line = new TLine(P_tau_value, 0, P_tau_value, hists[i]->GetMaximum());
         TLine* line = new TLine(P_tau_value, 0, P_tau_value, 8);
@@ -54,7 +66,7 @@ void plot() {
         line->SetLineWidth(2);
         line->Draw();
 
-        double stddev = hists[i]->GetStdDev();
+        //double stddev = hists[i]->GetStdDev();
         TLatex* txt = new TLatex(P_tau_value + 0.5 * stddev, hists[i]->GetMaximum() * 0.5, "P_{#tau}^{SM}");
         txt->SetTextColor(kBlue);
         txt->SetTextSize(0.05);

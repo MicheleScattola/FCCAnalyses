@@ -21,5 +21,9 @@ root -l -b -q ../confusion/matrix.C
 root -l -b -q ../confusion/matrix_eff.C
 root -l -b -q ../confusion/matrix_pur.C
 
+echo ">>> 5. Generating invariant mass plots..."
+
+root -l -b -q ../additional/mass.C
+
 
 echo ">>> DONE."

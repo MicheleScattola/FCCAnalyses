@@ -5,7 +5,7 @@ void mass() {
 
     gROOT->Reset();
 
-    const char* infile = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/p8_ee_Ztautau_ecm91.root";
+    const char* infile = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/split_analysis/output_merged.root";
     const char* outdir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/additional";
 
     gSystem->Exec(Form("mkdir -p %s", outdir));

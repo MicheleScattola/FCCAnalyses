@@ -175,6 +175,7 @@ void fitALL() {
     double std_mu = h_mu ? h_mu->GetStdDev() : 0.0;
     double std_pi = h_pi ? h_pi->GetStdDev() : 0.0;
     double std_rho = h_rho ? h_rho->GetStdDev() : 0.0;
+    const bool use_segmented_errors = (std_el > 0 && std_mu > 0 && std_pi > 0 && std_rho > 0);
     if (fAvg) fAvg->Close();
     
 
@@ -191,8 +192,10 @@ void fitALL() {
         std::vector<double> P_values = {bin_results.P_el, bin_results.P_mu, bin_results.P_pi, bin_results.P_rho};
         std::vector<double> P_errors = {bin_results.err_el, bin_results.err_mu, bin_results.err_pi, bin_results.err_rho};
         
-        // Optional: override per-bin fit errors with stddev from average.root
-        P_errors = {std_el, std_mu, std_pi, std_rho};
+        // Use segmented analysis errors for the quadratic sum in the weighted average
+        if (use_segmented_errors) {
+            P_errors = {std_el, std_mu, std_pi, std_rho};
+        }
         
         
         double sum_weights = 0.0;
@@ -223,7 +226,8 @@ void fitALL() {
             std::cout << "  P_pi = " << std::fixed << std::setprecision(6) << bin_results.P_pi << " ± " << bin_results.err_pi << std::endl;
             std::cout << "  P_rho = " << std::fixed << std::setprecision(6) << bin_results.P_rho << " ± " << bin_results.err_rho << std::endl;
             std::cout << "  Combined P = " << std::fixed << std::setprecision(6) << P_combined 
-                      << " ± " << P_combined_err << " (from " << valid_channels << " channels)" << std::endl;
+                      << " ± " << P_combined_err << " (from " << valid_channels << " channels, "
+                      << (use_segmented_errors ? "segmented errors" : "per-bin fit errors") << ")" << std::endl;
         } else {
             std::cout << "Bin " << bin_index << " [" << bin_low << ", " << bin_high << "): No valid results" << std::endl;
         }

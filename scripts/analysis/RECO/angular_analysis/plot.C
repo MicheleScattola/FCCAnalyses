@@ -49,13 +49,14 @@ void plot() {
   std::cout << "[INFO] Loaded TGraph with " << gr_Ptau->GetN() << " points" << std::endl;
   
   // Restyle the graph
-  gr_Ptau->SetTitle("Tau Polarization vs cos(#theta);cos(#theta);P_{#tau}");
+  gr_Ptau->SetTitle("P_{#tau} (cos#theta);cos#theta;P_{#tau}");
   gr_Ptau->SetMarkerStyle(20);
   gr_Ptau->SetMarkerSize(1.0);
   gr_Ptau->SetMarkerColor(kBlack);
   gr_Ptau->SetLineColor(kBlack);
   gr_Ptau->SetLineWidth(2);
   gr_Ptau->GetYaxis()->SetRangeUser(-0.35, 0.05);
+  gr_Ptau->GetXaxis()->SetRangeUser(-1, 1);
   
   // Create canvas
   TCanvas *c = new TCanvas("c_universality", "Tau Polarization Universality", 900, 700);
@@ -105,7 +106,7 @@ void plot() {
   leg->SetFillColor(kWhite);
   leg->AddEntry(gr_Ptau, "Combined data", "ep");
   leg->AddEntry(f_ptau, Form("Fit: A_{e} = %.4f #pm %.4f", A_e_fit, A_e_err), "l");
-  leg->AddEntry(f_theory, Form("SM: A_{e} = %.4f", SM_Atau_theory), "l");
+  leg->AddEntry(f_theory, Form("SM: A_{e} #equiv A_{#tau} = %.4f", SM_Atau_theory), "l");
   leg->AddEntry((TObject*)0, Form("#chi^{2}/ndf = %.2f", chi2_ndf), "");
   leg->Draw();
   

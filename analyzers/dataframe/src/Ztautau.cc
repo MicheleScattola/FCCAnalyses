@@ -1164,6 +1164,10 @@ RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
+    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+      continue;
+    if (e.m_type == 4 && e.m_debug == 99)
+      continue;
     // invariant mass
     out.push_back(e.m_RecoMass);
   }
@@ -1181,6 +1185,10 @@ RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
       continue;
     // check reco event
     if (bool_reco && e.m_type != reco_type)
+      continue;
+    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+      continue;
+    if (e.m_type == 4 && e.m_debug == 99)
       continue;
     // meson mass
     out.push_back(e.mc_daughterMass - e.m_RecoMass);
