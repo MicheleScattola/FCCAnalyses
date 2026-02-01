@@ -120,10 +120,8 @@ void matrix_pur(){
         }
     }
 
-    
-    TString name_pdf = Form("%sconf_pur.pdf", outdir);
-
-    c->SaveAs(name_pdf);
+    c->SaveAs(Form("%sconf_pur.pdf", outdir));
+    c->SaveAs(Form("%sconf_pur.png", outdir));
 
     //f->Close();
 }

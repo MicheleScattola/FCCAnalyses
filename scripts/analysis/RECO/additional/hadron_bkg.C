@@ -64,6 +64,7 @@ void hadron_bkg() {
     gPad->RedrawAxis();
 
     cPi->SaveAs(Form("%sPion_Bkg.pdf", outDir));
+    cPi->SaveAs(Form("%sPion_Bkg.png", outDir));
 
 
     // =======================================================
@@ -94,6 +95,7 @@ void hadron_bkg() {
     gPad->RedrawAxis();
     
     cRho->SaveAs(Form("%sRho_Bkg.pdf", outDir));
+    cRho->SaveAs(Form("%sRho_Bkg.png", outDir));
 
     // 7. Cleanup
     delete cPi; delete cRho; delete h_Rest;

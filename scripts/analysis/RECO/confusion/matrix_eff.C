@@ -118,10 +118,8 @@ void matrix_eff(){
             t->Draw("same");
         }
     }
-
-    TString name_pdf = Form("%sconf_eff.pdf", outdir);
-
-    c->SaveAs(name_pdf);
+    c->SaveAs(Form("%sconf_eff.pdf", outdir));
+    c->SaveAs(Form("%sconf_eff.png", outdir));
 
     //f->Close();
 }

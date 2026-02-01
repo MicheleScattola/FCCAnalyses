@@ -65,7 +65,9 @@ void plot() {
 
     mkdir(output_dir.c_str(), 0755);
     const std::string output_plot = output_dir + "/segmented_summary.pdf";
+    const std::string output_plot_png = output_dir + "/segmented_summary.png";
     c->SaveAs(output_plot.c_str());
+    c->SaveAs(output_plot_png.c_str());
     std::cout << "Plot saved to: " << output_plot << std::endl;
 
     fin->Close();

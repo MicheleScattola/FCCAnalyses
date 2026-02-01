@@ -14,6 +14,7 @@
 #include "TLegend.h"
 #include "TMatrixDSym.h"
 #include "TObjArray.h"
+#include "TPaveText.h"
 #include "TStyle.h"
 
 namespace Fitter {
@@ -551,8 +552,8 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   TF1 *f_fit = new TF1("f_template", functor, xMin, xMax, 2);
 
   // Setup Parameters
-  f_fit->SetParName(0, "Norm");
-  f_fit->SetParName(1, "P_tau");
+  f_fit->SetParName(0, "N");
+  f_fit->SetParName(1, "P_{#tau}");
   f_fit->FixParameter(0, h_data->Integral());
   f_fit->SetParameter(1, -0.15);
 
@@ -560,7 +561,7 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   // Q = Quiet
   // M = Improved Errors (alg from TMinuit)
   // E = Better errors estimation (Minos technique)
-  TFitResultPtr fitStatus = h_data->Fit(f_fit, "L Q");
+  TFitResultPtr fitStatus = h_data->Fit(f_fit, "L Q S");
 
   if ((Int_t)fitStatus != 0) {
     std::cerr << "[Fitter] Template Fit failed." << std::endl;
@@ -586,6 +587,7 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
 
   // plotting
   gStyle->SetOptStat(0);
+  gStyle->SetOptFit(0);
   TCanvas *c = new TCanvas("c", "Fit", 800, 600);
 
   // scale templates to data
@@ -610,6 +612,8 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   h_data->SetMarkerStyle(20);
   h_data->SetMarkerSize(0.8);
   h_data->SetMinimum(0.);
+  h_data->GetXaxis()->SetTitleSize(0.045);
+
 
   TH1D *h_result_total = (TH1D *)h_plus_plot->Clone("h_res_total");
   h_result_total->Add(h_minus_plot);
@@ -619,7 +623,6 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   h_result_total->SetLineStyle(1);
   h_result_total->SetFillStyle(0);
 
-  // remove fit function from histogram to avoid drawing it
   h_data->GetListOfFunctions()->Clear();
 
   h_data->Draw("E1 X0 P");
@@ -627,19 +630,26 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   h_plus_plot->Draw("HIST SAME");
   h_minus_plot->Draw("HIST SAME");
 
-  TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
-  leg->SetTextSize(0.035);
-  leg->AddEntry(h_data, "Data", "lp");
-  // leg->AddEntry(f_fit, "Global Fit", "l");
-  leg->AddEntry(h_plus_plot, "#it{H} = +1", "l");
-  leg->AddEntry(h_minus_plot, "#it{H} = -1", "l");
-  leg->Draw();
+  // TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
+  // leg->SetTextSize(0.035);
+  // leg->AddEntry(h_data, "Data", "lp");
+  // // leg->AddEntry(f_fit, "Global Fit", "l");
+  // leg->AddEntry(h_plus_plot, "#it{H} = +1", "l");
+  // leg->AddEntry(h_minus_plot, "#it{H} = -1", "l");
+  // leg->Draw();
 
-  TLatex *tex = new TLatex();
-  tex->SetNDC();
-  tex->SetTextSize(0.035);
-  tex->SetTextFont(42);
-  tex->DrawLatex(0.6, 0.60, Form("P_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
+  const double chi2 = fitStatus->Chi2();
+  const int ndf = fitStatus->Ndf();
+  TPaveText *stats = new TPaveText(0.58, 0.7, 0.88, 0.88, "NDC");
+  stats->SetTextFont(42);
+  stats->SetTextSize(0.035);
+  stats->SetFillColorAlpha(kGray, 0.2);
+  //stats->SetBorderSize(1);
+  stats->SetTextAlign(12);
+  stats->AddText(Form("Events : %.0f", Norm));
+  stats->AddText(Form("#chi^{2}/ndf = %.0f/%d", chi2, ndf));
+  stats->AddText(Form("P_{#tau} = %.4f #pm %.4f", f_fit->GetParameter(1), f_fit->GetParError(1)));
+  stats->Draw();
 
   c->SaveAs((outdir + output_filename).c_str());
   

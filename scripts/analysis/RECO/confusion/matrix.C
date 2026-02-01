@@ -100,10 +100,8 @@ void matrix(){
     gStyle->SetPaintTextFormat("1.1e");
     hConf->Draw("COLZ TEXT");
 
-    TString name_pdf = Form("%smatrix_id.pdf", outdir);
-
-    //c->SaveAs(name_png);
-    c->SaveAs(name_pdf);
+    c->SaveAs(Form("%smatrix_id.png", outdir));
+    c->SaveAs(Form("%smatrix_id.pdf", outdir));
 
     //f->Close();
 }

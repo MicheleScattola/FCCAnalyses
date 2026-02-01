@@ -90,6 +90,7 @@ void mass() {
     C1->Update();
 
     C1->SaveAs(Form("%s/a1_mass.pdf", outdir));
+    C1->SaveAs(Form("%s/a1_mass.png", outdir));
 
     // RHO
     TCanvas* C2 = new TCanvas("C2", "rho Comparison", 800, 600);
@@ -124,6 +125,7 @@ void mass() {
     leg2->Draw();
 
     C2->SaveAs(Form("%s/rho_mass.pdf", outdir));
+    C2->SaveAs(Form("%s/rho_mass.png", outdir));
 
     // PULLS
     TCanvas* C3 = new TCanvas("C3", "Mass pulls", 900, 600);
@@ -148,6 +150,7 @@ void mass() {
     rPull->Draw("HIST");
 
     C3->SaveAs(Form("%s/mass_pulls.pdf", outdir));
+    C3->SaveAs(Form("%s/mass_pulls.png", outdir));
     
     // ==========================================
     // OVERFLOW COUNTS
