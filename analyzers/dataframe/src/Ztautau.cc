@@ -12,7 +12,6 @@ using namespace std;
 
 namespace Ztautau {
 
-
 //===================================
 // EVENT SRUCT
 //===================================
@@ -22,15 +21,16 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<edm4hep::ReconstructedParticleData> &rps,
                           const RVec<double> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
-                          const RVec<int> &daughters, 
+                          const RVec<int> &daughters,
                           const RVec<int> &rp2mc_idx,
                           const RVec<double> &thrust_vector) {
-  
+
   // Extract thrust axis components (indices 1, 3, 5 are x, y, z)
   double thrust_x = thrust_vector[1];
   double thrust_y = thrust_vector[3];
   double thrust_z = thrust_vector[5];
-  double thrust_mag = sqrt(thrust_x*thrust_x + thrust_y*thrust_y + thrust_z*thrust_z);
+  double thrust_mag =
+      sqrt(thrust_x * thrust_x + thrust_y * thrust_y + thrust_z * thrust_z);
   double thrust_costheta = thrust_z / thrust_mag;
   double thrust_phi = atan2(thrust_y, thrust_x);
 
@@ -76,7 +76,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     RVec<int> el_idx = get_idx(hemisphere, el_costheta, el_ids);
     RVec<int> pi_idx = get_idx(hemisphere, pi_costheta, pi_ids);
     RVec<int> ph_idx = get_idx(hemisphere, ph_costheta, ph_ids);
-    
+
     // fill struct
     ev.n_mu = mu.size();
     ev.n_el = el.size();
@@ -94,16 +94,22 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
     // Calculate total momentum of this hemisphere
     TLorentzVector p4_tot;
-    for (const auto &p4 : ev.m_muP4) p4_tot += p4;
-    for (const auto &p4 : ev.m_elP4) p4_tot += p4;
-    for (const auto &p4 : ev.m_piP4) p4_tot += p4;
-    for (const auto &p4 : ev.m_phP4) p4_tot += p4;
-    
+    for (const auto &p4 : ev.m_muP4)
+      p4_tot += p4;
+    for (const auto &p4 : ev.m_elP4)
+      p4_tot += p4;
+    for (const auto &p4 : ev.m_piP4)
+      p4_tot += p4;
+    for (const auto &p4 : ev.m_phP4)
+      p4_tot += p4;
+
     // Calculate dot product between hemisphere momentum and thrust axis
-    double dot_product = p4_tot.Px()*thrust_x + p4_tot.Py()*thrust_y + p4_tot.Pz()*thrust_z;
-    
+    double dot_product = p4_tot.Px() * thrust_x + p4_tot.Py() * thrust_y +
+                         p4_tot.Pz() * thrust_z;
+
     // Assign signed costheta: positive if aligned, negative if anti-aligned
-    ev.thrust_costheta_hemi = (dot_product >= 0) ? thrust_costheta : -thrust_costheta;
+    ev.thrust_costheta_hemi =
+        (dot_product >= 0) ? thrust_costheta : -thrust_costheta;
 
     // MC EVENT CLASSIFICATION & WEIGHTING
 
@@ -151,8 +157,6 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         }
       }
 
-
-
       // if tau has tau daughter skip this particle, it's not final tau
       if (tau_not_final)
         continue;
@@ -199,8 +203,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
     // Leptonic
     if ((ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
-      ev.m_type =
-          classify_lep(ev, mu_idx, el_idx, rp2mc_idx);
+      ev.m_type = classify_lep(ev, mu_idx, el_idx, rp2mc_idx);
     }
     // Hadronic
     else if (ev.n_pi > 0 && ev.n_mu == 0 && ev.n_el == 0) {
@@ -212,7 +215,8 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     }
 
     // calculate optimal variables for reco
-    if(ev.m_type != 0) reco_omega(ev);
+    if (ev.m_type != 0)
+      reco_omega(ev);
 
     // push back and change hemisphere
     out.push_back(ev);
@@ -280,7 +284,6 @@ RVec<double> getThrustPointing(const RVec<double> &charge,
   return out;
 }
 
-
 //===================================
 // select pion indices as hadron with mass = 0.139570
 RVec<int> sel_pions_id(const RVec<edm4hep::ReconstructedParticleData> &in,
@@ -296,7 +299,6 @@ RVec<int> sel_pions_id(const RVec<edm4hep::ReconstructedParticleData> &in,
   }
   return out;
 }
-
 
 // ==========================================
 // helper to fill P4 and add energy & charge
@@ -372,9 +374,8 @@ int classify_MC(const RVec<int> &pdgs) {
 // RECO EVENT CLASSIFICATION
 // ==========================================
 
-
 int classify_lep(myEvent &ev, const RVec<int> &mu_idx, const RVec<int> &el_idx,
-                    const RVec<int> &rp2mc_idx) {
+                 const RVec<int> &rp2mc_idx) {
 
   // Check MUON: 1 mu, 0 others
   if (ev.n_mu == 1 && ev.n_el == 0) {
@@ -396,7 +397,6 @@ int classify_lep(myEvent &ev, const RVec<int> &mu_idx, const RVec<int> &el_idx,
 
   return 0;
 }
-
 
 int classify_pion(myEvent &ev, const RVec<int> &pi_idx,
                   const RVec<int> &rp2mc_idx) {
@@ -456,11 +456,11 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
       out.push_back(0);
       continue;
     }
-    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11){
+    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) {
       out.push_back(0);
       continue;
     }
-    if(e.m_type == 4 && e.m_debug == 99){
+    if (e.m_type == 4 && e.m_debug == 99) {
       out.push_back(0);
       continue;
     }
@@ -474,39 +474,38 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
 // RECO OPTIMAL VARIABLE CALCULATION
 // ==========================================
 
-void reco_omega(myEvent &ev){
+void reco_omega(myEvent &ev) {
 
-    // leptonic
-    if(ev.m_type == 1){
-      ev.m_omega = ev.m_muP4[0].E()/E_TAU;
+  // leptonic
+  if (ev.m_type == 1) {
+    ev.m_omega = ev.m_muP4[0].E() / E_TAU;
 
-    }else if(ev.m_type == 2){
-      ev.m_omega  = ev.m_elP4[0].E()/E_TAU;
+  } else if (ev.m_type == 2) {
+    ev.m_omega = ev.m_elP4[0].E() / E_TAU;
 
+  }
+  // pion
+  else if (ev.m_type == 3) {
+    ev.m_omega = ev.m_piP4[0].E() / E_TAU;
+  }
+  // rho
+  else if (ev.m_type == 4) {
+
+    TLorentzVector p4_tau, p4_pip, p4_pi0, p4_rho;
+
+    p4_tau = ev.mc_tauP4;
+    p4_pip = ev.m_piP4[0];
+
+    // build pi0 from photons
+    for (const auto &p : ev.m_phP4) {
+      p4_pi0 += p;
     }
-    // pion
-    else if(ev.m_type == 3) {
-      ev.m_omega = ev.m_piP4[0].E()/E_TAU;
-    }
-    // rho
-    else if(ev.m_type == 4){
-      
-      TLorentzVector p4_tau, p4_pip, p4_pi0, p4_rho;
 
-      p4_tau = ev.mc_tauP4;
-      p4_pip = ev.m_piP4[0];
+    p4_rho = p4_pip + p4_pi0;
 
-      //build pi0 from photons
-      for(const auto &p: ev.m_phP4){
-        p4_pi0 += p;
-      }
-
-      p4_rho = p4_pip + p4_pi0;
-
-      ev.m_omega = calculate_omega_rho(ev,p4_tau,p4_rho,p4_pip,p4_pi0);
-    }
-    // a1
-
+    ev.m_omega = calculate_omega_rho(ev, p4_tau, p4_rho, p4_pip, p4_pi0);
+  }
+  // a1
 }
 
 // ==========================================
@@ -561,7 +560,6 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
     // flag bad event
     ev.m_debug = 99;
   }
-
 
   if (cos_psi_rho > 1.0 || cos_psi_rho < -1.0) {
     cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho
@@ -627,8 +625,6 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
   return omega;
 }
 
-
-
 // ==========================================
 // EXTRACT VARIABLES
 // ==========================================
@@ -670,11 +666,13 @@ RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
       continue;
 
     // masscheck
-    if(e.m_debug_mass == 1) continue;
+    if (e.m_debug_mass == 1)
+      continue;
 
-    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
-    if(e.m_type == 4 && e.m_debug == 99) continue;
-
+    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+      continue;
+    if (e.m_type == 4 && e.m_debug == 99)
+      continue;
 
     // optimal variable
     out.push_back(e.m_omega);
@@ -682,8 +680,6 @@ RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
 
   return out;
 }
-
-
 
 // ==========================================
 RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
@@ -700,10 +696,13 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
       continue;
 
     // masscheck
-    if(e.m_debug_mass == 1) continue;
+    if (e.m_debug_mass == 1)
+      continue;
 
-    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
-    if(e.m_type == 4 && e.m_debug == 99) continue;
+    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+      continue;
+    if (e.m_type == 4 && e.m_debug == 99)
+      continue;
 
     // get weight based on sign passed
     if (sign > 0)
@@ -976,8 +975,6 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_weight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 }
 
-
-
 // omega_rho with p4 angles instead of kinematic variables, possible only for MC
 // possible to implement with RECO with tau reconstruction??
 double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
@@ -1227,9 +1224,9 @@ RVec<double> get_Ptau(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 // get reco optimal in specifiec costheta min and max
 RVec<double> get_reco_x_theta(RVec<myEvent> &evs, const int mc_type,
-                                 const bool bool_mc, const int reco_type,
-                                 const bool bool_reco, const double costheta_min,
-                                 const double costheta_max) {
+                              const bool bool_mc, const int reco_type,
+                              const bool bool_reco, const double costheta_min,
+                              const double costheta_max) {
 
   RVec<double> out;
 
@@ -1242,13 +1239,17 @@ RVec<double> get_reco_x_theta(RVec<myEvent> &evs, const int mc_type,
       continue;
 
     // masscheck
-    if(e.m_debug_mass == 1) continue;
+    if (e.m_debug_mass == 1)
+      continue;
 
-    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
-    if(e.m_type == 4 && e.m_debug == 99) continue;
+    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+      continue;
+    if (e.m_type == 4 && e.m_debug == 99)
+      continue;
 
     // check costheta cuts
-    if (e.thrust_costheta_hemi < costheta_min || e.thrust_costheta_hemi > costheta_max)
+    if (e.thrust_costheta_hemi < costheta_min ||
+        e.thrust_costheta_hemi > costheta_max)
       continue;
     // optimal variable
     out.push_back(e.m_omega);
@@ -1260,9 +1261,10 @@ RVec<double> get_reco_x_theta(RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 // get weights in specific costheta min and max
 RVec<double> get_weights_theta(const int sign, const RVec<myEvent> &evs,
-                                  const int mc_type, const bool bool_mc,
-                                  const int reco_type, const bool bool_reco,
-                                  const double costheta_min, const double costheta_max) {
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco,
+                               const double costheta_min,
+                               const double costheta_max) {
 
   RVec<double> out;
 
@@ -1275,13 +1277,17 @@ RVec<double> get_weights_theta(const int sign, const RVec<myEvent> &evs,
       continue;
 
     // masscheck
-    if(e.m_debug_mass == 1) continue;
+    if (e.m_debug_mass == 1)
+      continue;
 
-    if(e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) continue;
-    if(e.m_type == 4 && e.m_debug == 99) continue;
+    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+      continue;
+    if (e.m_type == 4 && e.m_debug == 99)
+      continue;
 
     // check costheta cuts
-    if (e.thrust_costheta_hemi < costheta_min || e.thrust_costheta_hemi > costheta_max)
+    if (e.thrust_costheta_hemi < costheta_min ||
+        e.thrust_costheta_hemi > costheta_max)
       continue;
 
     // return appropriate weight
@@ -1298,7 +1304,6 @@ RVec<double> get_weights_theta(const int sign, const RVec<myEvent> &evs,
 // ==========================================
 // DEBUG
 // ==========================================
-
 
 RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type,
                          const int n_photons, const bool bool_ph) {
@@ -1335,11 +1340,9 @@ RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
   return out;
 }
 
-
-
 // =========================================
 // NOT IN USE
-// =========================================  
+// =========================================
 
 // ==========================================
 RVec<double> get_photon_e(const RVec<myEvent> &evs, const int mc_type,
@@ -1577,7 +1580,6 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
   return out;
 };
 
-
 // ==========================================
 RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
                            const bool bool_mc, const int reco_type,
@@ -1668,12 +1670,11 @@ RVec<double> get_lepton_x(const RVec<myEvent> &evs, const int mc_type,
       continue;
     // lepton energy
     if (e.n_mu > 0)
-      out.push_back(e.m_muP4[0].E()/E_TAU);
+      out.push_back(e.m_muP4[0].E() / E_TAU);
     else if (e.n_el > 0)
-      out.push_back(e.m_elP4[0].E()/E_TAU);
+      out.push_back(e.m_elP4[0].E() / E_TAU);
   }
   return out;
 };
-
 
 } // namespace Ztautau

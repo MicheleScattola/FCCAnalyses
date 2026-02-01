@@ -10,6 +10,7 @@
 #include "TFractionFitter.h"
 #include "TGaxis.h"
 #include "TH1D.h"
+#include "TLatex.h"
 #include "TLegend.h"
 #include "TMatrixDSym.h"
 #include "TObjArray.h"
@@ -256,16 +257,30 @@ myFit fit_fraction(const std::string &infile_data,
   h_plus_plot->Draw("HIST SAME");
   h_minus_plot->Draw("HIST SAME");
 
-  TLegend *leg = new TLegend(0.6, 0.6, 0.88, 0.9);
+  TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.9);
+  leg->SetTextSize(0.035);
   leg->AddEntry(h_data, "Data", "lp");
   leg->AddEntry(h_plus_plot, "#it{H} = +1", "l");
   leg->AddEntry(h_minus_plot, "#it{H} = -1", "l");
-  leg->AddEntry((TObject *)0,
-                Form("#bf{#it{P} = %.4f #pm %.4f}", result.P_tau, result.P_err),
-                "");
   leg->Draw();
 
+  TLatex *tex = new TLatex();
+  tex->SetNDC();
+  tex->SetTextSize(0.035);
+  tex->SetTextFont(42);
+  tex->DrawLatex(0.6, 0.60, Form("#mathcal{P}_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
+
   c->SaveAs((outdir + output_filename).c_str());
+  
+  // Save as PNG
+  std::string png_filename = output_filename;
+  size_t dot_pos = png_filename.rfind('.');
+  if (dot_pos != std::string::npos) {
+    png_filename = png_filename.substr(0, dot_pos) + ".png";
+  } else {
+    png_filename += ".png";
+  }
+  c->SaveAs((outdir + png_filename).c_str());
 
   delete c;
   delete f_fit;
@@ -376,7 +391,8 @@ myFit fit_no_plot(const std::string &infile_data,
 myFit fit_filtered(const std::string &infile_data,
                    const std::string &infile_templates,
                    const std::string &treeName, const std::string &dataColName,
-                   const std::string &name_plus, const std::string &name_minus) {
+                   const std::string &name_plus,
+                   const std::string &name_minus) {
   myFit result = {0, 0, 0, 0, false, "Template_Filtered"};
 
   // Recover Templates
@@ -409,12 +425,12 @@ myFit fit_filtered(const std::string &infile_data,
   // retrieve data and filter by RP_costheta
   ROOT::EnableImplicitMT();
   ROOT::RDataFrame df(treeName, infile_data);
-  
+
   if (!df.HasColumn(dataColName)) {
     std::cerr << "[Fitter] Data column missing: " << dataColName << std::endl;
     return result;
   }
-  
+
   int nBins = h_plus->GetNbinsX();
   double xMin = h_plus->GetXaxis()->GetXmin();
   double xMax = h_plus->GetXaxis()->GetXmax();
@@ -598,7 +614,7 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   TH1D *h_result_total = (TH1D *)h_plus_plot->Clone("h_res_total");
   h_result_total->Add(h_minus_plot);
 
-  h_result_total->SetLineColor(kGray + 2);
+  h_result_total->SetLineColor(kGray + 3);
   h_result_total->SetLineWidth(2);
   h_result_total->SetLineStyle(1);
   h_result_total->SetFillStyle(0);
@@ -611,17 +627,31 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   h_plus_plot->Draw("HIST SAME");
   h_minus_plot->Draw("HIST SAME");
 
-  TLegend *leg = new TLegend(0.6, 0.6, 0.88, 0.9);
+  TLegend *leg = new TLegend(0.6, 0.65, 0.88, 0.88);
+  leg->SetTextSize(0.035);
   leg->AddEntry(h_data, "Data", "lp");
   // leg->AddEntry(f_fit, "Global Fit", "l");
   leg->AddEntry(h_plus_plot, "#it{H} = +1", "l");
   leg->AddEntry(h_minus_plot, "#it{H} = -1", "l");
-  leg->AddEntry((TObject *)0,
-                Form("#bf{#it{P} = %.4f #pm %.4f}", result.P_tau, result.P_err),
-                "");
   leg->Draw();
 
+  TLatex *tex = new TLatex();
+  tex->SetNDC();
+  tex->SetTextSize(0.035);
+  tex->SetTextFont(42);
+  tex->DrawLatex(0.6, 0.60, Form("P_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
+
   c->SaveAs((outdir + output_filename).c_str());
+  
+  // Save as PS
+  std::string png_filename = output_filename;
+  size_t dot_pos = png_filename.rfind('.');
+  if (dot_pos != std::string::npos) {
+    png_filename = png_filename.substr(0, dot_pos) + ".png";
+  } else {
+    png_filename += ".png";
+  }
+  c->SaveAs((outdir + png_filename).c_str());
 
   delete c;
   delete f_fit;
@@ -707,17 +737,31 @@ myFit fit(const std::string &infile_data, const std::string &outdir,
   h_p->Draw("SAME");
   h_m->Draw("SAME");
 
-  TLegend *leg = new TLegend(0.2, 0.2, 0.55, 0.4);
+  TLegend *leg = new TLegend(0.2, 0.25, 0.55, 0.45);
+  leg->SetTextSize(0.035);
   leg->AddEntry(h_data, "Data", "lp");
   leg->AddEntry(f_fit, "Fit", "l");
   leg->AddEntry(h_p, "#it{H} = +1", "l");
   leg->AddEntry(h_m, "#it{H} = -1", "l");
-  leg->AddEntry((TObject *)0,
-                Form("#bf{#it{P} = %.4f #pm %.4f}", result.P_tau, result.P_err),
-                "");
   leg->Draw();
 
+  TLatex *tex = new TLatex();
+  tex->SetNDC();
+  tex->SetTextSize(0.035);
+  tex->SetTextFont(42);
+  tex->DrawLatex(0.2, 0.20, Form("P_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
+
   c->SaveAs((outdir + output_filename).c_str());
+  
+  // Save as PNG
+  std::string png_filename = output_filename;
+  size_t dot_pos = png_filename.rfind('.');
+  if (dot_pos != std::string::npos) {
+    png_filename = png_filename.substr(0, dot_pos) + ".png";
+  } else {
+    png_filename += ".png";
+  }
+  c->SaveAs((outdir + png_filename).c_str());
 
   delete c;
   delete f_fit;

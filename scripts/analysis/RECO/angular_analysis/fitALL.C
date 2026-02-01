@@ -164,7 +164,7 @@ void fitALL() {
     std::cout << "COMBINED RESULTS BY RP_costheta BIN" << std::endl;
     std::cout << "========================================\n" << std::endl;
 
-    /*
+    
     // Optional: use stddev from segmented analysis instead of fit errors
     TFile* fAvg = TFile::Open("/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/segmented_analysis/average.root", "READ");
     TH1D* h_el = fAvg ? (TH1D*)fAvg->Get("h_Electron") : nullptr;
@@ -176,7 +176,7 @@ void fitALL() {
     double std_pi = h_pi ? h_pi->GetStdDev() : 0.0;
     double std_rho = h_rho ? h_rho->GetStdDev() : 0.0;
     if (fAvg) fAvg->Close();
-    */
+    
 
     bin_index = 0;
     for (double bin_low = cos_min; bin_low < cos_max; bin_low += step) {
@@ -190,10 +190,10 @@ void fitALL() {
         // w_i = 1 / sigma_i^2
         std::vector<double> P_values = {bin_results.P_el, bin_results.P_mu, bin_results.P_pi, bin_results.P_rho};
         std::vector<double> P_errors = {bin_results.err_el, bin_results.err_mu, bin_results.err_pi, bin_results.err_rho};
-        /*
+        
         // Optional: override per-bin fit errors with stddev from average.root
         P_errors = {std_el, std_mu, std_pi, std_rho};
-        */
+        
         
         double sum_weights = 0.0;
         double sum_weighted_P = 0.0;

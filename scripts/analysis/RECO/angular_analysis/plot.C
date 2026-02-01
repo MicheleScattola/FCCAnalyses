@@ -27,7 +27,7 @@ struct PtauFunctor {
   }
 };
 
-void universality() {
+void plot() {
   gStyle->SetOptStat(0);
   //gStyle->SetOptFit(111);
   

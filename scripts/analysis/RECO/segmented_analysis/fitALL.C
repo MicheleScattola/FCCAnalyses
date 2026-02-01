@@ -194,15 +194,6 @@ void fitALL() {
 
     std::cout << "========================================" << std::endl;
 
-    // =========================================================================
-    // 5. DRAW DISTRIBUTIONS (2x2 CANVAS) AND SAVE
-    // =========================================================================
-
-    gStyle->SetOptStat(1111); // Show entries, mean, and RMS on stat box
-
-    TCanvas* c = new TCanvas("c", "Polarization distributions", 1200, 900);
-    c->Divide(2, 2);
-
     std::vector<std::pair<std::vector<double>*, std::pair<double, double>>> channels = {
         {&P_el, {mean_el, stddev_el}},
         {&P_mu, {mean_mu, stddev_mu}},
@@ -211,7 +202,6 @@ void fitALL() {
     };
 
     std::vector<std::string> labels = {"Electron", "Muon", "Pion", "Rho"};
-    const double P_tau_value = -0.14719; // Reference polarization value
 
     // Save histograms to ROOT file
     const std::string output_root = data_dir + "average.root";
@@ -219,37 +209,14 @@ void fitALL() {
     fout->cd();
 
     for (size_t idx = 0; idx < channels.size(); ++idx) {
-        c->cd(idx + 1);
         const auto& data = *channels[idx].first;
         double mean = channels[idx].second.first;
         double stddev = channels[idx].second.second;
         const std::string& label = labels[idx];
         TH1D* h = makeHist(data, "h_" + label, label + " Channel;P_{#tau};Entries", mean, stddev);
-        h->Draw();
         fout->cd();
         h->Write();
-        c->cd(idx + 1);
-
-        // Add blue dashed vertical line at P_tau value with label
-        TLine* line = new TLine(P_tau_value, 0, P_tau_value, h->GetMaximum());
-        line->SetLineColor(kBlue);
-        line->SetLineStyle(2); // Dashed line
-        line->SetLineWidth(2);
-        line->Draw();
-
-        // Add text label next to the line
-        TLatex* txt = new TLatex(P_tau_value + 0.5*stddev, h->GetMaximum() * 0.5, "P_{#tau}^{SM}");
-        txt->SetTextColor(kBlue);
-        txt->SetTextSize(0.05);
-        txt->Draw();
     }
-
-    // Ensure output directory exists
-    mkdir(output_dir.c_str(), 0755);
-
-    const std::string output_plot = output_dir + "/segmented_summary.pdf";
-    c->SaveAs(output_plot.c_str());
-    std::cout << "Plot saved to: " << output_plot << std::endl;
 
     fout->Close();
     std::cout << "Histograms saved to: " << output_root << std::endl;

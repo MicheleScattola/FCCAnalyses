@@ -39,7 +39,6 @@ const double SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
 const double SQRTS = 91.188;    // Z pole energy
 const double E_TAU = SQRTS / 2; // tau energy at Z pole
 
-
 //===================================
 // myEVENT
 //===================================
@@ -51,10 +50,10 @@ struct myEvent {
   double m_RecoEnergy = 0.;                   // total energy in hemisphere
   double m_RecoMass = 0.; // total invariant mass in hemisphere
   RVec<TLorentzVector> m_muP4, m_elP4, m_piP4,
-      m_phP4;     // particle TLorentzVectors
-  int m_type = 0; // event reco type
+      m_phP4;            // particle TLorentzVectors
+  int m_type = 0;        // event reco type
   int m_type_before = 0; // event reco type before optimal variable constraints
-  double m_omega = 0; // optimal variable binned
+  double m_omega = 0;    // optimal variable binned
 
   // MC
   int mc_tau_index = -1;        // tau MC index
@@ -96,7 +95,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                           const RVec<edm4hep::ReconstructedParticleData> &rps,
                           const RVec<double> &rps_costheta,
                           const RVec<edm4hep::MCParticleData> &mc,
-                          const RVec<int> &daughters, 
+                          const RVec<int> &daughters,
                           const RVec<int> &rp2mc_idx,
                           const RVec<double> &thrust_vector);
 
@@ -138,14 +137,13 @@ inline RVec<T> get_elements_by_index(const RVec<T> &A, const RVec<int> &B) {
   return out;
 }
 
-     
 //===================================
 // EVENT CLASSIFICATION
-//===================================                  
+//===================================
 
 // ==========================================
 int classify_lep(myEvent &ev, const RVec<int> &mu_idx, const RVec<int> &el_idx,
-                    const RVec<int> &rp2mc_idx);
+                 const RVec<int> &rp2mc_idx);
 
 int classify_pion(myEvent &ev, const RVec<int> &pi_idx,
                   const RVec<int> &rp2mc_idx);
@@ -173,7 +171,7 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
 RVec<double> get_optimal(RVec<myEvent> &evs, const int mc_type,
                          const bool bool_mc, const int reco_type,
                          const bool bool_reco);
-                         
+
 // =========================================
 RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
                         const bool bool_mc, const int reco_type,
@@ -183,7 +181,6 @@ RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
 RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                          const int mc_type, const bool bool_mc,
                          const int reco_type, const bool bool_reco);
-
 
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
@@ -213,7 +210,7 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
                            const TLorentzVector &p4_rho,
                            const TLorentzVector &p4_pip,
                            const TLorentzVector &p4_pi0);
-                           
+
 // ==========================================
 // additional
 // ==========================================
@@ -252,12 +249,12 @@ RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
 
 // =========================================
 // NOT IN USE
-// =========================================      
+// =========================================
 RVec<double> get_lepton_x(const RVec<myEvent> &evs, const int mc_type,
                           const bool bool_mc, const int reco_type,
                           const bool bool_reco, const bool masscheck,
                           const bool asymmetric);
-                                               
+
 RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
                           const bool bool_mc, const int reco_type,
                           const bool masscheck);
@@ -296,19 +293,17 @@ RVec<double> get_MCdaughter_mass(const RVec<myEvent> &evs, const int mc_type,
 // ==========================================
 // get reco optimal in specifiec costheta min and max
 RVec<double> get_reco_x_theta(RVec<myEvent> &evs, const int mc_type,
-                                 const bool bool_mc, const int reco_type,
-                                 const bool bool_reco, const double costheta_min,
-                                 const double costheta_max);
+                              const bool bool_mc, const int reco_type,
+                              const bool bool_reco, const double costheta_min,
+                              const double costheta_max);
 
 // ==========================================
 // get weights in specific costheta min and max
 RVec<double> get_weights_theta(const int sign, const RVec<myEvent> &evs,
-                                  const int mc_type, const bool bool_mc,
-                                  const int reco_type, const bool bool_reco,
-                                  const double costheta_min, const double costheta_max);
-
-                        
-
+                               const int mc_type, const bool bool_mc,
+                               const int reco_type, const bool bool_reco,
+                               const double costheta_min,
+                               const double costheta_max);
 
 } // namespace Ztautau
 
