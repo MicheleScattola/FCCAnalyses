@@ -646,7 +646,7 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   stats->SetFillColorAlpha(kGray, 0.2);
   //stats->SetBorderSize(1);
   stats->SetTextAlign(12);
-  stats->AddText(Form("Events : %.0f", Norm));
+  stats->AddText(Form("Events : %.2e", Norm));
   stats->AddText(Form("#chi^{2}/ndf = %.0f/%d", chi2, ndf));
   stats->AddText(Form("P_{#tau} = %.4f #pm %.4f", f_fit->GetParameter(1), f_fit->GetParError(1)));
   stats->Draw();

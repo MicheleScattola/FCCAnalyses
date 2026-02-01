@@ -25,6 +25,9 @@ void rho_rejection_efficiency() {
     auto h_reject_1 = df.Histo1D({"h_rho_mass_reject_1", "rho_mass_reject_1", 6, -0.5, 5.5}, "rho_mass_reject_1");
     auto h_reject_2 = df.Histo1D({"h_rho_mass_reject_2", "rho_mass_reject_2", 6, -0.5, 5.5}, "rho_mass_reject_2");
     
+    auto h_angle_1 = df.Histo1D({"h_rho_angle_reject_1", "rho_angle_reject_1", 6, -0.5, 5.5}, "rho_angle_reject_1");
+    auto h_angle_2 = df.Histo1D({"h_rho_angle_reject_2", "rho_angle_reject_2", 6, -0.5, 5.5}, "rho_angle_reject_2");
+    
     std::cout << ">>> Histograms built via DataFrame" << std::endl;
     
     // =========================================================================
@@ -112,6 +115,19 @@ void rho_rejection_efficiency() {
               << " = " << std::fixed << std::setprecision(6) << eff_1 << std::endl;
     std::cout << "rho_mass_reject_2: Background/Total = " << background_2 << "/" << total_2 
               << " = " << std::fixed << std::setprecision(6) << eff_2 << std::endl;
+    
+    // =========================================================================
+    // 9. ANGLE REJECTION HISTOGRAMS (TOTAL ENTRIES ONLY)
+    // =========================================================================
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "ANGLE REJECTION HISTOGRAMS" << std::endl;
+    std::cout << "========================================" << std::endl;
+    
+    int total_angle_1 = static_cast<int>(h_angle_1->GetEntries());
+    int total_angle_2 = static_cast<int>(h_angle_2->GetEntries());
+    
+    std::cout << "rho_angle_reject_1: Total entries = " << total_angle_1 << std::endl;
+    std::cout << "rho_angle_reject_2: Total entries = " << total_angle_2 << std::endl;
     
     std::cout << "\n>>> Analysis completed." << std::endl;
 }
