@@ -74,9 +74,9 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     TLorentzVector tau_reco;
     double p_mag = sqrt(E_TAU * E_TAU - SM_TAU * SM_TAU);
     
-    p4_tau.SetVectM(thrust_vector.Unit() * p_mag, SM_TAU);
+    tau_reco.SetVectM(thrust_vector.Unit() * p_mag, SM_TAU);
 
-    ev.m_tauP4 = p4_tau;
+    ev.m_tauP4 = tau_reco;
 
     // select particles in hemisphere
     // bool hemisphere starts as true for positive hemi, changing after first
@@ -1326,7 +1326,7 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_daughterMass = p4_rho_lab.M();
 
   // test with reco tau p4
-  TLorentzVector p4_tau_reco = ev.m_RecoTauP4;
+  TLorentzVector p4_tau_reco = ev.m_tauP4;
 
   double omega =
       geometric_omega_rho(ev, p4_tau_reco, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
