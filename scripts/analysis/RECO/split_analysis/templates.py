@@ -102,12 +102,18 @@ class RDFanalysis():
                 
 				# pi signal and weights
 				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true)")
+                #.Define("pi_sgn","Ztautau::get_optimal(myEvent,3,true,3,false)")
 				.Define("w_plus_pi","Ztautau::get_weights(1,myEvent,3,false,3,true)")
 				.Define("w_minus_pi","Ztautau::get_weights(-1,myEvent,3,false,3,true)")
+                #.Define("w_plus_pi","Ztautau::get_MCweights(1,myEvent,3)")
+                #.Define("w_minus_pi","Ztautau::get_MCweights(-1,myEvent,3)")
 				# rho signal
                 .Define("rho_sgn","Ztautau::get_reco_x(myEvent,4,false,4,true)")
+                #.Define("rho_sgn","Ztautau::get_optimal(myEvent,4,true,4,false)")
                 .Define("w_plus_rho","Ztautau::get_weights(1,myEvent,4,false,4,true)")
 				.Define("w_minus_rho","Ztautau::get_weights(-1,myEvent,4,false,4,true)")
+                #.Define("w_plus_rho","Ztautau::get_MCweights(1,myEvent,4)")
+                #.Define("w_minus_rho","Ztautau::get_MCweights(-1,myEvent,4)")
                 
 				# lep signal and weights
                 .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true)")

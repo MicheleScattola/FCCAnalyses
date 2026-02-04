@@ -139,7 +139,7 @@ void templates() {
     // IMPORTANT: Add NaN filter for Rho to prevent the "Empty Histogram" crash
     std::cout << "Processing Rho..." << std::endl;
     auto df_rho_clean = df.Filter("!std::isnan(rho_sgn[0])", "NaN Filter Rho");
-    create_and_save(df_rho_clean, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, 40, -1., 1.);
+    create_and_save(df_rho_clean, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, 40, -1, 1);
 
 
     // Close file

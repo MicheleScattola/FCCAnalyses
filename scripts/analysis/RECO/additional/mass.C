@@ -63,7 +63,7 @@ void mass() {
     //f->SetLineColor(kMagenta);
     //f->Draw("SAME");
     
-    // zoom pad
+    /* zoom pad
     TPad *p = new TPad("pad","zoom",0.15,0.2,0.4,0.6,kWhite,1,0);
     p->SetLineColor(kBlack);
     p->SetLineWidth(1);
@@ -80,7 +80,8 @@ void mass() {
     l->Draw("SAME");
     aMC->Draw("SAME");
     aReco->Draw("SAME");
-    
+    */
+   
     C1->cd();
     TLegend* leg1 = new TLegend(0.2, 0.70, 0.4, 0.88);
     leg1->AddEntry(aMC, "MC a_{1}", "f");   
@@ -157,8 +158,8 @@ void mass() {
     // ==========================================
     
     // Find bin for 2 GeV
-    int bin_a_start = aReco->FindBin(2);
-    int bin_r_start = rReco->FindBin(2);
+    int bin_a_start = aReco->FindBin(2.01);
+    int bin_r_start = rReco->FindBin(2.01);
     
     // GetNbinsX() + 1 is the OVERFLOW bin
     double counts_a = aReco->Integral(bin_a_start, aReco->GetNbinsX() + 1);

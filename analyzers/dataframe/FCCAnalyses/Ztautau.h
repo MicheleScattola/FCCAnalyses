@@ -33,6 +33,7 @@ namespace rv = ROOT::VecOps;
 
 const double SM_TAU = 1.77686; // tau mass in GeV
 const double SM_PI = 0.13957039;
+const double SM_RHO = 0.77526; // rho mass in GeV
 const double SM_sin2thetaW = 0.2315;
 const double gv_ga = 1 - 4 * SM_sin2thetaW;
 const double SM_Atau = 2 * gv_ga / (1 + gv_ga * gv_ga);
@@ -62,6 +63,7 @@ struct myEvent {
   double mc_weight_plus = 1.0;  // reweighting for h = +1
   double mc_weight_minus = 1.0; // reweighting for h = -1
   double mc_omega = 0.;         // optimal variable for each channel
+  double mc_charge = 0.;
   bool m_found = false;
   TLorentzVector mc_tauP4; // P4 of mc tau
   TLorentzVector
@@ -81,6 +83,9 @@ struct myEvent {
   double thrust_costheta = -999;
   double thrust_phi = -999;
   double thrust_costheta_hemi = -999;
+  double thrust_x = 0.;
+  double thrust_y = 0.;
+  double thrust_z = 0.;
 
   bool is_dressed = false;
 };
@@ -183,6 +188,10 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
                          const int reco_type, const bool bool_reco);
 
 // ==========================================
+RVec<double> get_MCweights(const int sign, const RVec<myEvent> &evs,
+                         const int mc_type);
+
+// ==========================================
 // RE-WEIGHTING FUNCTIONS
 // ==========================================
 double calc_Ptau(const TLorentzVector &p4_tau);
@@ -206,7 +215,13 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
                     const RVec<int> &daughters);
 
 // omega_rho with p4 angles instead of kinematic variables, possible only for MC
-double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
+double MC_calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
+                           const TLorentzVector &p4_rho,
+                           const TLorentzVector &p4_pip,
+                           const TLorentzVector &p4_pi0);
+
+// omega rho MC with p4 angles instead of kinematics
+double geometric_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
                            const TLorentzVector &p4_rho,
                            const TLorentzVector &p4_pip,
                            const TLorentzVector &p4_pi0);

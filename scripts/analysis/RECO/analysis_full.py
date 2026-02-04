@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.03},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.02},
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -64,7 +64,8 @@ class RDFanalysis():
 				.Define("RP_thrustangle",   'Algorithms::getAxisCosTheta(EVT_thrust, RP_px, RP_py, RP_pz)')
 				.Define("RP_thrustcostheta","return EVT_thrust[5]/ sqrt(EVT_thrust[1]*EVT_thrust[1]   + EVT_thrust[3]*EVT_thrust[3]   + EVT_thrust[5]*EVT_thrust[5])")
 				.Define("RP_thrustphi", "return atan2(EVT_thrust[3],EVT_thrust[1])")
-				
+				.Filter("abs(RP_thrustcostheta)<0.95")
+
 				#####
 				# RECONSTRUCTED PARTICLES
 				#####
@@ -93,7 +94,7 @@ class RDFanalysis():
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,EVT_thrust)")
                 
 								
 				# parameters are: event collection, MC type, reco type, masscheck

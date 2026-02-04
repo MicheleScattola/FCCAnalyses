@@ -34,6 +34,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
   double thrust_costheta = thrust_z / thrust_mag;
   double thrust_phi = atan2(thrust_y, thrust_x);
 
+
   // collect particles
   RVec<edm4hep::ReconstructedParticleData> mu_tot =
       ReconstructedParticle::get(mu_ids, rps);
@@ -59,6 +60,9 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
     ev.thrust_costheta = thrust_costheta;
     ev.thrust_phi = thrust_phi;
+    ev.thrust_x = thrust_x;
+    ev.thrust_y = thrust_y;
+    ev.thrust_z = thrust_z;
 
     // select particles in hemisphere
     // bool hemisphere starts as true for positive hemi, changing after first
@@ -102,6 +106,8 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       p4_tot += p4;
     for (const auto &p4 : ev.m_phP4)
       p4_tot += p4;
+    // set reconstructed mass
+    ev.m_RecoMass = p4_tot.M();
 
     // Calculate dot product between hemisphere momentum and thrust axis
     double dot_product = p4_tot.Px() * thrust_x + p4_tot.Py() * thrust_y +
@@ -187,19 +193,12 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       if (ev.mc_weight_plus < 0.0 || ev.mc_weight_minus < 0.0) {
         cerr << "[WARNING]: negative MC weight!" << endl;
       }
+      
       // now exit the loop
       break;
     }
 
     // RECO EVENT CLASSIFICATION
-
-    // generic mass limit less than 2 GeV
-    ev.m_RecoMass = p4_tot.M();
-    if (ev.m_RecoMass > 2) {
-      ev.m_debug_mass = 1; // high mass
-
-      // do not store type = 0 to check which events are rejected by rho case
-    }
 
     // Leptonic
     if ((ev.n_mu == 1 || ev.n_el == 1) && ev.n_pi == 0) {
@@ -217,6 +216,21 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     // calculate optimal variables for reco
     if (ev.m_type != 0)
       reco_omega(ev);
+
+    // generic mass limit less than 2 GeV
+    if (ev.m_RecoMass > 2) {
+      ev.m_debug_mass = 1; // high mass
+
+      // do not store type = 0 to check which events are rejected by rho case
+    }
+
+    // if negative weights reset type to 0
+    if (ev.mc_weight_plus < 0.0 || ev.mc_weight_minus < 0.0) {
+      cerr << "[WARNING]: negative weights, setting reco type to 0 from " << ev.m_type
+           << endl;
+      ev.m_type = 0;
+      ev.mc_type = 0;
+    }
 
     // push back and change hemisphere
     out.push_back(ev);
@@ -414,9 +428,10 @@ int classify_pion(myEvent &ev, const RVec<int> &pi_idx,
       return 3; // Type 3: Single Pion
 
     } else if (ev.n_ph >= 1 && ev.n_ph <= 2) {
+    //} else if (ev.n_ph == 2) {
 
       // flag: 0,2 GeV < mass < 1.4 GeV
-      if (ev.m_RecoMass > 1.4 || ev.m_RecoMass < 0.2) {
+      if (ev.m_RecoMass > 1.2 || ev.m_RecoMass < 0.3) {
         ev.m_debug_mass = 11;
       }
 
@@ -456,7 +471,7 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
       out.push_back(0);
       continue;
     }
-    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11) {
+    if (e.m_type == 4 && e.m_debug_mass == 11) {
       out.push_back(0);
       continue;
     }
@@ -486,14 +501,15 @@ void reco_omega(myEvent &ev) {
   }
   // pion
   else if (ev.m_type == 3) {
-    ev.m_omega = ev.m_piP4[0].E() / E_TAU;
+    double x = ev.m_piP4[0].E() / E_TAU;
+    ev.m_omega = x;
   }
   // rho
   else if (ev.m_type == 4) {
 
     TLorentzVector p4_tau, p4_pip, p4_pi0, p4_rho;
 
-    p4_tau = ev.mc_tauP4;
+    //p4_tau = ev.mc_tauP4;
     p4_pip = ev.m_piP4[0];
 
     // build pi0 from photons
@@ -503,7 +519,18 @@ void reco_omega(myEvent &ev) {
 
     p4_rho = p4_pip + p4_pi0;
 
-    ev.m_omega = calculate_omega_rho(ev, p4_tau, p4_rho, p4_pip, p4_pi0);
+    // calculate approx tau p4
+    //TLorentzVector p4_tau;
+    TVector3 thrustDir(ev.thrust_x, ev.thrust_y, ev.thrust_z);
+
+    if(p4_rho.Vect().Dot(thrustDir) < 0) {
+      thrustDir = -thrustDir;
+    }
+    double p_mag = sqrt(E_TAU * E_TAU - SM_TAU * SM_TAU);
+    
+    p4_tau.SetVectM(thrustDir.Unit() * p_mag, SM_TAU);
+
+    ev.m_omega = geometric_omega_rho(ev, p4_tau, p4_rho, p4_pip, p4_pi0);
   }
   // a1
 }
@@ -530,35 +557,43 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
       (2.0 * E_rho / E_tau - 1.0 - (m_rho * m_rho) / (SM_TAU * SM_TAU)) /
       (1.0 - (m_rho * m_rho) / (SM_TAU * SM_TAU));
 
-  if (cos_psi_tau > 1.0) {
+  if (cos_psi_tau > 1.01) {
     cos_psi_tau = 1.0;
     // flag bad event
     ev.m_debug = 99;
+  } else if (cos_psi_tau > 1.0) {
+    cos_psi_tau = 1.0;
   }
-  if (cos_psi_tau < -1.0) {
+  if (cos_psi_tau < -1.01) {
     cos_psi_tau = -1.0;
     // flag bad event
     ev.m_debug = 99;
+  } else if (cos_psi_tau < -1.0) {
+    cos_psi_tau = -1.0;
   }
 
   // angle of charged pion in rho rest frame
   // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged -
-  // E_pi_neutral) / P_rho check sqrt argument
-  if (m_rho * m_rho - 4.0 * SM_PI * SM_PI <= 0) {
+  // 50 MeV buffer over 2 m_pi for the reco rho mass
+  if (m_rho < 2.0 * SM_PI + 0.05) {
     ev.m_debug = 99;
   }
   double cos_psi_rho = (m_rho / sqrt(m_rho * m_rho - 4.0 * SM_PI * SM_PI)) *
                        (p4_pip.E() - p4_pi0.E()) / P_rho;
 
-  if (cos_psi_rho > 1.0) {
+  if (cos_psi_rho > 1.01) {
     cos_psi_rho = 1.0;
     // flag bad event
     ev.m_debug = 99;
+  } else if (cos_psi_rho > 1.0) {
+    cos_psi_rho = 1.0;
   }
-  if (cos_psi_rho < -1.0) {
+  if (cos_psi_rho < -1.01) {
     cos_psi_rho = -1.0;
     // flag bad event
     ev.m_debug = 99;
+  } else if (cos_psi_rho < -1.0) {
+    cos_psi_rho = -1.0;
   }
 
   if (cos_psi_rho > 1.0 || cos_psi_rho < -1.0) {
@@ -581,31 +616,31 @@ double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
   // Precompute trig terms for w functions
   double cos_eta = cos(eta);
   double sin_eta = sin(eta);
-  double cos_theta_2 = cos(psi_tau / 2.0);
-  double sin_theta_2 = sin(psi_tau / 2.0);
+  double cos_psi_tau_2 = cos(psi_tau / 2.0);
+  double sin_psi_tau_2 = sin(psi_tau / 2.0);
 
   // Calculate w_0 and w_1 components
   // w0+
   double term0p =
-      SM_TAU * cos_eta * cos_theta_2 + m_rho * sin_eta * sin_theta_2;
+      SM_TAU * cos_eta * cos_psi_tau_2 + m_rho * sin_eta * sin_psi_tau_2;
   double w0_plus = term0p * term0p;
 
   // w0-
   double term0m =
-      SM_TAU * cos_eta * sin_theta_2 - m_rho * sin_eta * cos_theta_2;
+      SM_TAU * cos_eta * sin_psi_tau_2 - m_rho * sin_eta * cos_psi_tau_2;
   double w0_minus = term0m * term0m;
 
   // w1 +
   double term1p =
-      SM_TAU * sin_eta * cos_theta_2 - m_rho * cos_eta * sin_theta_2;
+      SM_TAU * sin_eta * cos_psi_tau_2 - m_rho * cos_eta * sin_psi_tau_2;
   double w1_plus =
-      (term1p * term1p) + (m_rho * m_rho * sin_theta_2 * sin_theta_2);
+      (term1p * term1p) + (m_rho * m_rho * sin_psi_tau_2 * sin_psi_tau_2);
 
   // w1 -
   double term1m =
-      SM_TAU * sin_eta * sin_theta_2 + m_rho * cos_eta * cos_theta_2;
+      SM_TAU * sin_eta * sin_psi_tau_2 + m_rho * cos_eta * cos_psi_tau_2;
   double w1_minus =
-      (term1m * term1m) + (m_rho * m_rho * cos_theta_2 * cos_theta_2);
+      (term1m * term1m) + (m_rho * m_rho * cos_psi_tau_2 * cos_psi_tau_2);
 
   // Calculate h functions
   double h0 = 2.0 * cos_psi_rho * cos_psi_rho;
@@ -669,8 +704,8 @@ RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
     if (e.m_debug_mass == 1)
       continue;
 
-    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
-      continue;
+    /*if (e.m_type == 4 && e.m_debug_mass == 11)
+      continue;*/
     if (e.m_type == 4 && e.m_debug == 99)
       continue;
 
@@ -699,9 +734,28 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
     if (e.m_debug_mass == 1)
       continue;
 
-    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
-      continue;
+    /*if (e.m_type == 4 && e.m_debug_mass == 11)
+      continue;*/
     if (e.m_type == 4 && e.m_debug == 99)
+      continue;
+
+    // get weight based on sign passed
+    if (sign > 0)
+      out.push_back(e.mc_weight_plus);
+    else if (sign < 0)
+      out.push_back(e.mc_weight_minus);
+  }
+  return out;
+};
+
+// ==========================================
+RVec<double> get_MCweights(const int sign, const RVec<myEvent> &evs,
+                         const int mc_type) {
+
+  RVec<double> out;
+  for (const auto &e : evs) {
+    // check mc event
+    if (e.mc_type != mc_type)
       continue;
 
     // get weight based on sign passed
@@ -856,12 +910,18 @@ void pion_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_daughterMass = p4_pi_lab.M();
   z = GetCosThetaStar(p4_tau_lab, p4_pi_lab);
   // weight
-  double w_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
-  double w_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
+  //double w_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
+  //double w_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
+
+  double x = p4_pi_lab.E() / E_TAU;
+  double omega = 2 * x - 1;
+
+  double w_plus = (1 + omega) / (1 + Ptau * omega);
+  double w_minus = (1 - omega) / (1 + Ptau * omega);
 
   ev.mc_weight_plus = w_plus;
   ev.mc_weight_minus = w_minus;
-  ev.mc_omega = p4_pi_lab.E() / E_TAU;
+  ev.mc_omega = x;
 }
 
 // rho re-weighting
@@ -969,84 +1029,115 @@ void a1_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   }
   ev.mc_daughterP4 = p4_a1_lab;
   ev.mc_daughterMass = p4_a1_lab.M();
+  double m_a1 = p4_a1_lab.M();
+
   z = GetCosThetaStar(p4_tau_lab, p4_a1_lab);
+  alpha =
+      (SM_TAU * SM_TAU - 2 * m_a1 * m_a1) / (SM_TAU * SM_TAU + 2 * m_a1 * m_a1);
   // weights
   ev.mc_weight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
   ev.mc_weight_minus = (1 - alpha * z) / (1 + alpha * Ptau * z);
 }
 
-// omega_rho with p4 angles instead of kinematic variables, possible only for MC
-// possible to implement with RECO with tau reconstruction??
-double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
+// omega_rho with kinematics for MC
+double MC_calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
                            const TLorentzVector &p4_rho,
                            const TLorentzVector &p4_pip,
                            const TLorentzVector &p4_pi0) {
 
-  // get MC variables
-  double m_rho = p4_rho.M();
+  // get mass and energies from p4
+  double m_rho = p4_rho.M(); // use rho pole mass instead of actual MC mass
   double E_rho = p4_rho.E();
   double E_tau = p4_tau.E();
   double P_rho = p4_rho.P();
 
   // angle of rho in tau rest frame
+  // cos_psi_tau = (2x - 1 - m_rho^2/m_tau^2) / (1 - m_rho^2/m_tau^2)
+  // where x = E_rho / E_tau
 
-  double cos_psi_tau = GetCosThetaStar(p4_tau, p4_rho);
+  double cos_psi_tau =
+      (2.0 * E_rho / E_tau - 1.0 - (m_rho * m_rho) / (SM_TAU * SM_TAU)) /
+      (1.0 - (m_rho * m_rho) / (SM_TAU * SM_TAU));
 
-  if (cos_psi_tau > 1.0)
+  if (cos_psi_tau > 1.01) {
     cos_psi_tau = 1.0;
-  if (cos_psi_tau < -1.0)
-    cos_psi_tau = -1.0;
-
-  // aAngle of charged pion in rho rest frame
-
-  double cos_psi_rho = GetCosThetaStar(p4_rho, p4_pip);
-
-  if (cos_psi_rho > 1.0)
-    cos_psi_rho = 1.0;
-  if (cos_psi_rho < -1.0)
-    cos_psi_rho = -1.0;
-
-  if (cos_psi_rho > 1.0 || cos_psi_rho < -1.0) {
-    cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho
-         << " , reco evt = " << ev.m_type << endl;
-  }
-  if (cos_psi_tau > 1.0 || cos_psi_tau < -1.0) {
     cerr << "[WARNING]: cos(psi_tau) out of bounds: " << cos_psi_tau
-         << " , reco evt = " << ev.m_type << endl;
+         << " , MC_m_rho = " << m_rho << endl;
+  } else if (cos_psi_tau > 1.0) {
+    cos_psi_tau = 1.0;
+  }
+  if (cos_psi_tau < -1.01) {
+    cos_psi_tau = -1.0;
+    cerr << "[WARNING]: cos(psi_tau) out of bounds: " << cos_psi_tau
+         << " , MC_m_rho = " << m_rho << endl;
+  } else if (cos_psi_tau < -1.0) {
+    cos_psi_tau = -1.0;
   }
 
+  // angle of charged pion in rho rest frame
+  // cos_psi_rho = (m_rho / sqrt(m_rho^2 - 4m_pi^2)) * (E_pi_charged -
+  // E_pi_neutral) / P_rho check sqrt argument
+  if (m_rho * m_rho - 4.0 * SM_PI * SM_PI <= 0) {
+    cerr << "[WARNING]: sqrt argument negative for cos(psi_rho): "
+         << m_rho * m_rho - 4.0 * SM_PI * SM_PI << " , MC_m_rho = " << m_rho
+         << endl;
+    return -999;
+  }
+  double cos_psi_rho = (m_rho / sqrt(m_rho * m_rho - 4.0 * SM_PI * SM_PI)) *
+                       (p4_pip.E() - p4_pi0.E()) / P_rho;
+
+  if (cos_psi_rho > 1.01) {
+    cos_psi_rho = 1.0;
+    cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho
+         << " , MC_m_rho = " << m_rho << endl;
+  } else if (cos_psi_rho > 1.0) {
+    cos_psi_rho = 1.0;
+  }
+  if (cos_psi_rho < -1.01) {
+    cos_psi_rho = -1.0;
+    cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho
+         << " , MC_m_rho = " << m_rho << endl;
+  } else if (cos_psi_rho < -1.0) {
+    cos_psi_rho = -1.0;
+  }
+
+
+  // compute Omega
   double psi_tau = acos(cos_psi_tau);
+
+  // Wigner Rotation Angle eta
+  // tan(eta/2) = (m_rho/m_tau) * tan(psi_tau/2)
   double tan_theta_2 = tan(psi_tau / 2.0);
   double eta = 2.0 * atan((m_rho / SM_TAU) * tan_theta_2);
 
   // Precompute trig terms for w functions
   double cos_eta = cos(eta);
   double sin_eta = sin(eta);
-  double cos_theta_2 = cos(psi_tau / 2.0);
-  double sin_theta_2 = sin(psi_tau / 2.0);
+  double cos_psi_tau_2 = cos(psi_tau / 2.0);
+  double sin_psi_tau_2 = sin(psi_tau / 2.0);
 
   // Calculate w_0 and w_1 components
   // w0+
   double term0p =
-      SM_TAU * cos_eta * cos_theta_2 + m_rho * sin_eta * sin_theta_2;
+      SM_TAU * cos_eta * cos_psi_tau_2 + m_rho * sin_eta * sin_psi_tau_2;
   double w0_plus = term0p * term0p;
 
   // w0-
   double term0m =
-      SM_TAU * cos_eta * sin_theta_2 - m_rho * sin_eta * cos_theta_2;
+      SM_TAU * cos_eta * sin_psi_tau_2 - m_rho * sin_eta * cos_psi_tau_2;
   double w0_minus = term0m * term0m;
 
   // w1 +
   double term1p =
-      SM_TAU * sin_eta * cos_theta_2 - m_rho * cos_eta * sin_theta_2;
+      SM_TAU * sin_eta * cos_psi_tau_2 - m_rho * cos_eta * sin_psi_tau_2;
   double w1_plus =
-      (term1p * term1p) + (m_rho * m_rho * sin_theta_2 * sin_theta_2);
+      (term1p * term1p) + (m_rho * m_rho * sin_psi_tau_2 * sin_psi_tau_2);
 
   // w1 -
   double term1m =
-      SM_TAU * sin_eta * sin_theta_2 + m_rho * cos_eta * cos_theta_2;
+      SM_TAU * sin_eta * sin_psi_tau_2 + m_rho * cos_eta * cos_psi_tau_2;
   double w1_minus =
-      (term1m * term1m) + (m_rho * m_rho * cos_theta_2 * cos_theta_2);
+      (term1m * term1m) + (m_rho * m_rho * cos_psi_tau_2 * cos_psi_tau_2);
 
   // Calculate h functions
   double h0 = 2.0 * cos_psi_rho * cos_psi_rho;
@@ -1062,6 +1153,110 @@ double geometric_omega_rho(myEvent &ev, TLorentzVector &p4_tau,
     cerr << "[WARNING]: omega > 1.0 (" << omega << ")" << endl;
   if (omega < -1.0)
     cerr << "[WARNING]: omega < -1.0 (" << omega << ")" << endl;
+
+  return omega;
+}
+
+// omega rho with p4 angles instead of kinematics
+double geometric_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
+                           const TLorentzVector &p4_rho,
+                           const TLorentzVector &p4_pip,
+                           const TLorentzVector &p4_pi0) {
+
+  // angle between rho in tau rest frame and tau in lab frame
+
+  //boost rho in tau rest
+  TVector3 boost_to_tau_rest = -p4_tau.BoostVector();
+  TLorentzVector p4_rho_in_tau_rest = p4_rho;
+  p4_rho_in_tau_rest.Boost(boost_to_tau_rest);
+
+  // get tau dir
+  TVector3 tau_dir_lab = p4_tau.Vect().Unit();
+
+  
+  double angle_tau = p4_rho_in_tau_rest.Vect().Angle(tau_dir_lab);
+  double cos_psi_tau = cos(angle_tau);
+
+  // check cos bounds
+  if (cos_psi_tau > 1.01 || cos_psi_tau < -1.01) {
+    cerr << "[WARNING]: cos(psi_tau) out of bounds: " << cos_psi_tau
+         << endl;
+    if(ev.m_type == 4) ev.m_debug = 99;
+  }
+
+
+  // angle between pi direction in rho rest frame and rho flight in lab frame
+
+  // boost pi in rho rest
+  TVector3 boost_to_rho_rest = -p4_rho.BoostVector();
+  TLorentzVector p4_pip_in_rho_rest = p4_pip;
+  p4_pip_in_rho_rest.Boost(boost_to_rho_rest);
+
+  // rho diretion
+  TVector3 rho_dir_lab = p4_rho.Vect().Unit();
+
+
+  double angle_rho = p4_pip_in_rho_rest.Vect().Angle(rho_dir_lab);
+  double cos_psi_rho = cos(angle_rho);
+
+  // check cos bounds
+  if (cos_psi_rho > 1.01 || cos_psi_rho < -1.01) {
+    cerr << "[WARNING]: cos(psi_rho) out of bounds: " << cos_psi_rho
+         << endl;
+    if(ev.m_type == 4) ev.m_debug = 99;
+  }
+  
+  // calculate omega_rho
+
+  double m_rho = p4_rho.M(); 
+
+  // Wigner Rotation Angle eta
+  // tan(eta/2) = (m_rho/m_tau) * tan(psi_tau/2)
+  double tan_theta_2 = tan(angle_tau / 2.0);
+  double eta = 2.0 * atan((m_rho / SM_TAU) * tan_theta_2);
+
+  // Precompute trig terms for w functions
+  double cos_eta = cos(eta);
+  double sin_eta = sin(eta);
+  double cos_psi_tau_2 = cos(angle_tau / 2.0);
+  double sin_psi_tau_2 = sin(angle_tau / 2.0);
+
+  // Calculate w_0 and w_1 components
+  // w0+
+  double term0p =
+      SM_TAU * cos_eta * cos_psi_tau_2 + m_rho * sin_eta * sin_psi_tau_2;
+  double w0_plus = term0p * term0p;
+
+  // w0-
+  double term0m =
+      SM_TAU * cos_eta * sin_psi_tau_2 - m_rho * sin_eta * cos_psi_tau_2;
+  double w0_minus = term0m * term0m;
+
+  // w1 +
+  double term1p =
+      SM_TAU * sin_eta * cos_psi_tau_2 - m_rho * cos_eta * sin_psi_tau_2;
+  double w1_plus =
+      (term1p * term1p) + (m_rho * m_rho * sin_psi_tau_2 * sin_psi_tau_2);
+
+  // w1 -
+  double term1m =
+      SM_TAU * sin_eta * sin_psi_tau_2 + m_rho * cos_eta * cos_psi_tau_2;
+  double w1_minus =
+      (term1m * term1m) + (m_rho * m_rho * cos_psi_tau_2 * cos_psi_tau_2);
+
+  // Calculate h functions
+  double h0 = 2.0 * cos_psi_rho * cos_psi_rho;
+  double h1 = 1.0 - cos_psi_rho * cos_psi_rho;
+
+  // Calculate W+ and W-
+  double W_plus = w1_plus * h1 + w0_plus * h0;
+  double W_minus = w1_minus * h1 + w0_minus * h0;
+
+  double omega = (W_plus - W_minus) / (W_plus + W_minus);
+
+  // Final sanity check
+  if (omega > 1.0) omega = 1.0;
+  if (omega < -1.0) omega = -1.0;
 
   return omega;
 }
@@ -1113,38 +1308,26 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
     }
   }
 
-  if (found_pip && found_pi0) {
-    ev.m_found = true;
-
-    // Reconstruct Rho 4-vector from daughters
-    p4_rho_lab = p4_pip_lab + p4_pi0_lab;
-
-    // Store MC info in event struct
-    ev.mc_daughterP4 = p4_rho_lab;
-    ev.mc_daughterMass = p4_rho_lab.M();
-
-    double omega =
-        geometric_omega_rho(ev, p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
-
-    // ---------------------------------------------------------
-    // ASSIGN WEIGHTS
-    // W ~ 1 + Ptau * omega
-    // H=+1 (Ptau=+1) -> W ~ 1 + omega
-    // H=-1 (Ptau=-1) -> W ~ 1 - omega
-    // ---------------------------------------------------------
-
-    double weight_denom = 1.0 + Ptau * omega;
-    if (fabs(weight_denom) < 1e-6)
-      weight_denom = 1.0; // safety
-
-    ev.mc_weight_plus = (1.0 + omega) / weight_denom;
-    ev.mc_weight_minus = (1.0 - omega) / weight_denom;
-
-  } else {
-    // Fallback if daughters not found correctly
-    ev.mc_weight_plus = 1.0;
-    ev.mc_weight_minus = 1.0;
+  if (!found_pip || !found_pi0) {
+    cerr << "[ERROR]: Could not find all rho daughters in MC" << endl;
+    return;
   }
+
+  // Reconstruct Rho 4-vector from daughters
+  p4_rho_lab = p4_pip_lab + p4_pi0_lab;
+
+  // Store MC info in event struct
+  ev.mc_daughterP4 = p4_rho_lab;
+  ev.mc_daughterMass = p4_rho_lab.M();
+
+  double omega =
+      geometric_omega_rho(ev, p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
+
+  ev.mc_omega = omega;
+
+  //weights
+  ev.mc_weight_plus = (1.0 + omega) / (1.0 + Ptau * omega);
+  ev.mc_weight_minus = (1.0 - omega) / (1.0 + Ptau * omega);
 }
 
 // ==========================================
@@ -1164,9 +1347,11 @@ RVec<double> get_invariant_mass(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
-    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+    if(e.m_debug_mass == 1)
       continue;
-    if (e.m_type == 4 && e.m_debug == 99)
+    if (e.m_debug_mass == 11)
+      continue;
+    if (e.m_debug == 99)
       continue;
     // invariant mass
     out.push_back(e.m_RecoMass);
@@ -1186,9 +1371,11 @@ RVec<double> get_mass_pull(const RVec<myEvent> &evs, const int mc_type,
     // check reco event
     if (bool_reco && e.m_type != reco_type)
       continue;
-    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+    if (e.m_debug_mass == 1)
       continue;
-    if (e.m_type == 4 && e.m_debug == 99)
+    if (e.m_debug_mass == 11)
+      continue;
+    if (e.m_debug == 99)
       continue;
     // meson mass
     out.push_back(e.mc_daughterMass - e.m_RecoMass);
@@ -1476,7 +1663,11 @@ RVec<double> get_hadron_e(const RVec<myEvent> &evs, const int mc_type,
   for (const auto &e : evs) {
 
     // impose invariant mass check
-    if (masscheck && (e.m_debug_mass == 1 || e.m_debug_mass == 11))
+    if (masscheck && e.m_debug_mass == 1)
+      continue;
+    if(masscheck && e.m_type ==4 && e.n_ph==1 && e.m_debug_mass==11)
+      continue;
+    if(masscheck && e.m_type ==4 && e.m_debug==99)
       continue;
 
     // if bool_mc is false skip mc type check
@@ -1643,7 +1834,7 @@ RVec<double> get_omega_rho(RVec<myEvent> &evs, const int mc_type,
       p4_pi0 = e.mc_pi0P4;
       p4_tau = e.mc_tauP4;
       p4_rho = e.mc_daughterP4;
-      double omega = geometric_omega_rho(e, p4_tau, p4_rho, p4_pip, p4_pi0);
+      double omega = MC_calculate_omega_rho(e, p4_tau, p4_rho, p4_pip, p4_pi0);
       out.push_back(omega);
     }
   }
