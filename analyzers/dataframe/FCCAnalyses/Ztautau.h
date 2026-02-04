@@ -83,9 +83,7 @@ struct myEvent {
   double thrust_costheta = -999;
   double thrust_phi = -999;
   double thrust_costheta_hemi = -999;
-  double thrust_x = 0.;
-  double thrust_y = 0.;
-  double thrust_z = 0.;
+  TVector3 thrust_vector;
 
   bool is_dressed = false;
 };
@@ -162,7 +160,7 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs);
 // RECO OPTIMAL VARIABLE CALCULATION
 // ==========================================
 
-void reco_omega(myEvent &ev);
+void reco_omega(myEvent &ev, const TVector3 &thrustDir);
 
 double calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
                            const TLorentzVector &p4_rho,

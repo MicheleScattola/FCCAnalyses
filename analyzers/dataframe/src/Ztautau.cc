@@ -60,9 +60,15 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
     ev.thrust_costheta = thrust_costheta;
     ev.thrust_phi = thrust_phi;
-    ev.thrust_x = thrust_x;
-    ev.thrust_y = thrust_y;
-    ev.thrust_z = thrust_z;
+    
+    TVector3 thrust_vector;
+    thrust_vector.SetXYZ(thrust_x, thrust_y, thrust_z);
+    
+    // flip in negative hemisphere
+    if (!hemisphere) {
+      thrust_vector = -thrust_vector;
+    }
+    ev.thrust_vector = thrust_vector;
 
     // select particles in hemisphere
     // bool hemisphere starts as true for positive hemi, changing after first
@@ -110,8 +116,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     ev.m_RecoMass = p4_tot.M();
 
     // Calculate dot product between hemisphere momentum and thrust axis
-    double dot_product = p4_tot.Px() * thrust_x + p4_tot.Py() * thrust_y +
-                         p4_tot.Pz() * thrust_z;
+    double dot_product = thrust_vector.Dot(p4_tot.Vect());
 
     // Assign signed costheta: positive if aligned, negative if anti-aligned
     ev.thrust_costheta_hemi =
@@ -184,7 +189,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       } else if (ev.mc_type == 3) {
         pion_weight(ev, mc, daughters);
       } else if (ev.mc_type == 4) {
-        rho_weight(ev, mc, daughters);
+        new_rho_weight(ev, mc, daughters);
       } else if (ev.mc_type == 5) {
         a1_weight(ev, mc, daughters);
       }
@@ -215,7 +220,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
 
     // calculate optimal variables for reco
     if (ev.m_type != 0)
-      reco_omega(ev);
+      reco_omega(ev,ev.thrust_vector);
 
     // generic mass limit less than 2 GeV
     if (ev.m_RecoMass > 2) {
@@ -489,7 +494,7 @@ RVec<int> get_type_safe(const RVec<myEvent> &evs) {
 // RECO OPTIMAL VARIABLE CALCULATION
 // ==========================================
 
-void reco_omega(myEvent &ev) {
+void reco_omega(myEvent &ev, const TVector3 &thrustDir) {
 
   // leptonic
   if (ev.m_type == 1) {
@@ -521,11 +526,6 @@ void reco_omega(myEvent &ev) {
 
     // calculate approx tau p4
     //TLorentzVector p4_tau;
-    TVector3 thrustDir(ev.thrust_x, ev.thrust_y, ev.thrust_z);
-
-    if(p4_rho.Vect().Dot(thrustDir) < 0) {
-      thrustDir = -thrustDir;
-    }
     double p_mag = sqrt(E_TAU * E_TAU - SM_TAU * SM_TAU);
     
     p4_tau.SetVectM(thrustDir.Unit() * p_mag, SM_TAU);
@@ -704,8 +704,8 @@ RVec<double> get_reco_x(RVec<myEvent> &evs, const int mc_type,
     if (e.m_debug_mass == 1)
       continue;
 
-    /*if (e.m_type == 4 && e.m_debug_mass == 11)
-      continue;*/
+    if (e.m_type == 4 && e.m_debug_mass == 11)
+      continue;
     if (e.m_type == 4 && e.m_debug == 99)
       continue;
 
@@ -734,8 +734,8 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
     if (e.m_debug_mass == 1)
       continue;
 
-    /*if (e.m_type == 4 && e.m_debug_mass == 11)
-      continue;*/
+    if (e.m_type == 4 && e.m_debug_mass == 11)
+      continue;
     if (e.m_type == 4 && e.m_debug == 99)
       continue;
 
