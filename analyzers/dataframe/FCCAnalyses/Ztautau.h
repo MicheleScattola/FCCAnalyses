@@ -51,7 +51,7 @@ struct myEvent {
   double m_RecoEnergy = 0.;                   // total energy in hemisphere
   double m_RecoMass = 0.; // total invariant mass in hemisphere
   RVec<TLorentzVector> m_muP4, m_elP4, m_piP4,
-      m_phP4;            // particle TLorentzVectors
+      m_phP4, m_tauP4;            // particle TLorentzVectors
   int m_type = 0;        // event reco type
   int m_type_before = 0; // event reco type before optimal variable constraints
   double m_omega = 0;    // optimal variable binned

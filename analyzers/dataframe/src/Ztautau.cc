@@ -70,6 +70,14 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     }
     ev.thrust_vector = thrust_vector;
 
+    // build fake reco tau P4
+    TLorentzVector tau_reco;
+    double p_mag = sqrt(E_TAU * E_TAU - SM_TAU * SM_TAU);
+    
+    p4_tau.SetVectM(thrust_vector.Unit() * p_mag, SM_TAU);
+
+    ev.m_tauP4 = p4_tau;
+
     // select particles in hemisphere
     // bool hemisphere starts as true for positive hemi, changing after first
     // loop to false for negative hemi
@@ -524,11 +532,8 @@ void reco_omega(myEvent &ev, const TVector3 &thrustDir) {
 
     p4_rho = p4_pip + p4_pi0;
 
-    // calculate approx tau p4
-    //TLorentzVector p4_tau;
-    double p_mag = sqrt(E_TAU * E_TAU - SM_TAU * SM_TAU);
-    
-    p4_tau.SetVectM(thrustDir.Unit() * p_mag, SM_TAU);
+    //use approx tau p4 from thrust axis
+    p4_tau = ev.m_tauP4;
 
     ev.m_omega = geometric_omega_rho(ev, p4_tau, p4_rho, p4_pip, p4_pi0);
   }
@@ -1320,8 +1325,11 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_daughterP4 = p4_rho_lab;
   ev.mc_daughterMass = p4_rho_lab.M();
 
+  // test with reco tau p4
+  TLorentzVector p4_tau_reco = ev.m_RecoTauP4;
+
   double omega =
-      geometric_omega_rho(ev, p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
+      geometric_omega_rho(ev, p4_tau_reco, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
 
   ev.mc_omega = omega;
 
