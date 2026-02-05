@@ -51,11 +51,11 @@ struct myEvent {
   double m_RecoEnergy = 0.;                   // total energy in hemisphere
   double m_RecoMass = 0.; // total invariant mass in hemisphere
   RVec<TLorentzVector> m_muP4, m_elP4, m_piP4,
-      m_phP4;            // particle TLorentzVectors
+      m_phP4;             // particle TLorentzVectors
   TLorentzVector m_tauP4; // reconstructed tau P4
-  int m_type = 0;        // event reco type
-  int m_type_before = 0; // event reco type before optimal variable constraints
-  double m_omega = 0;    // optimal variable binned
+  int m_type = 0;         // event reco type
+  int m_type_before = 0;  // event reco type before optimal variable constraints
+  double m_omega = 0;     // optimal variable binned
 
   // MC
   int mc_tau_index = -1;        // tau MC index
@@ -188,7 +188,7 @@ RVec<double> get_weights(const int sign, const RVec<myEvent> &evs,
 
 // ==========================================
 RVec<double> get_MCweights(const int sign, const RVec<myEvent> &evs,
-                         const int mc_type);
+                           const int mc_type);
 
 // ==========================================
 // RE-WEIGHTING FUNCTIONS
@@ -215,9 +215,9 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
 
 // omega_rho with p4 angles instead of kinematic variables, possible only for MC
 double MC_calculate_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,
-                           const TLorentzVector &p4_rho,
-                           const TLorentzVector &p4_pip,
-                           const TLorentzVector &p4_pi0);
+                              const TLorentzVector &p4_rho,
+                              const TLorentzVector &p4_pip,
+                              const TLorentzVector &p4_pi0);
 
 // omega rho MC with p4 angles instead of kinematics
 double geometric_omega_rho(myEvent &ev, const TLorentzVector &p4_tau,

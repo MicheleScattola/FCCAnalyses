@@ -269,10 +269,12 @@ myFit fit_fraction(const std::string &infile_data,
   tex->SetNDC();
   tex->SetTextSize(0.035);
   tex->SetTextFont(42);
-  tex->DrawLatex(0.6, 0.60, Form("#mathcal{P}_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
+  tex->DrawLatex(
+      0.6, 0.60,
+      Form("#mathcal{P}_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
 
   c->SaveAs((outdir + output_filename).c_str());
-  
+
   // Save as PNG
   std::string png_filename = output_filename;
   size_t dot_pos = png_filename.rfind('.');
@@ -614,7 +616,6 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   h_data->SetMinimum(0.);
   h_data->GetXaxis()->SetTitleSize(0.045);
 
-
   TH1D *h_result_total = (TH1D *)h_plus_plot->Clone("h_res_total");
   h_result_total->Add(h_minus_plot);
 
@@ -644,15 +645,16 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   stats->SetTextFont(42);
   stats->SetTextSize(0.035);
   stats->SetFillColorAlpha(kGray, 0.2);
-  //stats->SetBorderSize(1);
+  // stats->SetBorderSize(1);
   stats->SetTextAlign(12);
   stats->AddText(Form("Events : %.2e", Norm));
   stats->AddText(Form("#chi^{2}/ndf = %.0f/%d", chi2, ndf));
-  stats->AddText(Form("P_{#tau} = %.4f #pm %.4f", f_fit->GetParameter(1), f_fit->GetParError(1)));
+  stats->AddText(Form("P_{#tau} = %.4f #pm %.4f", f_fit->GetParameter(1),
+                      f_fit->GetParError(1)));
   stats->Draw();
 
   c->SaveAs((outdir + output_filename).c_str());
-  
+
   // Save as PS
   std::string png_filename = output_filename;
   size_t dot_pos = png_filename.rfind('.');
@@ -759,10 +761,11 @@ myFit fit(const std::string &infile_data, const std::string &outdir,
   tex->SetNDC();
   tex->SetTextSize(0.035);
   tex->SetTextFont(42);
-  tex->DrawLatex(0.2, 0.20, Form("P_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
+  tex->DrawLatex(0.2, 0.20,
+                 Form("P_{#tau} = %.4f #pm %.4f", result.P_tau, result.P_err));
 
   c->SaveAs((outdir + output_filename).c_str());
-  
+
   // Save as PNG
   std::string png_filename = output_filename;
   size_t dot_pos = png_filename.rfind('.');
