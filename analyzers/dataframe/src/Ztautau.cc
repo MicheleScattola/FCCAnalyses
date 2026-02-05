@@ -535,7 +535,7 @@ void reco_omega(myEvent &ev, const TVector3 &thrustDir) {
     //use approx tau p4 from thrust axis
     p4_tau = ev.m_tauP4;
 
-    ev.m_omega = geometric_omega_rho(ev, p4_tau, p4_rho, p4_pip, p4_pi0);
+    ev.m_omega = calculate_omega_rho(ev, p4_tau, p4_rho, p4_pip, p4_pi0);
   }
   // a1
 }
@@ -1329,7 +1329,7 @@ void new_rho_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   TLorentzVector p4_tau_reco = ev.m_tauP4;
 
   double omega =
-      geometric_omega_rho(ev, p4_tau_reco, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
+      geometric_omega_rho(ev, p4_tau_lab, p4_rho_lab, p4_pip_lab, p4_pi0_lab);
 
   ev.mc_omega = omega;
 
