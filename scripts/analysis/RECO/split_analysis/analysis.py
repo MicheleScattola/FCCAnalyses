@@ -106,13 +106,13 @@ class RDFanalysis():
                 
 				#APPLYING INV MASS CHECK:
 				# pi signal
-				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,true,3,true)")
+				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true)")
                 #.Define("pi_sgn","Ztautau::get_optimal(myEvent,3,true,3,false)")
 				# lepton signals
                 .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true)")
                 .Define("mu_sgn","Ztautau::get_reco_x(myEvent,1,false,1,true)")
 				# rho signal
-                .Define("rho_sgn","Ztautau::get_reco_x(myEvent,4,true,4,true)")
+                .Define("rho_sgn","Ztautau::get_reco_x(myEvent,4,false,4,true)")
                 #.Define("rho_sgn","Ztautau::get_optimal(myEvent,4,true,4,false)")
                 
 				#debug stats on rho
