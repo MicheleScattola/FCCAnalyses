@@ -123,7 +123,9 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     ev.m_RecoMass = p4_tot.M();
 
     // Calculate dot product between hemisphere momentum and thrust axis
-    double dot_product = thrust_vector.Dot(p4_tot.Vect());
+    double dot_product = p4_tot.Px() * thrust_x + 
+                                p4_tot.Py() * thrust_y + 
+                                p4_tot.Pz() * thrust_z;
 
     // Assign signed costheta: positive if aligned, negative if anti-aligned
     ev.thrust_costheta_hemi =
@@ -196,7 +198,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
       } else if (ev.mc_type == 3) {
         pion_weight(ev, mc, daughters);
       } else if (ev.mc_type == 4) {
-        new_rho_weight(ev, mc, daughters);
+        rho_weight(ev, mc, daughters);
       } else if (ev.mc_type == 5) {
         a1_weight(ev, mc, daughters);
       }
@@ -1442,7 +1444,7 @@ RVec<double> get_reco_x_theta(RVec<myEvent> &evs, const int mc_type,
     if (e.m_debug_mass == 1)
       continue;
 
-    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+    if (e.m_type == 4 && e.m_debug_mass == 11)
       continue;
     if (e.m_type == 4 && e.m_debug == 99)
       continue;
@@ -1480,7 +1482,7 @@ RVec<double> get_weights_theta(const int sign, const RVec<myEvent> &evs,
     if (e.m_debug_mass == 1)
       continue;
 
-    if (e.m_type == 4 && e.n_ph == 1 && e.m_debug_mass == 11)
+    if (e.m_type == 4 && e.m_debug_mass == 11)
       continue;
     if (e.m_type == 4 && e.m_debug == 99)
       continue;
@@ -1523,7 +1525,7 @@ RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type,
 }
 
 RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
-                    const int n_photons) {
+                    const int n_photons, const bool bool_ph) {
   RVec<int> out;
   for (const auto &e : evs) {
     // check reco event
@@ -1532,7 +1534,7 @@ RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
     // check debug_mass
     if (e.m_debug != 99)
       continue;
-    if (e.n_ph != n_photons)
+    if (bool_ph && e.n_ph != n_photons)
       continue;
     if (e.m_debug == 99 && e.m_debug_mass != 1 && e.m_debug_mass != 11)
       out.push_back(e.mc_type);

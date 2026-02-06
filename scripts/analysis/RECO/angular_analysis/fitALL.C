@@ -28,13 +28,13 @@ void fitALL() {
     // =========================================================================
     const std::string merged_data_file = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/angular_analysis/output_merged.root";
     const std::string template_dir = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/angular_analysis/";
-    const std::string output_dir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/";
+    const std::string output_dir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/angular_analysis/";
     const std::string treeName = "events";
 
     // RP_costheta binning settings
-    double cos_min = -1.0;
-    double cos_max = 1.0;
-    double step = 0.2;
+    double cos_min = -0.95;
+    double cos_max = 0.95;
+    double step = 0.19;
 
     std::cout << ">>> Starting Polarization Fits on RP_costheta bins..." << std::endl;
     std::cout << ">>> Using merged data file: " << merged_data_file << std::endl;
@@ -87,7 +87,8 @@ void fitALL() {
             merged_data_file, infile_templates.Data(),
             treeName, el_col, 
             "h_template_el_plus", 
-            "h_template_el_minus"
+            "h_template_el_minus",
+            true, output_dir, bin_low, bin_high
         );
         if (result_el.success) {
             bin_results.P_el = result_el.P_tau;
@@ -103,7 +104,8 @@ void fitALL() {
             merged_data_file, infile_templates.Data(),
             treeName, mu_col, 
             "h_template_mu_plus", 
-            "h_template_mu_minus"
+            "h_template_mu_minus",
+            true, output_dir, bin_low, bin_high
         );
         if (result_mu.success) {
             bin_results.P_mu = result_mu.P_tau;
@@ -119,7 +121,8 @@ void fitALL() {
             merged_data_file, infile_templates.Data(),
             treeName, pi_col, 
             "h_template_pi_plus", 
-            "h_template_pi_minus"
+            "h_template_pi_minus",
+            true, output_dir, bin_low, bin_high
         );
         if (result_pi.success) {
             bin_results.P_pi = result_pi.P_tau;
@@ -135,7 +138,8 @@ void fitALL() {
             merged_data_file, infile_templates.Data(),
             treeName, rho_col, 
             "h_template_rho_plus", 
-            "h_template_rho_minus"
+            "h_template_rho_minus",
+            true, output_dir, bin_low, bin_high
         );
         if (result_rho.success) {
             bin_results.P_rho = result_rho.P_tau;
@@ -159,6 +163,12 @@ void fitALL() {
     // Prepare data for TGraphErrors
     const int n_bins_plot = static_cast<int>(results_per_bin.size());
     std::vector<double> x_values, y_values, x_errors, y_errors;
+    
+    // Separate vectors for each channel
+    std::vector<double> x_values_el, y_values_el, x_errors_el, y_errors_el;
+    std::vector<double> x_values_mu, y_values_mu, x_errors_mu, y_errors_mu;
+    std::vector<double> x_values_pi, y_values_pi, x_errors_pi, y_errors_pi;
+    std::vector<double> x_values_rho, y_values_rho, x_errors_rho, y_errors_rho;
 
     std::cout << "\n\n========================================" << std::endl;
     std::cout << "COMBINED RESULTS BY RP_costheta BIN" << std::endl;
@@ -197,6 +207,31 @@ void fitALL() {
             P_errors = {std_el, std_mu, std_pi, std_rho};
         }
         
+        // Store individual channel results
+        if (bin_results.err_el > 0) {
+            x_values_el.push_back(bin_center);
+            y_values_el.push_back(bin_results.P_el);
+            x_errors_el.push_back(bin_width);
+            y_errors_el.push_back(bin_results.err_el);
+        }
+        if (bin_results.err_mu > 0) {
+            x_values_mu.push_back(bin_center);
+            y_values_mu.push_back(bin_results.P_mu);
+            x_errors_mu.push_back(bin_width);
+            y_errors_mu.push_back(bin_results.err_mu);
+        }
+        if (bin_results.err_pi > 0) {
+            x_values_pi.push_back(bin_center);
+            y_values_pi.push_back(bin_results.P_pi);
+            x_errors_pi.push_back(bin_width);
+            y_errors_pi.push_back(bin_results.err_pi);
+        }
+        if (bin_results.err_rho > 0) {
+            x_values_rho.push_back(bin_center);
+            y_values_rho.push_back(bin_results.P_rho);
+            x_errors_rho.push_back(bin_width);
+            y_errors_rho.push_back(bin_results.err_rho);
+        }
         
         double sum_weights = 0.0;
         double sum_weighted_P = 0.0;
@@ -238,7 +273,7 @@ void fitALL() {
     std::cout << "========================================\n" << std::endl;
 
     // =========================================================================
-    // 6. CREATE AND SAVE ROOT PLOT
+    // 6. CREATE AND SAVE ROOT HISTOGRAMS (individual channels + combined)
     // =========================================================================
 
     if (x_values.empty()) {
@@ -246,19 +281,63 @@ void fitALL() {
         return;
     }
 
-    TGraphErrors* graph = new TGraphErrors(x_values.size(), 
-                                           x_values.data(), 
-                                           y_values.data(), 
-                                           x_errors.data(), 
-                                           y_errors.data());
+    // Create TGraphErrors for each channel
+    TGraphErrors* graph_el = new TGraphErrors(x_values_el.size(), 
+                                               x_values_el.data(), 
+                                               y_values_el.data(), 
+                                               x_errors_el.data(), 
+                                               y_errors_el.data());
+    graph_el->SetName("el_theta");
+    graph_el->SetTitle("Electron Polarization vs #cos(#theta)");
 
-    // Also save as ROOT file
+    TGraphErrors* graph_mu = new TGraphErrors(x_values_mu.size(), 
+                                               x_values_mu.data(), 
+                                               y_values_mu.data(), 
+                                               x_errors_mu.data(), 
+                                               y_errors_mu.data());
+    graph_mu->SetName("mu_theta");
+    graph_mu->SetTitle("Muon Polarization vs #cos(#theta)");
+
+    TGraphErrors* graph_pi = new TGraphErrors(x_values_pi.size(), 
+                                               x_values_pi.data(), 
+                                               y_values_pi.data(), 
+                                               x_errors_pi.data(), 
+                                               y_errors_pi.data());
+    graph_pi->SetName("pi_theta");
+    graph_pi->SetTitle("Pion Polarization vs #cos(#theta)");
+
+    TGraphErrors* graph_rho = new TGraphErrors(x_values_rho.size(), 
+                                                x_values_rho.data(), 
+                                                y_values_rho.data(), 
+                                                x_errors_rho.data(), 
+                                                y_errors_rho.data());
+    graph_rho->SetName("rho_theta");
+    graph_rho->SetTitle("Rho Polarization vs #cos(#theta)");
+
+    // Combined graph
+    TGraphErrors* graph_combined = new TGraphErrors(x_values.size(), 
+                                                     x_values.data(), 
+                                                     y_values.data(), 
+                                                     x_errors.data(), 
+                                                     y_errors.data());
+    graph_combined->SetName("combined_theta");
+    graph_combined->SetTitle("Combined Polarization vs #cos(#theta)");
+
+    // Save as ROOT file
     const std::string output_root = template_dir + "universality.root";
     TFile* fout = new TFile(output_root.c_str(), "RECREATE");
-    graph->Write("graph_polarization");
+    graph_el->Write();
+    graph_mu->Write();
+    graph_pi->Write();
+    graph_rho->Write();
+    graph_combined->Write();
     fout->Close();
     std::cout << "[INFO] ROOT file saved to: " << output_root << std::endl;
 
-    delete graph;
+    delete graph_el;
+    delete graph_mu;
+    delete graph_pi;
+    delete graph_rho;
+    delete graph_combined;
     std::cout << ">>> All fits completed." << std::endl;
 }

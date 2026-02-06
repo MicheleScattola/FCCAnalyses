@@ -395,7 +395,11 @@ myFit fit_filtered(const std::string &infile_data,
                    const std::string &infile_templates,
                    const std::string &treeName, const std::string &dataColName,
                    const std::string &name_plus,
-                   const std::string &name_minus) {
+                   const std::string &name_minus,
+                   bool save_plot,
+                   const std::string &outdir,
+                   double costheta_min,
+                   double costheta_max) {
   myFit result = {0, 0, 0, 0, false, "Template_Filtered"};
 
   // Recover Templates
@@ -438,7 +442,7 @@ myFit fit_filtered(const std::string &infile_data,
   double xMin = h_plus->GetXaxis()->GetXmin();
   double xMax = h_plus->GetXaxis()->GetXmax();
 
-  auto h_data_ptr = df.Histo1D(
+    auto h_data_ptr = df.Histo1D(
       {"h_data_filtered", "Data;x;Events", nBins, xMin, xMax}, dataColName);
   TH1D *h_data = (TH1D *)h_data_ptr->Clone("data_filtered");
   h_data->SetDirectory(0);
@@ -482,6 +486,90 @@ myFit fit_filtered(const std::string &infile_data,
   result.f_plus = (1.0 + P_val) / 2.0;
   result.f_minus = (1.0 - P_val) / 2.0;
   result.success = true;
+
+  // =========================================================
+  // PLOTTING (if requested)
+  // =========================================================
+  if (save_plot && !outdir.empty()) {
+    gStyle->SetOptStat(0);
+    gStyle->SetOptFit(0);
+    TGaxis::SetMaxDigits(3);
+    TCanvas *c = new TCanvas("c_filtered", "Filtered Fit", 800, 600);
+
+    // scale templates to data
+    TH1D *h_plus_plot = (TH1D *)h_plus->Clone("h_plus_plot_filtered");
+    TH1D *h_minus_plot = (TH1D *)h_minus->Clone("h_minus_plot_filtered");
+
+    double Norm = h_data->Integral();
+    double scale_p = Norm * result.f_plus;
+    double scale_m = Norm * result.f_minus;
+
+    h_plus_plot->Scale(scale_p);
+    h_minus_plot->Scale(scale_m);
+
+    h_plus_plot->SetLineColor(kBlue);
+    h_plus_plot->SetLineStyle(2);
+    h_plus_plot->SetFillColorAlpha(kBlue, 0.1);
+    h_minus_plot->SetLineColor(kRed);
+    h_minus_plot->SetLineStyle(2);
+    h_minus_plot->SetFillColorAlpha(kRed, 0.1);
+
+    h_data->SetLineColor(kBlack);
+    h_data->SetMarkerColor(kBlack);
+    h_data->SetMarkerStyle(20);
+    h_data->SetMarkerSize(0.8);
+    h_data->SetMinimum(0.);
+    h_data->GetXaxis()->SetTitleSize(0.045);
+    h_data->GetYaxis()->SetTitleSize(0.045);
+    h_data->GetYaxis()->SetMaxDigits(3);
+    //h_data->GetYaxis()->SetNoExponent(false);
+
+    TH1D *h_result_total = (TH1D *)h_plus_plot->Clone("h_res_total_filtered");
+    h_result_total->Add(h_minus_plot);
+
+    h_result_total->SetLineColor(kGray + 3);
+    h_result_total->SetLineWidth(2);
+    h_result_total->SetLineStyle(1);
+    h_result_total->SetFillStyle(0);
+
+    h_data->GetListOfFunctions()->Clear();
+
+    h_data->Draw("E1 X0 P");
+    h_result_total->Draw("HIST SAME");
+    h_plus_plot->Draw("HIST SAME");
+    h_minus_plot->Draw("HIST SAME");
+
+    // Create title with costheta range (2 decimals)
+    std::string plot_title = Form("%s : %.2f < cos#theta < %.2f",
+                    dataColName.c_str(), costheta_min, costheta_max);
+    h_data->SetTitle((plot_title + ";x;Events").c_str());
+
+    const double chi2 = fitStatus->Chi2();
+    const int ndf = fitStatus->Ndf();
+    TPaveText *stats = new TPaveText(0.58, 0.7, 0.88, 0.88, "NDC");
+    stats->SetTextFont(42);
+    stats->SetTextSize(0.035);
+    stats->SetFillColorAlpha(kGray, 0.2);
+    stats->SetTextAlign(12);
+    stats->AddText(Form("Events : %.2e", Norm));
+    stats->AddText(Form("#chi^{2}/ndf = %.0f/%d", chi2, ndf));
+    stats->AddText(Form("P_{#tau} = %.4f #pm %.4f", P_val, P_err));
+    stats->Draw();
+
+    // Save PDF
+    std::string pdf_filename = dataColName + ".pdf";
+    c->SaveAs((outdir + pdf_filename).c_str());
+
+    // Save PNG
+    std::string png_filename = dataColName + ".png";
+    c->SaveAs((outdir + png_filename).c_str());
+
+    delete c;
+    delete h_plus_plot;
+    delete h_minus_plot;
+    delete h_result_total;
+    delete stats;
+  }
 
   delete f_fit;
   delete h_data;

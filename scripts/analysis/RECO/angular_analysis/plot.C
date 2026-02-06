@@ -18,38 +18,44 @@ const double SM_Atau_theory = 2 * gv_ga / (1 + gv_ga * gv_ga);
 struct PtauFunctor {
   double operator()(double *x, double *par) const {
     double costheta = x[0];
-    double A_tau = par[0];  // Parameter to fit
+    double A_tau = par[0];
+    double A_e = par[1]; // check universality
     
-    double numerator = A_tau * (1 + costheta * costheta) + 2 * A_tau * costheta;
-    double denominator = 1 + costheta * costheta + 2 * A_tau * A_tau * costheta;
+    double numerator = A_tau * (1 + costheta * costheta) + 2 * A_e * costheta;
+    double denominator = 1 + costheta * costheta + 2 * A_tau * A_e * costheta;
     
     return -numerator / denominator;
   }
 };
 
-void plot() {
+// Function to fit and plot a single TGraph
+void plotChannel(const std::string &graph_name, const std::string &channel_label, 
+                 const std::string &input_file, const std::string &output_pdf, 
+                 const std::string &output_png) {
+  
   gStyle->SetOptStat(0);
-  //gStyle->SetOptFit(111);
   
   // Open the file with the TGraph
-  TFile *infile = TFile::Open("/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/angular_analysis/universality.root", "READ");
+  TFile *infile = TFile::Open(input_file.c_str(), "READ");
   if (!infile || infile->IsZombie()) {
-    std::cerr << "[ERROR] Cannot open universality.root" << std::endl;
+    std::cerr << "[ERROR] Cannot open " << input_file << std::endl;
     return;
   }
   
   // Read the TGraph
-  TGraphErrors *gr_Ptau = (TGraphErrors*)infile->Get("graph_polarization");
+  TGraphErrors *gr_Ptau = (TGraphErrors*)infile->Get(graph_name.c_str());
   if (!gr_Ptau) {
-    std::cerr << "[ERROR] TGraph 'graph_polarization' not found in file" << std::endl;
+    std::cerr << "[ERROR] TGraph '" << graph_name << "' not found in file" << std::endl;
     infile->Close();
     return;
   }
   
+  std::cout << "\n========================================" << std::endl;
+  std::cout << "[INFO] Processing channel: " << channel_label << std::endl;
   std::cout << "[INFO] Loaded TGraph with " << gr_Ptau->GetN() << " points" << std::endl;
   
   // Restyle the graph
-  gr_Ptau->SetTitle("P_{#tau} (cos#theta);cos#theta;P_{#tau}");
+  gr_Ptau->SetTitle((channel_label + ";cos#theta;P_{#tau}").c_str());
   gr_Ptau->SetMarkerStyle(20);
   gr_Ptau->SetMarkerSize(1.0);
   gr_Ptau->SetMarkerColor(kBlack);
@@ -59,25 +65,29 @@ void plot() {
   gr_Ptau->GetXaxis()->SetRangeUser(-1, 1);
   
   // Create canvas
-  TCanvas *c = new TCanvas("c_universality", "Tau Polarization Universality", 900, 700);
+  TCanvas *c = new TCanvas("c_channel", ("Tau Polarization - " + channel_label).c_str(), 900, 700);
   c->SetGrid(1, 1);
   c->SetLeftMargin(0.14);
   
   // Create and fit with analytic function
   PtauFunctor functor;
-  TF1 *f_ptau = new TF1("f_ptau", functor, -1.0, 1.0, 1);
+  TF1 *f_ptau = new TF1("f_ptau", functor, -1.0, 1.0, 2);
   
   // Set parameter name and initial guess (start with SM value)
-  f_ptau->SetParName(0, "A_{e}");
+  f_ptau->SetParName(0, "A_{#tau}");
+  f_ptau->SetParName(1, "A_{e}");
   f_ptau->SetParameter(0, SM_Atau_theory);
+  f_ptau->SetParameter(1, SM_Atau_theory);
   
   // Fit to the data
-  std::cout << "\n>>> Performing analytic fit for P_tau(cos theta)..." << std::endl;
+  std::cout << ">>> Performing analytic fit for P_tau(cos theta)..." << std::endl;
   TFitResultPtr fitResult = gr_Ptau->Fit(f_ptau, "S");  // S = return TFitResultPtr
   
   // Extract results
-  double A_e_fit = f_ptau->GetParameter(0);
-  double A_e_err = f_ptau->GetParError(0);
+  double A_tau_fit = f_ptau->GetParameter(0);
+  double A_tau_err = f_ptau->GetParError(0);
+  double A_e_fit = f_ptau->GetParameter(1);
+  double A_e_err = f_ptau->GetParError(1);
   double chi2 = f_ptau->GetChisquare();
   int ndf = f_ptau->GetNDF();
   double chi2_ndf = (ndf > 0) ? chi2 / ndf : -1;
@@ -92,27 +102,35 @@ void plot() {
   f_ptau->Draw("SAME");
   
   // Add theory line
-  TF1 *f_theory = new TF1("f_theory", functor, -1.0, 1.0, 1);
+  TF1 *f_theory = new TF1("f_theory", functor, -1.0, 1.0, 2);
   f_theory->SetParameter(0, SM_Atau_theory);
+  f_theory->SetParameter(1, SM_Atau_theory);
   f_theory->SetLineColor(kBlue);
   f_theory->SetLineWidth(2);
   f_theory->SetLineStyle(2);
   f_theory->Draw("SAME");
+
+  // Redraw data with error bars on top
+  gr_Ptau->Draw("E1 P SAME");
+  
   
   // Legend
-  TLegend *leg = new TLegend(0.58, 0.60, 0.90, 0.88);
-  leg->SetBorderSize(1);
+  TLegend *leg = new TLegend(0.55, 0.55, 0.89, 0.89);
+  leg->SetBorderSize(2);
   leg->SetFillStyle(1001);
   leg->SetFillColor(kWhite);
-  leg->AddEntry(gr_Ptau, "Combined data", "ep");
+  leg->SetTextSize(0.032);
+  //leg->SetShadowColor(kGray + 2);
+  leg->AddEntry(gr_Ptau, "Data", "ep");
+  leg->AddEntry(f_ptau, Form("Fit: A_{#tau} = %.4f #pm %.4f", A_tau_fit, A_tau_err), "l");
   leg->AddEntry(f_ptau, Form("Fit: A_{e} = %.4f #pm %.4f", A_e_fit, A_e_err), "l");
   leg->AddEntry(f_theory, Form("SM: A_{e} #equiv A_{#tau} = %.4f", SM_Atau_theory), "l");
   leg->AddEntry((TObject*)0, Form("#chi^{2}/ndf = %.2f", chi2_ndf), "");
   leg->Draw();
   
-  // Print results
-  std::cout << "\n" << std::string(60, '=') << std::endl;
-  std::cout << ">>> UNIVERSALITY FIT RESULTS <<<" << std::endl;
+  /* Print results
+  std::cout << std::string(60, '=') << std::endl;
+  std::cout << ">>> " << channel_label << " FIT RESULTS <<<" << std::endl;
   std::cout << std::string(60, '=') << std::endl;
   std::cout << "\nFitted A_e (= A_tau): " << A_e_fit << " +/- " << A_e_err << std::endl;
   std::cout << "SM prediction A_e:    " << SM_Atau_theory << std::endl;
@@ -122,20 +140,39 @@ void plot() {
   std::cout << "  χ²/ndf: " << chi2_ndf << std::endl;
   std::cout << "  χ²:     " << chi2 << std::endl;
   std::cout << "  ndf:    " << ndf << std::endl;
-  std::cout << std::string(60, '=') << std::endl << std::endl;
+  std::cout << std::string(60, '=') << std::endl << std::endl;*/
   
   // Save the canvas
-  c->SaveAs("/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/universality_fit.pdf");
-  c->SaveAs("/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/universality_fit.png");
-  std::cout << "[INFO] Canvas saved as universality_fit.pdf and universality_fit.png" << std::endl;
+  c->SaveAs(output_pdf.c_str());
+  c->SaveAs(output_png.c_str());
+  std::cout << "[INFO] Canvas saved as " << output_pdf << " and " << output_png << std::endl;
   
-  // Optionally save results to ROOT file
-  TFile *outfile = TFile::Open("/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/angular_analysis/universality_results.root", "RECREATE");
-  gr_Ptau->Write("gr_Ptau");
-  f_ptau->Write("f_ptau_fit");
-  f_theory->Write("f_ptau_theory");
-  outfile->Close();
-  std::cout << "[INFO] Results saved to universality_results.root" << std::endl;
-  
+  delete c;
+  delete f_ptau;
+  delete f_theory;
+  delete leg;
   infile->Close();
+}
+
+void plot() {
+  const std::string input_file = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/angular_analysis/universality.root";
+  const std::string output_dir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/plots/RECO/angular_analysis/";
+  
+  // Plot each channel
+  plotChannel("el_theta", "Electron Channel", input_file, 
+              output_dir + "universality_fit_el.pdf", output_dir + "universality_fit_el.png");
+  
+  plotChannel("mu_theta", "Muon Channel", input_file,
+              output_dir + "universality_fit_mu.pdf", output_dir + "universality_fit_mu.png");
+  
+  plotChannel("pi_theta", "Pion Channel", input_file,
+              output_dir + "universality_fit_pi.pdf", output_dir + "universality_fit_pi.png");
+  
+  plotChannel("rho_theta", "Rho Channel", input_file,
+              output_dir + "universality_fit_rho.pdf", output_dir + "universality_fit_rho.png");
+  
+  plotChannel("combined_theta", "Combined Channel", input_file,
+              output_dir + "universality_fit_combined.pdf", output_dir + "universality_fit_combined.png");
+  
+  std::cout << "\n>>> All plots completed successfully!" << std::endl;
 }

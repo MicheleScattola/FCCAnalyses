@@ -52,7 +52,9 @@ myFit fit_no_plot(const std::string &infile_data,
 myFit fit_filtered(const std::string &infile_data,
                    const std::string &infile_templates,
                    const std::string &treeName, const std::string &dataColName,
-                   const std::string &name_plus, const std::string &name_minus);
+                   const std::string &name_plus, const std::string &name_minus,
+                   bool save_plot = false, const std::string &outdir = "",
+                   double costheta_min = -1.0, double costheta_max = 1.0);
 
 // =========================================================
 // ANALYTIC FIT (leptons)

@@ -107,14 +107,12 @@ class RDFanalysis():
 				#APPLYING INV MASS CHECK:
 				# pi signal
 				.Define("pi_sgn","Ztautau::get_reco_x(myEvent,3,false,3,true)")
-                #.Define("pi_sgn","Ztautau::get_optimal(myEvent,3,true,3,false)")
 				# lepton signals
                 .Define("el_sgn","Ztautau::get_reco_x(myEvent,2,false,2,true)")
                 .Define("mu_sgn","Ztautau::get_reco_x(myEvent,1,false,1,true)")
 				# rho signal
                 .Define("rho_sgn","Ztautau::get_reco_x(myEvent,4,false,4,true)")
-                #.Define("rho_sgn","Ztautau::get_optimal(myEvent,4,true,4,false)")
-                
+
 				#debug stats on rho
                 .Define("rho_mass_reject_1","Ztautau::get_debug_mass(myEvent,4,1,true)")
                 .Define("rho_mass_reject_2","Ztautau::get_debug_mass(myEvent,4,2,true)")
@@ -122,15 +120,7 @@ class RDFanalysis():
                 .Define("rho_angle_reject_1","Ztautau::get_debug(myEvent,4,1)")
                 .Define("rho_angle_reject_2","Ztautau::get_debug(myEvent,4,2)")
                 
-				# MC invariant mass
-				.Define("MC_rho_m","Ztautau::get_MCdaughter_mass(myEvent,4,true,4,false)")
-				.Define("MC_a1_m","Ztautau::get_MCdaughter_mass(myEvent,5,true,5,false)")
-                # Reco invariant mass
-				.Define("reco_rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
-				.Define("reco_a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
-                # confront invariant mass in reco and MC - diagonal elements of confusion matrix
-				.Define("rho_pull","Ztautau::get_mass_pull(myEvent,4,true,4,true)")
-				.Define("a1_pull","Ztautau::get_mass_pull(myEvent,5,true,5,true)")
+				
                 
 
 				  
@@ -155,13 +145,8 @@ class RDFanalysis():
             "rho_mass_reject_2",
             "a1_mass_reject",
             "rho_angle_reject_1",
-            "rho_angle_reject_2",
-            "MC_rho_m",
-            "MC_a1_m",
-            "reco_rho_m",
-            "reco_a1_m",
-            "rho_pull",
-            "a1_pull",
+			"rho_angle_reject_2",
+            
             
 		
         	

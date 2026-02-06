@@ -13,13 +13,13 @@ for entry in sorted(os.listdir(events_dir)):
     if entry.endswith(".root") and os.path.isfile(candidate):
         all_files.append(candidate)
 
-# 1. Create Template Lists (First 20M events - 100k events per file -> 200 files)
-n_template_files = 400
+# 1. Create Template Lists
+n_template_files = 500
 template_files = all_files[:n_template_files]
 
 # Split templates into 20 jobs of 1M events each (10 files/job at 100k events/file)
 template_files_per_job = 20
-n_template_jobs = 20
+n_template_jobs = 25
 
 job_manifest = []
 
@@ -38,11 +38,11 @@ for i in range(n_template_jobs):
     abs_list_path = os.path.abspath(list_name)
     job_manifest.append(f"{abs_list_path} {output_root} templates.py")
 
-# 2. Create Lists for Fits (Next 20M events each - 10 files per job)
+# 2. Create Lists for Fits 
 # Start after the template files
 start_idx = n_template_files
-data_files_per_job = 20 # 1M events
-n_data_jobs = 20
+data_files_per_job = 20 # 2M events
+n_data_jobs = 25
 
 for i in range(n_data_jobs):
     end_idx = start_idx + data_files_per_job

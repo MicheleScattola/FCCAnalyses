@@ -14,12 +14,12 @@ for entry in sorted(os.listdir(events_dir)):
         all_files.append(candidate)
 
 # 1. Create Template Lists (First 50M events - 100k events per file -> 500 files)
-n_template_files = 200
+n_template_files = 500
 template_files = all_files[:n_template_files]
 
 # Split templates into 20 jobs of 1M events each (10 files/job at 100k events/file)
 template_files_per_job = 10
-n_template_jobs = 20
+n_template_jobs = 50
 
 job_manifest = []
 
@@ -42,7 +42,7 @@ for i in range(n_template_jobs):
 # Start after the template files
 start_idx = n_template_files
 data_files_per_job = 10 # 1M events
-n_data_jobs = 20
+n_data_jobs = 50
 
 for i in range(n_data_jobs):
     end_idx = start_idx + data_files_per_job

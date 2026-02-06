@@ -24,6 +24,7 @@ void rho_rejection_efficiency() {
     
     auto h_reject_1 = df.Histo1D({"h_rho_mass_reject_1", "rho_mass_reject_1", 6, -0.5, 5.5}, "rho_mass_reject_1");
     auto h_reject_2 = df.Histo1D({"h_rho_mass_reject_2", "rho_mass_reject_2", 6, -0.5, 5.5}, "rho_mass_reject_2");
+    auto h_a1_reject = df.Histo1D({"h_a1_mass_reject", "a1_mass_reject", 6, -0.5, 5.5}, "a1_mass_reject");
     
     auto h_angle_1 = df.Histo1D({"h_rho_angle_reject_1", "rho_angle_reject_1", 6, -0.5, 5.5}, "rho_angle_reject_1");
     auto h_angle_2 = df.Histo1D({"h_rho_angle_reject_2", "rho_angle_reject_2", 6, -0.5, 5.5}, "rho_angle_reject_2");
@@ -104,10 +105,48 @@ void rho_rejection_efficiency() {
     std::cout << "Total entries: " << total_2 << std::endl;
     std::cout << "Background (non-rho): " << background_2 << std::endl;
     std::cout << "Rejection Efficiency: " << std::fixed << std::setprecision(6) << eff_2 << std::endl;
+
+    // =========================================================================
+    // 8. EXTRACT BIN ENTRIES FOR a1_mass_reject
+    // =========================================================================
+    std::vector<int> bins_a1(6);
+    for (int b = 0; b <= 5; ++b) {
+        bins_a1[b] = static_cast<int>(h_a1_reject->GetBinContent(b + 1));
+    }
+
+    // =========================================================================
+    // 9. PRINT RESULTS FOR a1_mass_reject
+    // =========================================================================
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "a1_mass_reject Histogram" << std::endl;
+    std::cout << "========================================" << std::endl;
+
+    int total_a1 = 0;
+    int background_a1 = 0;
+
+    std::cout << std::setw(6) << "Bin"
+              << std::setw(15) << "Category"
+              << std::setw(15) << "Entries" << std::endl;
+    std::cout << std::string(36, '-') << std::endl;
+
+    for (int b = 0; b <= 5; ++b) {
+        int count = bins_a1[b];
+        total_a1 += count;
+        if (b != 5) background_a1 += count;  // b=5 is a1
+        std::cout << std::setw(6) << b
+                  << std::setw(15) << categories[b]
+                  << std::setw(15) << count << std::endl;
+    }
+    std::cout << std::string(36, '-') << std::endl;
+
+    double eff_a1 = (total_a1 > 0) ? (double)background_a1 / total_a1 : 0.0;
+    std::cout << "Total entries: " << total_a1 << std::endl;
+    std::cout << "Background (non-a1): " << background_a1 << std::endl;
+    std::cout << "Rejection Efficiency: " << std::fixed << std::setprecision(6) << eff_a1 << std::endl;
     
     
     // =========================================================================
-    // 8. EXTRACT BIN ENTRIES FOR ANGLE REJECTION
+    // 10. EXTRACT BIN ENTRIES FOR ANGLE REJECTION
     // =========================================================================
     std::vector<int> angle_bins_1(6), angle_bins_2(6);
     
@@ -117,7 +156,7 @@ void rho_rejection_efficiency() {
     }
     
     // =========================================================================
-    // 9. PRINT RESULTS FOR rho_angle_reject_1
+    // 11. PRINT RESULTS FOR rho_angle_reject_1
     // =========================================================================
     std::cout << "\n========================================" << std::endl;
     std::cout << "rho_angle_reject_1 Histogram" << std::endl;
@@ -147,7 +186,7 @@ void rho_rejection_efficiency() {
     std::cout << "Rejection Efficiency: " << std::fixed << std::setprecision(6) << eff_angle_1 << std::endl;
     
     // =========================================================================
-    // 10. PRINT RESULTS FOR rho_angle_reject_2
+    // 12. PRINT RESULTS FOR rho_angle_reject_2
     // =========================================================================
     std::cout << "\n========================================" << std::endl;
     std::cout << "rho_angle_reject_2 Histogram" << std::endl;
@@ -178,7 +217,7 @@ void rho_rejection_efficiency() {
 
 
     // =========================================================================
-    // 11. SUMMARY
+    // 13. SUMMARY
     // =========================================================================
     std::cout << "\n========================================" << std::endl;
     std::cout << "SUMMARY" << std::endl;
@@ -187,6 +226,8 @@ void rho_rejection_efficiency() {
               << " = " << std::fixed << std::setprecision(6) << eff_1 << std::endl;
     std::cout << "rho_mass_reject_2: Background/Total = " << background_2 << "/" << total_2 
               << " = " << std::fixed << std::setprecision(6) << eff_2 << std::endl;
+    std::cout << "a1_mass_reject: Background/Total = " << background_a1 << "/" << total_a1
+              << " = " << std::fixed << std::setprecision(6) << eff_a1 << std::endl;
     std::cout << "rho_angle_reject_1: Background/Total = " << background_angle_1 << "/" << total_angle_1 
               << " = " << std::fixed << std::setprecision(6) << eff_angle_1 << std::endl;
     std::cout << "rho_angle_reject_2: Background/Total = " << background_angle_2 << "/" << total_angle_2 

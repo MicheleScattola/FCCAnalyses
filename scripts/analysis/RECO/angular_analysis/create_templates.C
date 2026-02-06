@@ -18,14 +18,14 @@ void create_and_save(ROOT::RDF::RNode df,
     // This ensures ZERO statistical correlation between the two histograms.
     std::string size_filter = var_sgn + ".size() > 0 && " + w_plus + ".size() == " + var_sgn + ".size() && " + w_minus + ".size() == " + var_sgn + ".size()";
     auto df_valid = df.Filter(size_filter, "non-empty bin filter");
-    auto df_even = df_valid.Filter("rdfentry_ % 2 == 0", "Split Sample (Even)");
-    auto df_odd  = df_valid.Filter("rdfentry_ % 2 != 0", "Split Sample (Odd)");
+    // auto df_even = df_valid.Filter("rdfentry_ % 2 == 0", "Split Sample (Even)");
+    // auto df_odd  = df_valid.Filter("rdfentry_ % 2 != 0", "Split Sample (Odd)");
 
-    // H+ filled from Even events
-    auto h_plus_ptr  = df_even.Histo1D({("h_plus_"+suffix).c_str(),  ("Template Helicity +1 (" + label + ");x;Events").c_str(), nBins, xMin, xMax}, var_sgn, w_plus);
+    // H+ filled from all events (even and odd combined for better statistics)
+    auto h_plus_ptr  = df_valid.Histo1D({("h_plus_"+suffix).c_str(),  ("Template Helicity +1 (" + label + ");x;Events").c_str(), nBins, xMin, xMax}, var_sgn, w_plus);
     
-    // H- filled from Odd events
-    auto h_minus_ptr = df_odd.Histo1D({("h_minus_"+suffix).c_str(), ("Template Helicity -1 (" + label + ");x;Events").c_str(), nBins, xMin, xMax}, var_sgn, w_minus);
+    // H- filled from all events (even and odd combined for better statistics)
+    auto h_minus_ptr = df_valid.Histo1D({("h_minus_"+suffix).c_str(), ("Template Helicity -1 (" + label + ");x;Events").c_str(), nBins, xMin, xMax}, var_sgn, w_minus);
 
     // Clone and detach from RDataFrame
     TH1D *h_plus  = (TH1D*)h_plus_ptr->Clone(("h_template_"+suffix+"_plus").c_str());
@@ -64,9 +64,9 @@ void create_templates() {
     double xMax = 1.0; 
 
     // RP_costheta binning settings
-    double cos_min = -1.0;
-    double cos_max = 1.0;
-    double step = 0.2;
+    double cos_min = -0.95;
+    double cos_max = 0.95;
+    double step = 0.19;
     
     // Open Dataframe
     ROOT::EnableImplicitMT(); // Enable multi-threading for speed

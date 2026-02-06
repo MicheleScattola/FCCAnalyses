@@ -18,6 +18,11 @@
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_17.txt templates_17.root templates.py
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_18.txt templates_18.root templates.py
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_19.txt templates_19.root templates.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_20.txt templates_20.root templates.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_21.txt templates_21.root templates.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_22.txt templates_22.root templates.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_23.txt templates_23.root templates.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/templates_24.txt templates_24.root templates.py
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_0.txt output_0.root analysis.py
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_1.txt output_1.root analysis.py
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_2.txt output_2.root analysis.py
@@ -38,3 +43,8 @@
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_17.txt output_17.root analysis.py
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_18.txt output_18.root analysis.py
 /afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_19.txt output_19.root analysis.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_20.txt output_20.root analysis.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_21.txt output_21.root analysis.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_22.txt output_22.root analysis.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_23.txt output_23.root analysis.py
+/afs/cern.ch/user/s/scattola/FCCAnalyses/scripts/analysis/RECO/angular_analysis/lists/data_24.txt output_24.root analysis.py

@@ -10,10 +10,15 @@ output                = logs/job.$(ClusterId).$(ProcId).out
 error                 = logs/job.$(ClusterId).$(ProcId).err
 log                   = logs/job.$(ClusterId).$(ProcId).log
 
+# priority
+#accounting_group = group_u_FCC.local_gen
+#accounting_group_user = scattola
+
 # Resources
 request_cpus          = 2
 request_memory        = 12GB
-+JobFlavour           = "espresso" 
+#+JobFlavour           = "microcentury" 
++MaxRuntime           = 1800 
 
 # --- QUEUE LOGIC ---
 # This tells Condor: Read "job_manifest.txt".
