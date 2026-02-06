@@ -1,0 +1,87 @@
+rho_mass_reject_1 Histogram
+========================================
+   Bin       Category        Entries
+------------------------------------
+     0          other          15066
+     1          muons          11667
+     2      electrons          14506
+     3          pions          53985
+     4            rho         259117
+     5             a1          87351
+------------------------------------
+Total entries: 441692
+Background (non-rho): 182575
+Rejection Efficiency: 0.413354
+
+========================================
+rho_mass_reject_2 Histogram
+========================================
+   Bin       Category        Entries
+------------------------------------
+     0          other          53947
+     1          muons             69
+     2      electrons             76
+     3          pions           1285
+     4            rho         304736
+     5             a1         386483
+------------------------------------
+Total entries: 746596
+Background (non-rho): 441860
+Rejection Efficiency: 0.591833
+
+========================================
+a1_mass_reject Histogram
+========================================
+   Bin       Category        Entries
+------------------------------------
+     0          other          21127
+     1          muons            144
+     2      electrons            150
+     3          pions          20140
+     4            rho          38036
+     5             a1          69585
+------------------------------------
+Total entries: 149182
+Background (non-a1): 79597
+Rejection Efficiency: 0.533556
+
+========================================
+rho_angle_reject_1 Histogram
+========================================
+   Bin       Category        Entries
+------------------------------------
+     0          other           5308
+     1          muons          10283
+     2      electrons          12597
+     3          pions          17030
+     4            rho         388401
+     5             a1          62124
+------------------------------------
+Total entries: 495743
+Background (non-rho): 107342
+Rejection Efficiency: 0.216528
+
+========================================
+rho_angle_reject_2 Histogram
+========================================
+   Bin       Category        Entries
+------------------------------------
+     0          other           1784
+     1          muons             23
+     2      electrons             24
+     3          pions            535
+     4            rho          36759
+     5             a1          11852
+------------------------------------
+Total entries: 50977
+Background (non-rho): 14218
+Rejection Efficiency: 0.278910
+
+========================================
+SUMMARY
+========================================
+rho_mass_reject_1: Background/Total = 182575/441692 = 0.413354
+rho_mass_reject_2: Background/Total = 441860/746596 = 0.591833
+a1_mass_reject: Background/Total = 79597/149182 = 0.533556
+rho_angle_reject_1: Background/Total = 107342/495743 = 0.216528
+rho_angle_reject_2: Background/Total = 14218/50977 = 0.278910

@@ -1,0 +1,5 @@
+label	entries_plus	entries_minus
+Pions	7.76882e+06	7.76928e+06
+Muons	7.22824e+06	7.23401e+06
+Electrons	7.30641e+06	7.30611e+06
+Rho	1.14806e+07	1.14821e+07

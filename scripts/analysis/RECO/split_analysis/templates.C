@@ -6,6 +6,7 @@
 #include "TString.h"
 #include "TFile.h"
 #include <iostream>
+#include <fstream>
 #include <string>
 
 void create_and_save(ROOT::RDF::RNode df, 
@@ -16,6 +17,7 @@ void create_and_save(ROOT::RDF::RNode df,
                      const std::string& label, 
                      const std::string& suffix, 
                      const char* outdir,
+                     std::ostream& log_stream,
                      int nBins, double xMin, double xMax) {
 
     // We filter the dataframe based on the entry number.
@@ -41,7 +43,11 @@ void create_and_save(ROOT::RDF::RNode df,
     TH1D *h_minus = (TH1D*)h_minus_ptr->Clone(("h_template_"+suffix+"_minus").c_str());
 
     // Print histogram entry counts
-    std::cout << "[INFO] " << label << " - h_plus entries: " << h_plus->GetEntries() << ", h_minus entries: " << h_minus->GetEntries() << std::endl;
+    const double entries_plus = h_plus->GetEntries();
+    const double entries_minus = h_minus->GetEntries();
+    std::cout << "[INFO] " << label << " - h_plus entries: " << entries_plus
+              << ", h_minus entries: " << entries_minus << std::endl;
+    log_stream << label << "\t" << entries_plus << "\t" << entries_minus << std::endl;
 
     // Safety check for empty histograms (NaN protection)
     if (h_plus->Integral() <= 0 || h_minus->Integral() <= 0) {
@@ -123,28 +129,35 @@ void templates() {
     TString rootOutName = TString(outdir2) + "templates_histograms.root";
     TFile *fOut = new TFile(rootOutName, "RECREATE");
 
+    // Open text log for entry counts
+    const std::string counts_path = std::string(outdir) + "templates_entries.txt";
+    std::ofstream counts_file(counts_path);
+    counts_file << "label\tentries_plus\tentries_minus" << std::endl;
+
     // Processing Pions
     std::cout << "Processing Pions..." << std::endl;
-    create_and_save(df, fOut, "pi_sgn", "w_plus_pi", "w_minus_pi", "Pions", "pi", outdir, nBins, xMin, xMax);
+    create_and_save(df, fOut, "pi_sgn", "w_plus_pi", "w_minus_pi", "Pions", "pi", outdir, counts_file, nBins, xMin, xMax);
 
     // Processing Muons
     std::cout << "Processing Muons..." << std::endl;
-    create_and_save(df, fOut, "mu_sgn", "w_plus_mu", "w_minus_mu", "Muons", "mu", outdir, nBins, xMin, xMax);
+    create_and_save(df, fOut, "mu_sgn", "w_plus_mu", "w_minus_mu", "Muons", "mu", outdir, counts_file, nBins, xMin, xMax);
 
     // Processing Electrons
     std::cout << "Processing Electrons..." << std::endl;
-    create_and_save(df, fOut, "el_sgn", "w_plus_el", "w_minus_el", "Electrons", "el", outdir, nBins, xMin, xMax);
+    create_and_save(df, fOut, "el_sgn", "w_plus_el", "w_minus_el", "Electrons", "el", outdir, counts_file, nBins, xMin, xMax);
 
     // Processing Rho 
     // IMPORTANT: Add NaN filter for Rho to prevent the "Empty Histogram" crash
     std::cout << "Processing Rho..." << std::endl;
     auto df_rho_clean = df.Filter("!std::isnan(rho_sgn[0])", "NaN Filter Rho");
-    create_and_save(df_rho_clean, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, 40, -1, 1);
+    create_and_save(df_rho_clean, fOut, "rho_sgn", "w_plus_rho", "w_minus_rho", "Rho", "rho", outdir, counts_file, 40, -1, 1);
 
 
     // Close file
     fOut->Close();
+    counts_file.close();
 
     std::cout << "\n[INFO] All Split-Sample templates created and saved in: " << rootOutName << std::endl;
     std::cout << "[INFO] PDFs saved in: " << outdir << std::endl;
+    std::cout << "[INFO] Entry counts saved in: " << counts_path << std::endl;
 }

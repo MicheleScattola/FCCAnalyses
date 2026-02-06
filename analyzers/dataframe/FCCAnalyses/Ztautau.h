@@ -259,7 +259,7 @@ RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type,
                          const int n_photons, const bool bool_ph);
 
 RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
-                    const int n_photons);
+                    const int n_photons, const bool bool_ph);
 
 // =========================================
 // NOT IN USE

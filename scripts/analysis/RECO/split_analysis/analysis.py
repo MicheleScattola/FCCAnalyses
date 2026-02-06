@@ -117,8 +117,18 @@ class RDFanalysis():
                 .Define("rho_mass_reject_1","Ztautau::get_debug_mass(myEvent,4,1,true)")
                 .Define("rho_mass_reject_2","Ztautau::get_debug_mass(myEvent,4,2,true)")
                 .Define("a1_mass_reject","Ztautau::get_debug_mass(myEvent,5,1,false)")
-                .Define("rho_angle_reject_1","Ztautau::get_debug(myEvent,4,1)")
-                .Define("rho_angle_reject_2","Ztautau::get_debug(myEvent,4,2)")
+                .Define("rho_angle_reject_1","Ztautau::get_debug(myEvent,4,1,true)")
+                .Define("rho_angle_reject_2","Ztautau::get_debug(myEvent,4,2,true)")
+                
+				# MC invariant mass
+				.Define("MC_rho_m","Ztautau::get_MCdaughter_mass(myEvent,4,true,4,false)")
+				.Define("MC_a1_m","Ztautau::get_MCdaughter_mass(myEvent,5,true,5,false)")
+                # Reco invariant mass
+				.Define("reco_rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
+				.Define("reco_a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
+                # confront invariant mass in reco and MC - diagonal elements of confusion matrix
+				.Define("rho_pull","Ztautau::get_mass_pull(myEvent,4,true,4,true)")
+				.Define("a1_pull","Ztautau::get_mass_pull(myEvent,5,true,5,true)")
                 
 				
                 
@@ -146,6 +156,12 @@ class RDFanalysis():
             "a1_mass_reject",
             "rho_angle_reject_1",
 			"rho_angle_reject_2",
+            "MC_rho_m",
+			"MC_a1_m",	
+            "reco_rho_m",
+			"reco_a1_m",
+			"rho_pull",	
+			"a1_pull",
             
             
 		

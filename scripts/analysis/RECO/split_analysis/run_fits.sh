@@ -25,5 +25,9 @@ echo ">>> 5. Generating invariant mass plots..."
 
 root -l -b -q ../additional/mass.C
 
+#echo ">>> 6. calculating rejecetion efficiencies.."
+
+root -l -b -q rho_rejection_efficiency.C
+
 
 echo ">>> DONE."

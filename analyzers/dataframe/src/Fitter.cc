@@ -16,8 +16,38 @@
 #include "TObjArray.h"
 #include "TPaveText.h"
 #include "TStyle.h"
+#include <fstream>
 
 namespace Fitter {
+
+namespace {
+void append_data_entries_log(const std::string &outdir,
+                             const std::string &label,
+                             double entries) {
+  if (outdir.empty()) {
+    return;
+  }
+
+  const std::string log_path = outdir + "data_hist_entries.txt";
+  bool needs_header = true;
+  std::ifstream check_in(log_path);
+  if (check_in.good() && check_in.peek() != std::ifstream::traits_type::eof()) {
+    needs_header = false;
+  }
+
+  std::ofstream log_out(log_path, std::ios::app);
+  if (!log_out.good()) {
+    std::cerr << "[Fitter] Warning: Cannot open log file: " << log_path
+              << std::endl;
+    return;
+  }
+
+  if (needs_header) {
+    log_out << "label\tentries" << std::endl;
+  }
+  log_out << label << "\t" << entries << std::endl;
+}
+} // namespace
 
 // =========================================================
 // INTERNAL HELPERS
@@ -636,6 +666,7 @@ myFit fit(const std::string &infile_data, const std::string &infile_templates,
   TH1D *h_data = (TH1D *)h_data_ptr->Clone("data");
   h_data->SetDirectory(0);
   h_data->Sumw2();
+  append_data_entries_log(outdir, dataColName, h_data->GetEntries());
 
   // linear fit with functor
   TemplateFunctor functor(h_plus, h_minus);

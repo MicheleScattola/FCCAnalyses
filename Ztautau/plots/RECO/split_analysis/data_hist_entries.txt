@@ -1,0 +1,9 @@
+label	entries
+rho_sgn	2.29615e+07
+pi_sgn	1.55496e+07
+mu_sgn	1.44593e+07
+el_sgn	1.46115e+07
+rho_sgn	2.29615e+07
+pi_sgn	1.55496e+07
+mu_sgn	1.44593e+07
+el_sgn	1.46115e+07
