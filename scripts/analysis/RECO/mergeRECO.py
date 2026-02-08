@@ -2,9 +2,8 @@ import os
 import subprocess
 
 # Paths for MC
-base_path = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/"
+base_path = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker/"
 data_dir = os.path.join(base_path, "p8_ee_Ztautau_ecm91")
-temp_dir = os.path.join(base_path, "templates/p8_ee_Ztautau_ecm91")
 
 def merge_and_clean(target_dir):
     output_file = f"{target_dir}.root"
@@ -23,4 +22,3 @@ def merge_and_clean(target_dir):
 
 # Run for both data and templates
 merge_and_clean(data_dir)
-merge_and_clean(temp_dir)

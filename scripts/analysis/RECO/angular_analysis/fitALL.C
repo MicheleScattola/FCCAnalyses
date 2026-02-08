@@ -32,9 +32,10 @@ void fitALL() {
     const std::string treeName = "events";
 
     // RP_costheta binning settings
-    double cos_min = -0.95;
-    double cos_max = 0.95;
-    double step = 0.19;
+    const double cos_min = -0.95;
+    const double cos_max = 0.95;
+    const int n_costheta_bins = 20;
+    const double step = (cos_max - cos_min) / n_costheta_bins;
 
     std::cout << ">>> Starting Polarization Fits on RP_costheta bins..." << std::endl;
     std::cout << ">>> Using merged data file: " << merged_data_file << std::endl;
@@ -50,15 +51,14 @@ void fitALL() {
                        err_el(0), err_mu(0), err_pi(0), err_rho(0) {}
     };
     
-    const int n_bins = static_cast<int>((cos_max - cos_min) / step);
-    std::vector<BinResults> results_per_bin(n_bins);
+    std::vector<BinResults> results_per_bin(n_costheta_bins);
 
     // =========================================================================
     // 3. LOOP OVER RP_costheta BINS
     // =========================================================================
     
-    int bin_index = 0;
-    for (double bin_low = cos_min; bin_low < cos_max; bin_low += step) {
+    for (int bin_index = 0; bin_index < n_costheta_bins; ++bin_index) {
+        double bin_low = cos_min + bin_index * step;
         double bin_high = bin_low + step;
         
         std::cout << "\n========================================" << std::endl;
@@ -150,7 +150,6 @@ void fitALL() {
         }
         
         std::cout << "  Bin " << bin_index << " processing completed." << std::endl;
-        bin_index++;
     }
 
     // =========================================================================
@@ -189,8 +188,8 @@ void fitALL() {
     if (fAvg) fAvg->Close();
     
 
-    bin_index = 0;
-    for (double bin_low = cos_min; bin_low < cos_max; bin_low += step) {
+    for (int bin_index = 0; bin_index < n_costheta_bins; ++bin_index) {
+        double bin_low = cos_min + bin_index * step;
         double bin_high = bin_low + step;
         double bin_center = (bin_low + bin_high) / 2.0;
         double bin_width = (bin_high - bin_low) / 2.0; // half width for error bars
@@ -203,9 +202,9 @@ void fitALL() {
         std::vector<double> P_errors = {bin_results.err_el, bin_results.err_mu, bin_results.err_pi, bin_results.err_rho};
         
         // Use segmented analysis errors for the quadratic sum in the weighted average
-        if (use_segmented_errors) {
+        /*if (use_segmented_errors) {
             P_errors = {std_el, std_mu, std_pi, std_rho};
-        }
+        }*/
         
         // Store individual channel results
         if (bin_results.err_el > 0) {

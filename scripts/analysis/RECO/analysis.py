@@ -3,7 +3,7 @@
 
 #List of processes
 processList = {
-    'p8_ee_Ztautau_ecm91':{'fraction':0.1 , 'chunks':20},
+    'p8_ee_Ztautau_ecm91':{'fraction':0.1, 'chunks':10}
 }
 
 #Mandatory: Production tag when running over EDM4Hep centrally produced events, this points to the yaml files for getting sample statistics
@@ -12,7 +12,7 @@ processList = {
 procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 #output directory
-outputDir = "/eos/user/s/scattola/FCCAnalyses/Ztautau/treemaker/RECO/"
+outputDir = "/afs/cern.ch/user/s/scattola/FCCAnalyses/Ztautau/treemaker"
 outputName = "p8_ee_Ztautau_ecm91"
 #input directory
 inputDir    = "/eos/experiment/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
@@ -95,43 +95,13 @@ class RDFanalysis():
 				#####
 				# EVENTS IDENTIFICATION
 				#####
-				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,RP_thrustcostheta,RP_thrustphi)")
+				.Define("myEvent","Ztautau::myget_event(Muon0,Electron0,Pion0,Photon0,rps,RP_thrustangle,Particle,Particle1,rp2mc_idx,EVT_thrust)")
+				.Define("rho_true","Ztautau::get_reco_x(myEvent,4,true,4,true)")
+				.Define("rho_fake","Ztautau::get_reco_x(myEvent,3,true,4,true)")
                 
-				.Define("event_type_reco","Ztautau::get_type_safe(myEvent,true)")
-                .Define("event_type_reco_noMassCheck","Ztautau::get_type_safe(myEvent,false)")
-				
-				#####
-				# MC IDENTIFICATION
-				#####
-                .Define("MC_event","RVec<int> {myEvent[0].mc_type,myEvent[1].mc_type}")
-                
-				# masks for later cuts and selections
-				#.Define("pi_mask", "Ztautau::get_pi_mask(myEvent)")
-				#.Define("weight_mask", "Ztautau::get_weight_mask(myEvent)")
-                
-				#APPLYING INV MASS CHECK:
-				# pi signal
-				.Define("pi_sgn","Ztautau::get_hadron_e(myEvent,3,false,3,true)/45.5")
-				# lepton signals
-                .Define("el_sgn","Ztautau::get_lepton_e(myEvent,2,false,2,true,true,false)/45.5")
-                .Define("mu_sgn","Ztautau::get_lepton_e(myEvent,1,false,1,true,true,false)/45.5")
-				# rho signal
-                .Define("rho_sgn","Ztautau::get_omega_rho(myEvent,4,false,4,true,true,false)")
-
-				# MC invariant mass
-				.Define("MC_rho_m","Ztautau::get_MCdaughter_mass(myEvent,4,true,4,false)")
-				.Define("MC_a1_m","Ztautau::get_MCdaughter_mass(myEvent,5,true,5,false)")
-                # Reco invariant mass
-				.Define("reco_rho_m","Ztautau::get_invariant_mass(myEvent,4,false,4,true)")
-				.Define("reco_a1_m","Ztautau::get_invariant_mass(myEvent,5,false,5,true)")
-				.Define("reco_pi_m","Ztautau::get_invariant_mass(myEvent,3,false,3,true)")
-                # confront invariant mass in reco and MC - diagonal elements of confusion matrix
-				.Define("rho_pull","Ztautau::get_mass_pull(myEvent,4,true,4,true)")
-				.Define("a1_pull","Ztautau::get_mass_pull(myEvent,5,true,5,true)")
-                
-				# debug mass 
-                .Define("rho_reject","Ztautau::get_debug_mass(myEvent,4)")
-                .Define("a1_reject","Ztautau::get_debug_mass(myEvent,5)")
+				.Define("e_sys","Ztautau::lep_system(myEvent,2)")	
+				.Define("mu_sys","Ztautau::lep_system(myEvent,1)")
+				#.Define("pi_sys","Ztautau::lep_system(myEvent,3)")
 
 				  
                 )
@@ -145,24 +115,10 @@ class RDFanalysis():
     #Mandatory: output function, please make sure you return the branchlist as a python list
     def output():
         branchList = [
-        	"MC_event",
-        	"event_type_reco",
-            "event_type_reco_noMassCheck",
-        	"pi_sgn",
-			"mu_sgn",
-			"el_sgn",
-            "rho_sgn",
-            "RP_thrustcostheta",
-			"RP_thrustphi",
-			"reco_rho_m",
-			"reco_a1_m",
-			"reco_pi_m",
-			"MC_rho_m",
-			"MC_a1_m",
-			"rho_pull",
-			"a1_pull",
-            "rho_reject",
-			"a1_reject"
+        	"e_sys",
+			"mu_sys",
+			"rho_true",
+			"rho_fake"
 		
         	
         	]

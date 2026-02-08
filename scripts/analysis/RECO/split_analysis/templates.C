@@ -113,9 +113,9 @@ void templates() {
     
     std::string treeName = "events"; 
     
-    int nBins = 38;
+    int nBins = 40;
     double xMin = 0.05;
-    double xMax = 1.0; 
+    double xMax = 1.05; 
 
     // Style
     gStyle->SetOptStat(0); 

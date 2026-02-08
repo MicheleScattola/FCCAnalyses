@@ -843,7 +843,7 @@ void lepton_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
   ev.mc_daughterMass = p4_lep_lab.M();
 
   double lep_energy = p4_lep_lab.E();
-  // add photons if event is electron decay
+  /* add photons if event is electron decay
   if (ev.mc_type == 2) {
     for (int i = pb; i < pe; i++) {
       int dau_idx = daughters[i];
@@ -856,9 +856,9 @@ void lepton_weight(myEvent &ev, const RVec<edm4hep::MCParticleData> &mc,
         lep_energy += p4_photon.E();
       }
     }
-  }
+  }*/
 
-  double x = lep_energy / E_TAU;
+  double x = lep_energy / p4_tau_lab.E();
 
   double a = (5.0 - 9.0 * x * x + 4.0 * x * x * x);
   double b = (1.0 - 9.0 * x * x + 8.0 * x * x * x);
@@ -1541,6 +1541,38 @@ RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
   }
   return out;
 }
+
+// check lepton systematics
+RVec<double> lep_system(const RVec<myEvent> &evs, const int reco_type) {
+
+  RVec<double> out;
+
+  for (const auto &e : evs) {
+    // check reco event
+    if( e.m_type == reco_type){
+
+      double reco_e = 0.0;
+      double mc_e = 0.0;
+      if(e.n_el > 0 && e.mc_type == reco_type){
+        reco_e = e.m_omega;
+        mc_e = e.mc_omega;
+      }
+      else if(e.n_mu > 0 && e.mc_type == reco_type){
+        reco_e = e.m_omega;
+        mc_e = e.mc_omega;
+      }
+      else if(e.n_pi > 0){
+        reco_e = e.m_piP4[0].E();
+        mc_e = e.mc_piP4.E();
+      }
+
+      out.push_back((reco_e - mc_e)/mc_e);
+    }
+  }
+  return out;
+}
+
+
 
 // =========================================
 // NOT IN USE

@@ -261,6 +261,8 @@ RVec<int> get_debug_mass(const RVec<myEvent> &evs, const int reco_type,
 RVec<int> get_debug(const RVec<myEvent> &evs, const int reco_type,
                     const int n_photons, const bool bool_ph);
 
+// check lepton systematics
+RVec<double> lep_system(const RVec<myEvent> &evs, const int reco_type);
 // =========================================
 // NOT IN USE
 // =========================================

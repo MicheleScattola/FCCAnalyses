@@ -64,17 +64,18 @@ void create_templates() {
     double xMax = 1.0; 
 
     // RP_costheta binning settings
-    double cos_min = -0.95;
-    double cos_max = 0.95;
-    double step = 0.19;
+    const double cos_min = -0.95;
+    const double cos_max = 0.95;
+    const int n_costheta_bins = 20;
+    const double step = (cos_max - cos_min) / n_costheta_bins;
     
     // Open Dataframe
     ROOT::EnableImplicitMT(); // Enable multi-threading for speed
     ROOT::RDataFrame df(treeName, infile);
 
     // Loop over RP_costheta bins
-    int bin_index = 0;
-    for (double bin_low = cos_min; bin_low < cos_max; bin_low += step) {
+    for (int bin_index = 0; bin_index < n_costheta_bins; ++bin_index) {
+        double bin_low = cos_min + bin_index * step;
         double bin_high = bin_low + step;
         
         std::cout << "\n========================================" << std::endl;
@@ -121,8 +122,8 @@ void create_templates() {
 
         std::cout << "\n[INFO] Template histograms for bin " << bin_index << " saved in: " << rootOutName << std::endl;
         
-        bin_index++;
     }
     
-    std::cout << "\n[INFO] All template histograms created across " << bin_index+1 << " RP_costheta bins." << std::endl;
+    std::cout << "\n[INFO] All template histograms created across " << n_costheta_bins
+              << " RP_costheta bins." << std::endl;
 }
