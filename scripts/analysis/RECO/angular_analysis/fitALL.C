@@ -266,7 +266,6 @@ void fitALL() {
             std::cout << "Bin " << bin_index << " [" << bin_low << ", " << bin_high << "): No valid results" << std::endl;
         }
 
-        bin_index++;
     }
 
     std::cout << "========================================\n" << std::endl;
