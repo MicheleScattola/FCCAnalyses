@@ -1,3 +1,11 @@
+// -*- C++ -*-
+//
+/** FCCAnalysis module: Z -> tau tau events
+ *
+ * \file Ztautau.cc
+ * \author Michele Scattola <michele.scattola@studenti.unimi.it>
+ */
+
 #include "FCCAnalyses/Fitter.h"
 
 // ROOT Includes

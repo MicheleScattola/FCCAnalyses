@@ -1,6 +1,14 @@
 #ifndef FITTER_H
 #define FITTER_H
 
+// -*- C++ -*-
+//
+/** FCCAnalysis module: Z -> tau tau events
+ *
+ * \file Ztautau.cc
+ * \author Michele Scattola <michele.scattola@studenti.unimi.it>
+ */
+
 #include <iostream>
 #include <string>
 #include <vector>
