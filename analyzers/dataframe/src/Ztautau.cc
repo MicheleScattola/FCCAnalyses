@@ -127,7 +127,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
                                 p4_tot.Py() * thrust_y + 
                                 p4_tot.Pz() * thrust_z;
 
-    // Assign signed costheta: positive if aligned, negative if anti-aligned
+    // Assign signed costheta
     ev.thrust_costheta_hemi =
         (dot_product >= 0) ? thrust_costheta : -thrust_costheta;
 
@@ -170,6 +170,7 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         const auto &dau = mc[dau_idx];
         dau_pdgs.push_back(abs(dau.PDG));
 
+        // if tau has tau daughter it's not final!
         if (abs(dau.PDG) == 15) {
           tau_not_final = true;
           // exit
@@ -177,7 +178,6 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
         }
       }
 
-      // if tau has tau daughter skip this particle, it's not final tau
       if (tau_not_final)
         continue;
 
@@ -235,7 +235,6 @@ RVec<myEvent> myget_event(const RVec<int> &mu_ids, const RVec<int> &el_ids,
     if (ev.m_RecoMass > 2) {
       ev.m_debug_mass = 1; // high mass
 
-      // do not store type = 0 to check which events are rejected by rho case
     }
 
     // if negative weights reset type to 0

@@ -18,18 +18,6 @@ struct myFit {
 };
 
 // =========================================================
-// OLD METHOD: FRACTION FIT (Fit N+, N- then Error Prop)
-// =========================================================
-myFit fit_fraction(const std::string &infile_data,
-                   const std::string &infile_templates,
-                   const std::string &outdir,
-                   const std::string &output_filename,
-                   const std::string &treeName, const std::string &dataColName,
-                   const std::string &name_plus, const std::string &name_minus,
-                   const std::string &plot_title,
-                   const std::string &x_axis_title);
-
-// =========================================================
 // TEMPLATE FIT (generic)
 // =========================================================
 myFit fit(const std::string &infile_data, const std::string &infile_templates,

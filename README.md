@@ -1,23 +1,44 @@
 
-## $Z \rightarrow \tau \tau$ analysis
+# $Z \rightarrow \tau \tau$ analysis
 Analysis performed by Michele Scattola, if you have any questions don't hesitate to write at michele.scattola@studenti.unimi.it
 
 The overall code structure is the following:
-- personalized functions are stored in `FCCAnalyses/analyzer/dataframe/src/Ztautau.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Ztautau.h` . Further specifications are explained in the file FUNCTIONS.md
+- personalized functions are stored in `FCCAnalyses/analyzer/dataframe/src/Ztautau.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Ztautau.h` . Further specifications are explained in the file **`FUNCTIONS.md`** .
 - fitting functions are stored in `FCCAnalyses/analyzer/dataframe/src/Fitter.cc` and `FCCAnalyses/analyzer/dataframe/FCCAnalyses/Fitter.h` .
-The methods applied are explained in the file FITTING.md
-- analysis scripts are stored in 'FCCAnalyses/scripts/analysis' in folders 'MC' and 'RECO' for Monte Carlo or Reconstructed analysis
-- both analysis folder feature a 'split_analysis' section where the templates and data events are collected from indipendent event samples
-- `/FCCAnalyses/Ztautau/plots` contains all the created plots for MC and RECO
+The methods applied are explained in the file **`FITTING.md`** .
+- analysis scripts are stored in `FCCAnalyses/scripts/analysis` in folders `/MC` and `/RECO` for Monte Carlo or Reconstructed analysis.
+- both analysis folder feature a `/split_analysis` section where the templates and data events are collected from indipendent event samples.
+- `/FCCAnalyses/Ztautau/plots` contains all the created plots for MC and RECO.
 
-## RECO analysis
-# Split analysis:
+### Usage:
+**Tip:** in order to understand more easily the workflow I suggest starting from the bash scripts `run_fits.sh` which are present in most of the analysis folders.
+
+As with most of the code it won't easily be applicable outside of the FCCAnalyses setup. The code was developed for a specific *key4hep* stack version, which should always be the version sourced on lxplus machines. The version depends on the dataset used, but it should be clearly labelled:
+https://fcc-physics-events.web.cern.ch/fcc-ee/rec/winter2023/IDEA
+For my `p8_ee_Ztautau_ecm91` data the stack is obtainable via
+```
+source /cvmfs/sw.hsf.org/spackages6/key4hep-stack/2022-12-23/x86_64-centos7-gcc11.2.0-opt/ll3gi/setup.sh
+```
+
+I highly suggest to go through the tutorial for a better understanding of the FCCAnalyses framework ([FCC tutorial](https://hep-fcc.github.io/fcc-tutorials/main/index.html)).
+
+
+
+# RECO analysis
+## /split_analysis:
 This folder produces an analysis over $20 \times 10^6$ events for both templates and data. The events are taken from indipendent samples via python scripts and convenient condor queuing system.
-# Segmented analysis:
+## /segmented_analysis:
 This folder produces a repeated analysis with $20 \times 10^6$ events for templates and $1 \times 10^6$ events for data. The polarization analysis is perfomed over 80 different sets of data, in order to calculate the standard deviation of the fitting results.
+## /angular_analysis:
+This folder produces an analysis of the datasets binned by angular production, providing the fits for the leptonic universality test.
+## /confusion:
+This folder produces the plots for confusion matrices and background contamination of the reconstruction performed.
 
-## MC analysis
-This section provides the same analysis ad 'RECO/split_analysis/' but on Monte Carlo data.
+# MC analysis
+This section provides the same analysis ad 'RECO/split_analysis/' but on Montecarlo data.
+
+======================== end of my work
+
 # FCCAnalyses
 
 [![DOI](https://zenodo.org/badge/177151745.svg)](https://zenodo.org/doi/10.5281/zenodo.4767810)
@@ -64,5 +85,3 @@ To apply formatting to a given file:
 ```
 clang-format -i -style=file /path/to/file.cpp
 ```
-
-## Test 1
