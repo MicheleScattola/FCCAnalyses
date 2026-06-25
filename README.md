@@ -16,8 +16,25 @@ The methods applied are explained in the file **`FITTING.md`** .
 As with most of the code it won't easily be applicable outside of the FCCAnalyses setup. The code was developed for a specific *key4hep* stack version, which should always be the version sourced on lxplus machines. The version depends on the dataset used, but it should be clearly labelled:
 https://fcc-physics-events.web.cern.ch/fcc-ee/rec/winter2023/IDEA
 For my `p8_ee_Ztautau_ecm91` data the stack is obtainable via
-```
+```bash
 source /cvmfs/sw.hsf.org/spackages6/key4hep-stack/2022-12-23/x86_64-centos7-gcc11.2.0-opt/ll3gi/setup.sh
+```
+
+*JUNE 2026 NOTE:*
+It seems that the update to AlmaLinux9 machines broke down the software stack used prior.
+In order to compile now clean up the local install open up a **new** shell and source an intermediate version:
+```bash
+source /cvmfs/sw.hsf.org/key4hep/setup.sh -r 2024-03-10
+```
+cleanup the old install and re-build
+```bash
+cd ~/path/to/FCCAnalyses
+rm -rf build/
+rm -rf install/
+mkdir build install
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=../install
+make install -j 4
 ```
 
 I highly suggest to go through the tutorial for a better understanding of the FCCAnalyses framework ([FCC tutorial](https://hep-fcc.github.io/fcc-tutorials/main/index.html)).

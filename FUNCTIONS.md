@@ -6,7 +6,7 @@ The analysis creates instances of a `struct myEvent`. These hold information abo
 
 ### struct myEvent
 - Reconstructed (RECO) information is stored in the following variables:
-  ```
+  ```c++
   // RECO
   int n_mu = 0, n_el = 0, n_pi = 0, n_ph = 0; // particle counts
   double m_RecoCharge = 0.;                   // total charge in hemisphere
@@ -21,7 +21,7 @@ The analysis creates instances of a `struct myEvent`. These hold information abo
   ```
 
 - Montecarlo (MC) information stores in analogy:
-  ```
+  ```c++
   // MC
   int mc_tau_index = -1;        // tau MC index
   int mc_type = 0;              // event mc type
@@ -45,7 +45,7 @@ The analysis creates instances of a `struct myEvent`. These hold information abo
   ```
 
 - Some debug variables which I found useful during my work:
-  ```
+  ```c++
   // debug
   int m_debug = 0;
   int m_debug_mass = 0;
@@ -67,7 +67,7 @@ The event is reconstructed in the function `RVec<myEvent> myget_event`. It can b
 ### Miscellaneous
 - The function `void reco_omega` takes care of calculating the optimal variable, depending on the assigned RECO event identification.
 - The function `void rho_weight` showed some unclear behaviour. In order to recover full sensitivity to the polarization the re-weighting variable should be the optimal variable $\omega$, however it produced very instable results. Only partial sensitivity is obtained in the current implementation, where the spin-analyzer is the angle between the rho and the tau, see:
-  ```
+  ```c++
   z = GetCosThetaStar(p4_tau_lab, p4_rho_lab);
   alpha = (SM_TAU * SM_TAU - 2 * mRho * mRho) / (SM_TAU * SM_TAU + 2 * mRho * mRho);
   ev.mc_weight_plus = (1 + alpha * z) / (1 + alpha * Ptau * z);
@@ -75,7 +75,7 @@ The event is reconstructed in the function `RVec<myEvent> myget_event`. It can b
   ```
   an optimal approach should implement instead
 
-  ```
+  ```c++
   ev.mc_weight_plus = = (1 + omega) / (1 + Ptau * omega);
   ev.mc_weight_minus = (1 - omega) / (1 + Ptau * omega);
   ```
